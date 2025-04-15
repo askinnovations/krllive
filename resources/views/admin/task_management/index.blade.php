@@ -286,7 +286,7 @@
                                     name="high_priority" 
                                     style="width: 3rem; height: 1.5rem;" 
                                     {{ old('high_priority') ? 'checked' : '' }}>
-                                <label class="form-check-label ms-2" for="highPriority" style="font-size: 1.1rem;">Yes</label>
+                                <label class="form-check-label ms-2" for="highPriority" style="font-size: 1.1rem;"></label>
                             </div>
                         </div>
 
