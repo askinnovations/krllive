@@ -89,8 +89,8 @@ Route::prefix('admin')->group(function () {
     Route::post('/update/{id}', [DriverController::class, 'update'])->name('admin.drivers.update');
     Route::get('/delete/{id}', [DriverController::class, 'destroy'])->name('admin.drivers.delete');
     });
-// attendance
-Route::prefix('attendance')->group( function(){
+   // attendance
+    Route::prefix('attendance')->group( function(){
     Route::get('/', [AttendanceController::class, 'index'])->name('admin.attendance.index');
     Route::post('/update', [AttendanceController::class, 'update'])->name('admin.attendance.update');
    });
@@ -110,13 +110,7 @@ Route::prefix('attendance')->group( function(){
 
    });
       
-    Route::get('/stock-transfer/index', [StockTransferController::class, 'index'])->name('admin.stock.index');
-
-   
-    
-    
-
-    // Orders Management
+   // Orders Management
     Route::prefix('orders')->group(function () {
         Route::get('/', [OrderController::class, 'index'])->name('admin.orders.index');
         Route::get('/create', [OrderController::class, 'create'])->name('admin.orders.create');
@@ -151,6 +145,9 @@ Route::prefix('attendance')->group( function(){
         Route::post('/update/{order_id}', [FreightBillController::class, 'update'])->name('admin.freight-bill.update');
         Route::delete('/delete/{order_id}', [FreightBillController::class, 'destroy'])->name('admin.freight-bill.delete');
     });
+
+    Route::get('/stock-transfer/index', [StockTransferController::class, 'index'])->name('admin.stock.index');
+
 
     
 });
