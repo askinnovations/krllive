@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>KRL New LR Format</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+   
+</head>
+
+<body>
+<style>
+        :root {
+            --primary: #ca2639;
+            --text: #2e2e2e;
+            --subtle-bg: #fafafa;
+            --border-color: #e1e1e1;
+            --light-gray: #f5f5f5;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Roboto', sans-serif;
+            background: var(--light-gray);
+            padding: 30px;
+            color: var(--text);
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: auto;
+            background: #fff;
+            padding: 30px;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+        }
+
+        header {
+            text-align: center;
+            padding-bottom: 20px;
+            border-bottom: 2px solid var(--primary);
+            margin-bottom: 30px;
+        }
+
+        header h2 {
+            color: var(--primary);
+            font-size: 26px;
+            margin-bottom: 6px;
+        }
+
+        header p {
+            font-size: 14px;
+            color: #444;
+        }
+
+        .flex {
+            display: flex;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .box {
+            flex: 1;
+            min-width: 200px;
+        }
+
+        .address-block {
+            background: var(--subtle-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            padding: 16px;
+            width: 48%;
+        }
+
+        .address-block h4 {
+            color: var(--primary);
+            font-size: 15px;
+            margin-bottom: 10px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 25px;
+            font-size: 14px;
+        }
+
+        th {
+            background: #f3f3f3;
+            color: #333;
+            font-weight: 500;
+            padding: 10px;
+            border: 1px solid var(--border-color);
+        }
+
+        td {
+            padding: 10px;
+            border: 1px solid var(--border-color);
+            text-align: center;
+            background: #fff;
+        }
+
+        .checkbox-line {
+            margin-top: 25px;
+            font-size: 14px;
+        }
+
+        .checkbox-line label {
+            margin-right: 20px;
+        }
+
+        .checkbox-line input[type="checkbox"] {
+            margin-left: 6px;
+            transform: scale(1.1);
+            accent-color: var(--primary);
+        }
+
+        .gst-note {
+            font-size: 13px;
+            margin-top: 20px;
+            padding: 12px 16px;
+            background: #fff7f8;
+            border-left: 4px solid var(--primary);
+            border-radius: 4px;
+            color: #444;
+        }
+
+        h3 {
+            font-size: 16px;
+            color: var(--primary);
+            margin: 30px 0 10px;
+        }
+
+        ol {
+            font-size: 13px;
+            padding-left: 18px;
+            color: #555;
+        }
+
+        ol li {
+            margin-bottom: 5px;
+        }
+
+        .footer {
+            text-align: right;
+            margin-top: 40px;
+            font-size: 15px;
+            color: var(--primary);
+            font-weight: 500;
+        }
+
+        .print-btn {
+            display: block;
+            margin: 40px auto 0;
+            padding: 12px 30px;
+            background-color: var(--primary);
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            font-size: 15px;
+            cursor: pointer;
+        }
+
+        @media (max-width: 600px) {
+            .address-block {
+                width: 100%;
+            }
+
+            .box {
+                flex: 100%;
+            }
+
+            .print-btn {
+                width: 100%;
+            }
+        }
+    </style>
+
+    <div class="container">
+        <header>
+            <div style="text-align: center; margin-bottom: 10px;">
+            <img src="{{ asset('backend/images/logo.png') }}" alt="Company Logo" style="max-height: 60px;">
+                
+              
+              </div>
+         
+            <p> Head Office : Khandelwal RoadLines, Opp. Abhinav Talkies, Ujjain Road, Dewas - 455001 </p>
+            <p>Mobile –9098733332, 9770533332 <br>
+                Offices - Mumbai : 9326145500, Indore : 9303188889</p>
+            <p>Email: krl@khandelwalroadlines.com | Website: www.khandelwalroadlines.com</p>
+        </header>
+
+        <section class="flex">
+            <div class="box">
+                <strong>CONSIGNEE COPY</strong><br />
+                <strong>AT OWNER’S RISK</strong>
+            </div>
+            <div class="box">
+                <p><strong>GSTIN / Transporter Id:</strong> 23AABFM6400F1ZX</p>
+                <p><strong>PAN:</strong> AABFM6400F</p>
+            </div>
+        </section>
+
+        <section class="flex">
+            <div class="box"><strong>L.R. NO:</strong>{{ $order->lr_number }}</div>
+            <div class="box"><strong>L.R. Dated:</strong>{{ $order->lr_date }}</div>
+            @php
+                $vehicle = collect($vehicles)->firstWhere('id', $order->vehicle_id);
+            @endphp
+
+            <div class="box"><strong>Vehicle:</strong> {{ $vehicle->vehicle_no ?? 'N/A' }}</div>
+            <div class="box"><strong>Vehicle Type:</strong> {{ $vehicle->vehicle_type ?? 'N/A' }}</div>
+
+            <div class="box"><strong>Delivery Mode:</strong> {{ $order->delivery_mode ?? 'N/A' }}</div>
+        </section>
+
+        <section class="flex">
+            <div class="box"><strong>FROM:</strong>{{ $order->from_location }}</div>
+            <div class="box"><strong>TO:</strong> {{ $order->to_location }}</div>
+            <div class="box">
+                <strong>GST to be paid by:</strong>
+                <input type="checkbox" /> Consignor
+                <input type="checkbox" /> Consignee
+            </div>
+        </section>
+
+        <p class="gst-note">
+            We are registered as GTA under sec 9 (3) of GST act 2017 & GST is liable to pay by recipient (consignor /
+            consignee) under RCM – notification No. 13/2017 CTR dated 28/06/2017
+        </p>
+
+        <section class="flex">
+            <div class="address-block">
+                <h4>CONSIGNOR’S NAME & ADDRESS</h4>
+               
+                <p>{{ $order->consignor->name ?? '-' }}</p>
+                           
+
+                <p>{{ $order->consignor_loading }}</p>
+                <p>GSTIN - {{ $order->consignor_gst }}</p>
+            </div>
+            <div class="address-block">
+                <h4>CONSIGNEE’S NAME & ADDRESS</h4>
+                <p>{{ $order->consignee->name ?? '-' }}</p>
+                <p>{{ $order->consignee_unloading }}</p>
+                <p>GSTIN - {{ $order->consignee_gst }}</p>
+            </div>
+        </section>
+
+        <table>
+            <thead>
+                <tr>
+                    
+                    <th>No. of Packages</th>
+                    <th>Method of Packing</th>
+                    <th>Description / Said to Contain</th>
+                    <th>Weight</th>
+                    <th>Actual Weight</th>
+                    <th>Charged Weight</th>
+                </tr>
+            </thead>
+            <tbody>
+                                    @php
+                            function toArray($value) {
+                                return is_array($value) ? $value : json_decode($value, true);
+                            }
+
+                            $packages_no = toArray($order->packages_no ?? []);
+                            $types = toArray($order->package_type ?? []);
+                            $descriptions = toArray($order->package_description ?? []);
+                            $weights = toArray($order->weight ?? []); // changed to lowercase
+                            $actualWeights = toArray($order->actual_weight ?? []);
+                            $chargedWeights = toArray($order->charged_weight ?? []);
+
+                            $rows = max(
+                                count($packages_no),
+                                count($types),
+                                count($descriptions),
+                                count($weights),
+                                count($actualWeights),
+                                count($chargedWeights)
+                            );
+                        @endphp
+
+                        @for($i = 0; $i < $rows; $i++)
+                            <tr>
+                                <td>{{ $packages_no[$i] ?? '' }}</td>
+                                <td>{{ $types[$i] ?? '' }}</td>
+                                <td>{{ $descriptions[$i] ?? '' }}</td>
+                                <td>{{ $weights[$i] ?? '' }}</td>
+                                <td>{{ $actualWeights[$i] ?? '' }}</td>
+                                <td>{{ $chargedWeights[$i] ?? '' }}</td>
+                            </tr>
+                        @endfor
+
+                </tbody>
+
+        </table>
+        @php
+    if (!function_exists('toArray')) {
+        function toArray($value) {
+            return is_array($value) ? $value : json_decode($value, true);
+        }
+    }
+
+    $ewayBills = toArray($order->eway_bill ?? []);
+    $validUpto = toArray($order->valid_upto ?? []);
+@endphp
+
+@for ($i = 0; $i < max(count($ewayBills), count($validUpto)); $i++)
+    <p style="margin-top: 3%;">
+        <strong>E-WAY BILL NO:</strong> {{ $ewayBills[$i] ?? '__________' }} &nbsp;&nbsp;
+        <strong>VALID UPTO:</strong> {{ $validUpto[$i] ?? '__________' }}
+    </p>
+@endfor
+
+
+
+
+        <div class="checkbox-line">
+            <strong>FREIGHT</strong>
+            <input type="checkbox" /> PAID
+            <input type="checkbox" /> TO PAY
+            <input type="checkbox" /> TO BE BILLED
+        </div>
+
+        <table class="small-table" style="width: 50%; margin-top: 15px;">
+            <tr>
+                <td>FREIGHT</td>
+                <td>{{ $order->freight_amount }}</td>
+            </tr>
+            <tr>
+                <td>LR CHARGES</td>
+                <td>{{ $order->lr_charges }}</td>
+            </tr>
+            <tr>
+                <td>HAMALI</td>
+                <td>{{ $order->hamali }}</td>
+            </tr>
+            <tr>
+                <td>OTHER CHARGES</td>
+                <td>{{ $order->other_charges }}</td>
+            </tr>
+            <tr>
+                <td>GST</td>
+                <td>{{ $order->gst_amount }}</td>
+            </tr>
+            <tr>
+                <td><strong>TOTAL FREIGHT</strong></td>
+                <td>{{ $order->total_freight }}</td>
+            </tr>
+            <tr>
+                <td>LESS ADVANCE</td>
+                <td>{{ $order->less_advance }}</td>
+            </tr>
+            <tr>
+                <td><strong>BALANCE FREIGHT</strong></td>
+                <td>{{ $order->balance_freight }}</td>
+            </tr>
+        </table>
+
+        <p style="margin-top: 2%;"><strong>Declared Value Rs.</strong>{{ $order->declared_value }}</p>
+
+        <section class="terms">
+            <h3>TERMS & CONDITIONS</h3>
+            <ol>
+                <li>No responsibility for leakage, breakage, shortage, damage due to rain, sun, or weather. Sender must
+                    pack properly.</li>
+                <li>Fresh fruits are transported at the risk of consignor/consignee as they may spoil en route.</li>
+                <li>Goods may be sent in one lot or in parts depending on convenience.</li>
+                <li>Delivery to consignee/agent on payment of all charges.</li>
+                <li>Delivery at destination company godown only unless otherwise agreed in writing.</li>
+                <li>Goods must be collected within 7 days of arrival. Delay incurs demurrage Rs.100/- per ton/day or per
+                    package/day, at owner’s risk.</li>
+                <li>Claims must be made within 15 days, else considered void.</li>
+                <li>No responsibility for delays/loss due to accident, strikes, riots, or natural calamities.</li>
+                <li>Disputes subject to Dewas (MP) jurisdiction only.</li>
+            </ol>
+        </section>
+
+        <div class="footer">
+            For Khandelwal RoadLines
+        </div>
+
+        <button class="print-btn" onclick="window.print()">Print LR / Consignment</button>
+    </div>
+    </body>
+
+</html>
