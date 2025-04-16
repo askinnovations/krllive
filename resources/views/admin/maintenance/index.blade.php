@@ -79,7 +79,19 @@
         <ul>
           @foreach ($maintenance->autoparts as $part)
         <li>
-        Name {{ $part['name'] }} (ID: {{ $part['id'] }}) - Quantity: {{ $part['quantity'] }}
+          
+           
+                <label class="fw-bold">Name:</label> {{ $part['name'] }}
+           
+           
+                <label class="fw-bold">ID:</label> {{ $part['id'] }}
+           
+            
+                <label class="fw-bold">Quantity:</label> {{ $part['quantity'] }}
+           
+        
+        
+        {{-- Name: - {{ $part['name'] }} ID:- {{ $part['id'] }}   Quantity:- {{ $part['quantity'] }} --}}
         </li>
 
       @endforeach
