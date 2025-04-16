@@ -149,9 +149,8 @@ public function store(Request $request)
 
 public function update(Request $request, $order_id)
 {
-    // 1. Find the Order and update its fields
     $order = Order::findOrFail($order_id);
-    
+
     // Update order fields
     $order->description = $request->description;
     $order->order_date = $request->order_date;
@@ -162,26 +161,27 @@ public function update(Request $request, $order_id)
     $order->customer_gst = $request->gst_number;
     $order->customer_address = $request->customer_address;
 
-    // Prepare LRs array for updating
-    $lrArray = [];
+    // Existing LRs from DB
+    $existingLrs = $order->lr ?? [];
+    $existingLrMap = collect($existingLrs)->keyBy('lr_number')->toArray();
 
-    // Loop through each LR and update
+    $updatedLrs = [];
+
     foreach ($request->lr as $lrKey => $lr) {
         // Skip empty LRs
         if (
-            empty($lr['lr_date']) && 
-            empty($lr['consignor_id']) && 
+            empty($lr['lr_date']) &&
+            empty($lr['consignor_id']) &&
             empty($lr['consignor_gst']) &&
             empty($lr['consignor_loading'])
         ) {
             continue;
         }
 
-        // Prepare cargos for the current LR
+        // Prepare cargos
         $cargoArray = [];
         if (!empty($lr['cargo']) && is_array($lr['cargo'])) {
-            foreach ($lr['cargo'] as $cargoKey => $cargo) {
-                // Skip empty cargo rows
+            foreach ($lr['cargo'] as $cargo) {
                 if (
                     empty($cargo['packages_no']) &&
                     empty($cargo['package_type']) &&
@@ -192,7 +192,6 @@ public function update(Request $request, $order_id)
                     continue;
                 }
 
-                // Add cargo row to the cargoArray
                 $cargoArray[] = [
                     'packages_no'         => $cargo['packages_no'] ?? null,
                     'package_type'        => $cargo['package_type'] ?? null,
@@ -209,11 +208,11 @@ public function update(Request $request, $order_id)
             }
         }
 
-        // LR Number (preserve if already exists or generate new)
+        // Get lr_number
         $lrNumber = $lr['lr_number'] ?? 'LR-' . now()->format('YmdHis') . '-' . $lrKey;
 
-        // Add LR data to lrArray
-        $lrArray[] = [
+        // Prepare LR Data
+        $lrData = [
             'lr_number'           => $lrNumber,
             'lr_date'             => $lr['lr_date'] ?? null,
             'vehicle_date'        => $lr['vehicle_date'] ?? null,
@@ -222,15 +221,12 @@ public function update(Request $request, $order_id)
             'delivery_mode'       => $lr['delivery_mode'] ?? null,
             'from_location'       => $lr['from_location'] ?? null,
             'to_location'         => $lr['to_location'] ?? null,
-
             'consignor_id'        => $lr['consignor_id'] ?? null,
             'consignor_gst'       => $lr['consignor_gst'] ?? null,
             'consignor_loading'   => $lr['consignor_loading'] ?? null,
-
             'consignee_id'        => $lr['consignee_id'] ?? null,
             'consignee_gst'       => $lr['consignee_gst'] ?? null,
             'consignee_unloading' => $lr['consignee_unloading'] ?? null,
-
             'freight_amount'      => $lr['freight_amount'] ?? null,
             'lr_charges'          => $lr['lr_charges'] ?? null,
             'hamali'              => $lr['hamali'] ?? null,
@@ -240,19 +236,25 @@ public function update(Request $request, $order_id)
             'less_advance'        => $lr['less_advance'] ?? null,
             'balance_freight'     => $lr['balance_freight'] ?? null,
             'declared_value'      => $lr['declared_value'] ?? null,
-
-            'cargo'               => $cargoArray, // Attach cargos
+            'cargo'               => $cargoArray,
         ];
+
+        // Update if exists or add as new
+        $existingLrMap[$lrNumber] = $lrData;
     }
 
-    // Save the updated LRs and Order
-    $order->lr = $lrArray;
+    // Save updated LR array
+    $order->lr = array_values($existingLrMap); // Re-index the array
     $order->save();
 
-    // Redirect with success message
     return redirect()->route('admin.orders.index')
         ->with('success', 'Order and LRs updated successfully!');
 }
+
+
+
+
+
 
 public function destroy($order_id)
 {

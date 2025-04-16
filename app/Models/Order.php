@@ -30,6 +30,7 @@ class Order extends Model
     protected $casts = [
         'lr' => 'array',
     ];
+    
     // Relationships
     
     public function consignor()

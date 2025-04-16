@@ -95,8 +95,9 @@
          @php
          $lrData = is_array($order->lr) ? $order->lr : json_decode($order->lr, true);
          @endphp
-         <div id="lrContainer">
-         @foreach($lrData as $index => $lr)
+        
+        {{-- @foreach($lrData as $index => $lr) --}}
+        @foreach($lrData as $index => $lr)
 
          <div class="row mt-4" >
             <h4 style="margin-bottom: 2%;">🚚 Update LR - Consignment Details</h4>
@@ -331,7 +332,7 @@
                : collect();
                @endphp
                <div class="col-12" data-lr-index="{{ $lrIndex }}">
-                  <h5 class="mb-3 pb-3">📦 Cargo Description (LR #{{ $lrIndex + 1 }})</h5>
+                  <h5 class="mb-3 pb-3">📦 Cargo Description (LR #{{ $lrIndex  }})</h5>
                   <div class="table-responsive">
                      <table class="table table-bordered align-middle text-center">
                         <thead>
@@ -351,30 +352,33 @@
                            </tr>
                         </thead>
                         <tbody id="cargoTableBody-{{ $lrIndex }}">
-                           @foreach ($cargoData as $cargoIndex => $cargo)
+                           {{-- @foreach ($cargoData as $cargoIndex => $cargo) --}}
+                           @foreach ($lr['cargo'] as $cargoIndex => $cargo)
                            <tr>
-                              <td><input type="number" name="lr[{{ $lrIndex }}][cargo][{{ $cargoIndex }}][packages_no]" class="form-control" value="{{ $cargo['packages_no'] }}" required></td>
-                              <td>
-                                 <select name="lr[{{ $lrIndex }}][cargo][{{ $cargoIndex }}][package_type]" class="form-select" required>
-                                 <option value="Pallets" {{ $cargo['package_type'] == 'Pallets' ? 'selected' : '' }}>Pallets</option>
-                                 <option value="Cartons" {{ $cargo['package_type'] == 'Cartons' ? 'selected' : '' }}>Cartons</option>
-                                 <option value="Bags" {{ $cargo['package_type'] == 'Bags' ? 'selected' : '' }}>Bags</option>
-                                 </select>
-                              </td>
-                              <td><input type="text" name="lr[{{ $lrIndex }}][cargo][{{ $cargoIndex }}][package_description]" class="form-control" value="{{ $cargo['package_description'] }}" required></td>
-                              <td><input type="number" name="lr[{{ $lrIndex }}][cargo][{{ $cargoIndex }}][weight]" class="form-control" value="{{ $cargo['weight'] }}" required></td>
-                              <td><input type="number" name="lr[{{ $lrIndex }}][cargo][{{ $cargoIndex }}][actual_weight]" class="form-control" value="{{ $cargo['actual_weight'] }}" required></td>
-                              <td><input type="number" name="lr[{{ $lrIndex }}][cargo][{{ $cargoIndex }}][charged_weight]" class="form-control" value="{{ $cargo['charged_weight'] }}" required></td>
-                              <td><input type="text" name="lr[{{ $lrIndex }}][cargo][{{ $cargoIndex }}][document_no]" class="form-control" value="{{ $cargo['document_no'] }}" required></td>
-                              <td><input type="text" name="lr[{{ $lrIndex }}][cargo][{{ $cargoIndex }}][document_name]" class="form-control" value="{{ $cargo['document_name'] }}" required></td>
-                              <td><input type="date" name="lr[{{ $lrIndex }}][cargo][{{ $cargoIndex }}][document_date]" class="form-control" value="{{ $cargo['document_date'] }}" required></td>
-                              <td><input type="text" name="lr[{{ $lrIndex }}][cargo][{{ $cargoIndex }}][eway_bill]" class="form-control" value="{{ $cargo['eway_bill'] }}" required></td>
-                              <td><input type="date" name="lr[{{ $lrIndex }}][cargo][{{ $cargoIndex }}][valid_upto]" class="form-control" value="{{ $cargo['valid_upto'] }}" required></td>
-                              <td>
-                                 <button type="button" class="btn btn-danger btn-sm" onclick="removeRow(this)">🗑</button>
-                              </td>
+                              
+                               <td><input type="number" name="lr[{{ $index }}][cargo][{{ $cargoIndex }}][packages_no]" class="form-control" value="{{ $cargo['packages_no'] }}" required></td>
+                               <td>
+                                   <select name="lr[{{ $index }}][cargo][{{ $cargoIndex }}][package_type]" class="form-select" required>
+                                       <option value="Pallets" {{ $cargo['package_type'] == 'Pallets' ? 'selected' : '' }}>Pallets</option>
+                                       <option value="Cartons" {{ $cargo['package_type'] == 'Cartons' ? 'selected' : '' }}>Cartons</option>
+                                       <option value="Bags" {{ $cargo['package_type'] == 'Bags' ? 'selected' : '' }}>Bags</option>
+                                   </select>
+                               </td>
+                               <td><input type="text" name="lr[{{ $index }}][cargo][{{ $cargoIndex }}][package_description]" class="form-control" value="{{ $cargo['package_description'] }}" required></td>
+                               <td><input type="number" name="lr[{{ $index }}][cargo][{{ $cargoIndex }}][weight]" class="form-control" value="{{ $cargo['weight'] }}" required></td>
+                               <td><input type="number" name="lr[{{ $index }}][cargo][{{ $cargoIndex }}][actual_weight]" class="form-control" value="{{ $cargo['actual_weight'] }}" required></td>
+                               <td><input type="number" name="lr[{{ $index }}][cargo][{{ $cargoIndex }}][charged_weight]" class="form-control" value="{{ $cargo['charged_weight'] }}" required></td>
+                               <td><input type="text" name="lr[{{ $index }}][cargo][{{ $cargoIndex }}][document_no]" class="form-control" value="{{ $cargo['document_no'] }}" required></td>
+                               <td><input type="text" name="lr[{{ $index }}][cargo][{{ $cargoIndex }}][document_name]" class="form-control" value="{{ $cargo['document_name'] }}" required></td>
+                               <td><input type="date" name="lr[{{ $index }}][cargo][{{ $cargoIndex }}][document_date]" class="form-control" value="{{ $cargo['document_date'] }}" required></td>
+                               <td><input type="text" name="lr[{{ $index }}][cargo][{{ $cargoIndex }}][eway_bill]" class="form-control" value="{{ $cargo['eway_bill'] }}" required></td>
+                               <td><input type="date" name="lr[{{ $index }}][cargo][{{ $cargoIndex }}][valid_upto]" class="form-control" value="{{ $cargo['valid_upto'] }}" required></td>
+                               <td>
+                                   <button type="button" class="btn btn-danger btn-sm" onclick="removeRow(this)">🗑</button>
+                               </td>
                            </tr>
-                           @endforeach
+                       @endforeach
+                       
                         </tbody>
                      </table>
                      <!-- Add Row Button for this LR -->
@@ -388,7 +392,7 @@
                <!-- Freight Details Section  -->
                <div class="row mt-4">
                   <div class="col-12">
-                     <h5 class="pb-3">🚚 Freight Details (LR {{ $lrIndex + 1 }})</h5>
+                     <h5 class="pb-3">🚚 Freight Details </h5>
                      <div class="table-responsive">
                         <table class="table table-bordered align-middle text-center">
                            <thead>
@@ -405,21 +409,22 @@
                            </thead>
                            <tbody>
                               <tr>
-                                 <td><input name="lr[{{ $lrIndex }}][freight_amount]" type="number" class="form-control"
+                                 
+                                 <td><input name="lr[{{ $index }}][freight_amount]" type="number" class="form-control"
                                     value="{{ $lr['freight_amount'] ?? '' }}" placeholder="Enter Freight Amount" required></td>
-                                 <td><input name="lr[{{ $lrIndex }}][lr_charges]" type="number" class="form-control"
+                                 <td><input name="lr[{{ $index }}][lr_charges]" type="number" class="form-control"
                                     value="{{ $lr['lr_charges'] ?? '' }}" placeholder="Enter LR Charges" required></td>
-                                 <td><input name="lr[{{ $lrIndex }}][hamali]" type="number" class="form-control"
+                                 <td><input name="lr[{{ $index }}][hamali]" type="number" class="form-control"
                                     value="{{ $lr['hamali'] ?? '' }}" placeholder="Enter Hamali Charges" required></td>
-                                 <td><input name="lr[{{ $lrIndex }}][other_charges]" type="number" class="form-control"
+                                 <td><input name="lr[{{ $index }}][other_charges]" type="number" class="form-control"
                                     value="{{ $lr['other_charges'] ?? '' }}" placeholder="Enter Other Charges" required></td>
-                                 <td><input name="lr[{{ $lrIndex }}][gst_amount]" type="number" class="form-control"
+                                 <td><input name="lr[{{ $index }}][gst_amount]" type="number" class="form-control"
                                     value="{{ $lr['gst_amount'] ?? '' }}" placeholder="Enter GST Amount" required></td>
-                                 <td><input name="lr[{{ $lrIndex }}][total_freight]" type="number" class="form-control"
+                                 <td><input name="lr[{{ $index }}][total_freight]" type="number" class="form-control"
                                     value="{{ $lr['total_freight'] ?? '' }}" placeholder="Total Freight" required></td>
-                                 <td><input name="lr[{{ $lrIndex }}][less_advance]" type="number" class="form-control"
+                                 <td><input name="lr[{{ $index }}][less_advance]" type="number" class="form-control"
                                     value="{{ $lr['less_advance'] ?? '' }}" placeholder="Less Advance Amount" required></td>
-                                 <td><input name="lr[{{ $lrIndex }}][balance_freight]" type="number" class="form-control"
+                                 <td><input name="lr[{{ $index }}][balance_freight]" type="number" class="form-control"
                                     value="{{ $lr['balance_freight'] ?? '' }}" placeholder="Balance Freight Amount" required></td>
                               </tr>
                            </tbody>
@@ -432,7 +437,7 @@
                   <div class="col-md-6">
                      <div class="mb-3">
                         <label class="form-label" style="font-weight: bold;">💰 Declared Value (Rs.)</label>
-                        <input type="number" name="lr[{{ $lrIndex }}][declared_value]"
+                        <input type="number" name="lr[{{ $index }}][declared_value]"
                            value="{{ $lr['declared_value'] ?? '' }}" class="form-control" required>
                      </div>
                   </div>
@@ -442,6 +447,7 @@
          </div>
          <!-- lr -->
          @endforeach
+         <div id="lrContainer">
          </div>
          <!-- Remove / Add More LR Buttons -->
                <div class="d-flex justify-content-end gap-2 mt-3">
@@ -579,80 +585,297 @@
 
 <!-- lr scritp -->
 <script>
-let lrIndex = {{ count($lrData) }}; // Start from the count of existing LRs
-
-function addLrRow() {
-    const container = document.getElementById('lrContainer');
-    const newRow = document.createElement('div');
-    newRow.classList.add('row', 'mt-4');
-    newRow.innerHTML = `
-        <h4 style="margin-bottom: 2%;">🚚 New LR - Consignment Details</h4>
-        <div class="row g-3 mb-3 single-lr-row">
-            <div class="col-md-3">
-                <label class="form-label">LR Number</label>
-                <input type="text" name="lr[${lrIndex}][lr_number]" class="form-control" value="LR-${Date.now()}" readonly>
+   let lrIndex = {{ count($lrData) }}; // Start from existing count
+   
+   function addLrRow() {
+       const container = document.getElementById('lrContainer');
+       const newRow = document.createElement('div');
+       newRow.classList.add('row', 'mt-4');
+       newRow.innerHTML = `
+           <h4 style="margin-bottom: 2%;">🚚 New LR - Consignment Details</h4>
+           <div class="row g-3 mb-3 single-lr-row">
+               <div class="col-md-3">
+                   <label class="form-label">LR Number</label>
+                   <input type="text" name="lr[${lrIndex}][lr_number]" class="form-control" value="LR-${Date.now()}" readonly>
+               </div>
+               <div class="col-md-3">
+                   <label class="form-label">LR Date</label>
+                   <input type="date" name="lr[${lrIndex}][lr_date]" class="form-control" required>
+               </div>
+               <div class="col-md-3">
+                   <label class="form-label">Consignor Name</label>
+                   <select name="lr[${lrIndex}][consignor_id]" class="form-select" onchange="setConsignorDetails(${lrIndex})" required>
+                       <option value="">Select Consignor</option>
+                       @foreach($users as $user)
+                           @php
+                               $addresses = json_decode($user->address, true);
+                               $formattedAddress = '';
+                               if (!empty($addresses) && is_array($addresses)) {
+                                   $first = $addresses[0];
+                                   $formattedAddress = trim(
+                                       ($first['full_address'] ?? '') . ', ' .
+                                       ($first['city'] ?? '') . ', ' .
+                                       ($first['pincode'] ?? '')
+                                   );
+                               }
+                           @endphp
+                           <option value="{{ $user->id }}"
+                               data-gst-consignor="{{ $user->gst_number }}"
+                               data-address-consignor="{{ $formattedAddress }}">
+                               {{ $user->name }}
+                           </option>
+                       @endforeach
+                   </select>
+               </div>
+               <div class="col-md-3">
+                   <label class="form-label">Consignor GST</label>
+                   <input type="text" name="lr[${lrIndex}][consignor_gst]" id="consignor_gst_${lrIndex}" class="form-control" readonly>
+               </div>
+               <div class="col-md-3">
+                   <label class="form-label">Loading Address</label>
+                   <input type="text" name="lr[${lrIndex}][consignor_loading]" id="consignor_loading_${lrIndex}" class="form-control" readonly>
+               </div>
+               
+               <!-- Consignee Details -->
+                  <div class="col-md-3">
+                  
+                  <h5>📦 Consignee (Receiver)</h5>
+                  <select name="lr[${lrIndex}][consignee_id]" id="consignee_id_${lrIndex}" class="form-select" onchange="setConsigneeDetails(${lrIndex})" required>
+                     <option value="">Select Consignee Name</option>
+                     @foreach($users as $user)
+                           @php
+                              $addresses = json_decode($user->address, true);
+                              $formattedAddress = '';
+                              if (!empty($addresses) && is_array($addresses)) {
+                                 $first = $addresses[0];
+                                 $formattedAddress = trim(
+                                       ($first['full_address'] ?? '') . ', ' .
+                                       ($first['city'] ?? '') . ', ' .
+                                       ($first['pincode'] ?? '')
+                                 );
+                              }
+                           @endphp
+                           <option 
+                              value="{{ $user->id }}"
+                              data-gst-consignee="{{ $user->gst_number }}"
+                              data-address-consignee="{{ $formattedAddress }}">
+                              {{ $user->name }}
+                           </option>
+                     @endforeach
+                  </select>
+                  </div>
+                  
+                  <div class="col-md-3">
+                     <label class="form-label">Consignee Unloading Address</label>
+                     <textarea name="lr[${lrIndex}][consignee_unloading]" id="consignee_unloading_${lrIndex}" class="form-control" rows="2" placeholder="Enter unloading address" required></textarea>
+                  </div>
+                  
+                  <div class="col-md-3">
+                     <label class="form-label">Consignee GST</label>
+                     <input type="text" name="lr[${lrIndex}][consignee_gst]" id="consignee_gst_${lrIndex}" class="form-control" placeholder="Enter GST number" required>
+                  </div>
+                  
             </div>
-            <div class="col-md-3">
-                <label class="form-label">LR Date</label>
-                <input type="date" name="lr[${lrIndex}][lr_date]" class="form-control" required>
-            </div>
-            <div class="col-md-3">
-                <label class="form-label">Consignor Name</label>
-                <select name="lr[${lrIndex}][consignor_id]" class="form-select" onchange="setConsignorDetails(${lrIndex})" required>
-                    <option value="">Select Consignor</option>
-                    @foreach($users as $user)
-                        @php
-                            $addresses = json_decode($user->address, true);
-                            $formattedAddress = '';
-                            if (!empty($addresses) && is_array($addresses)) {
-                                $first = $addresses[0];
-                                $formattedAddress = trim(
-                                    ($first['full_address'] ?? '') . ', ' .
-                                    ($first['city'] ?? '') . ', ' .
-                                    ($first['pincode'] ?? '')
-                                );
-                            }
-                        @endphp
-                        <option value="{{ $user->id }}"
-                            data-gst-consignor="{{ $user->gst_number }}"
-                            data-address-consignor="{{ $formattedAddress }}">
-                            {{ $user->name }}
-                        </option>
-                    @endforeach
-                </select>
-            </div>
-            <div class="col-md-3">
-                <label class="form-label">Consignor GST</label>
-                <input type="text" name="lr[${lrIndex}][consignor_gst]" id="consignor_gst_${lrIndex}" class="form-control" readonly>
-            </div>
-            <div class="col-md-3">
-                <label class="form-label">Loading Address</label>
-                <input type="text" name="lr[${lrIndex}][consignor_loading]" id="consignor_loading_${lrIndex}" class="form-control" readonly>
-            </div>
-            <div class="d-flex justify-content-end gap-2 mt-3">
-                <button type="button" class="btn btn-outline-danger btn-sm" onclick="removeLrRow(this)">
-                    <i class="fas fa-trash-alt"></i> Remove
-                </button>
-            </div>
-        </div>
-    `;
-    container.appendChild(newRow);
-    lrIndex++;
-}
-
-function removeLrRow(button) {
-    const section = button.closest('.row.mt-4');
-    if (section) section.remove();
-}
-
-function setConsignorDetails(index) {
-    const select = document.querySelector(`select[name="lr[${index}][consignor_id]"]`);
-    const gst = select.options[select.selectedIndex].dataset.gstConsignor || '';
-    const address = select.options[select.selectedIndex].dataset.addressConsignor || '';
-
-    document.getElementById(`consignor_gst_${index}`).value = gst;
-    document.getElementById(`consignor_loading_${index}`).value = address;
-}
+   
+           <!-- Vehicle & Delivery Info -->
+           <div class="row">
+               <div class="col-md-4 mb-3">
+                   <label class="form-label">📅 Vehicle Date</label>
+                   <input type="date" name="lr[${lrIndex}][vehicle_date]" class="form-control" required>
+               </div>
+               <div class="col-md-4 mb-3">
+                   <label class="form-label">🚛 Vehicle Type</label>
+                   <select name="lr[${lrIndex}][vehicle_id]" class="form-select" required>
+                       ${generateVehicleOptions()}
+                   </select>
+               </div>
+               <div class="col-md-4">
+                   <label class="form-label">🛻 Vehicle Ownership</label>
+                   <div class="d-flex gap-3">
+                       <div class="form-check">
+                           <input class="form-check-input" type="radio" name="lr[${lrIndex}][vehicle_ownership]" value="Own" checked required>
+                           <label class="form-check-label">Own</label>
+                       </div>
+                       <div class="form-check">
+                           <input class="form-check-input" type="radio" name="lr[${lrIndex}][vehicle_ownership]" value="Other" required>
+                           <label class="form-check-label">Other</label>
+                       </div>
+                   </div>
+               </div>
+           </div>
+   
+           <div class="row">
+               <div class="col-md-4 mb-3">
+                   <label class="form-label">🚢 Delivery Mode</label>
+                   <select name="lr[${lrIndex}][delivery_mode]" class="form-select" required>
+                       <option value="">Select Mode</option>
+                       <option value="Road">Road</option>
+                       <option value="Rail">Rail</option>
+                       <option value="Air">Air</option>
+                   </select>
+               </div>
+               <div class="col-md-4 mb-3">
+                   <label class="form-label">📍 From (Origin)</label>
+                   <select name="lr[${lrIndex}][from_location]" class="form-select" required>
+                       <option value="">Select Origin</option>
+                       <option value="Mumbai">Mumbai</option>
+                       <option value="Delhi">Delhi</option>
+                       <option value="Chennai">Chennai</option>
+                   </select>
+               </div>
+               <div class="col-md-4 mb-3">
+                   <label class="form-label">📍 To (Destination)</label>
+                   <select name="lr[${lrIndex}][to_location]" class="form-select" required>
+                       <option value="">Select Destination</option>
+                       <option value="Kolkata">Kolkata</option>
+                       <option value="Hyderabad">Hyderabad</option>
+                       <option value="Pune">Pune</option>
+                   </select>
+               </div>
+           </div>
+   
+           <!-- Cargo Description Section -->
+           <div class="row mt-4">
+               <div class="col-12">
+                   <h5 class="mb-3 pb-3">📦 Cargo Description</h5>
+                   <div class="mb-3 d-flex gap-3">
+                       <div class="form-check">
+                           <input class="form-check-input" type="radio" name="cargo_description_type_${lrIndex}" id="singleDoc_${lrIndex}" value="single" checked required>
+                           <label class="form-check-label" for="singleDoc_${lrIndex}">Single Document</label>
+                       </div>
+                       <div class="form-check">
+                           <input class="form-check-input" type="radio" name="cargo_description_type_${lrIndex}" id="multipleDoc_${lrIndex}" value="multiple" required>
+                           <label class="form-check-label" for="multipleDoc_${lrIndex}">Multiple Documents</label>
+                       </div>
+                   </div>
+   
+                   <div class="table-responsive">
+                       <table class="table table-bordered align-middle text-center">
+                           <thead>
+                               <tr>
+                                   <th>No. of Packages</th>
+                                   <th>Packaging Type</th>
+                                   <th>Description</th>
+                                   <th>Weight (kg)</th>
+                                   <th>Actual Weight (kg)</th>
+                                   <th>Charged Weight (kg)</th>
+                                   <th>Document No.</th>
+                                   <th>Document Name</th>
+                                   <th>Document Date</th>
+                                   <th>Eway Bill</th>
+                                   <th>Valid Upto</th>
+                                   <th>Action</th>
+                               </tr>
+                           </thead>
+                           <tbody id="cargoTableBody-${lrIndex}">
+                               <tr>
+                                   <td><input type="number" class="form-control" name="lr[${lrIndex}][cargo][0][packages_no]" placeholder="0" required></td>
+                                   <td>
+                                       <select class="form-select" name="lr[${lrIndex}][cargo][0][package_type]" required>
+                                           <option>Pallets</option>
+                                           <option>Cartons</option>
+                                           <option>Bags</option>
+                                       </select>
+                                   </td>
+                                   <td><input type="text" class="form-control" name="lr[${lrIndex}][cargo][0][package_description]" placeholder="Enter description" required></td>
+                                   <td><input type="number" class="form-control" name="lr[${lrIndex}][cargo][0][weight]" placeholder="0" required></td>
+                                   <td><input type="number" class="form-control" name="lr[${lrIndex}][cargo][0][actual_weight]" placeholder="0" required></td>
+                                   <td><input type="number" class="form-control" name="lr[${lrIndex}][cargo][0][charged_weight]" placeholder="0" required></td>
+                                   <td><input type="text" class="form-control" name="lr[${lrIndex}][cargo][0][document_no]" placeholder="Doc No." required></td>
+                                   <td><input type="text" class="form-control" name="lr[${lrIndex}][cargo][0][document_name]" placeholder="Doc Name" required></td>
+                                   <td><input type="date" class="form-control" name="lr[${lrIndex}][cargo][0][document_date]" required></td>
+                                   <td><input type="text" class="form-control" name="lr[${lrIndex}][cargo][0][eway_bill]" placeholder="Eway Bill No." required></td>
+                                   <td><input type="date" class="form-control" name="lr[${lrIndex}][cargo][0][valid_upto]" required></td>
+                                   <td><button class="btn btn-danger btn-sm" onclick="removeRow(this)">🗑</button></td>
+                               </tr>
+                           </tbody>
+                       </table>
+                   </div>
+                   <div class="text-end mt-2">
+                       <button type="button" class="btn btn-sm" style="background: #ca2639; color: white;" onclick="addRow(${lrIndex})">
+                           <span style="filter: invert(1);">➕</span> Add Row
+                       </button>
+                   </div>
+               </div>
+           </div>
+   
+           <!-- Freight Details -->
+           <div class="row mt-4">
+               <div class="col-12">
+                   <h5 class="pb-3">🚚 Freight Details</h5>
+                   <div class="table-responsive">
+                       <table class="table table-bordered align-middle text-center">
+                           <thead>
+                               <tr>
+                                   <th>Freight</th>
+                                   <th>LR Charges</th>
+                                   <th>Hamali</th>
+                                   <th>Other Charges</th>
+                                   <th>GST</th>
+                                   <th>Total Freight</th>
+                                   <th>Less Advance</th>
+                                   <th>Balance Freight</th>
+                               </tr>
+                           </thead>
+                           <tbody>
+                               <tr>
+                                   <td><input type="number" name="lr[${lrIndex}][freight_amount]" class="form-control" required></td>
+                                   <td><input type="number" name="lr[${lrIndex}][lr_charges]" class="form-control" required></td>
+                                   <td><input type="number" name="lr[${lrIndex}][hamali]" class="form-control" required></td>
+                                   <td><input type="number" name="lr[${lrIndex}][other_charges]" class="form-control" required></td>
+                                   <td><input type="number" name="lr[${lrIndex}][gst_amount]" class="form-control" required></td>
+                                   <td><input type="number" name="lr[${lrIndex}][total_freight]" class="form-control" required></td>
+                                   <td><input type="number" name="lr[${lrIndex}][less_advance]" class="form-control" required></td>
+                                   <td><input type="number" name="lr[${lrIndex}][balance_freight]" class="form-control" required></td>
+                               </tr>
+                           </tbody>
+                       </table>
+                   </div>
+               </div>
+           </div>
+   
+           <!-- Declared Value -->
+           <div class="row mt-3">
+               <div class="col-md-6">
+                   <label class="form-label"><strong>💰 Declared Value (Rs.)</strong></label>
+                   <input type="number" name="lr[${lrIndex}][declared_value]" class="form-control" required>
+               </div>
+           </div>
+            <div class="row mt-3">
+           <div class="d-flex justify-content-end gap-2 mt-3">
+                   <button type="button" class="btn btn-outline-danger btn-sm" onclick="removeLrRow(this)">
+                       <i class="fas fa-trash-alt"></i> Remove
+                   </button>
+               </div>
+               </div>
+       `;
+       container.appendChild(newRow);
+       lrIndex++;
+   }
+   
+   function removeLrRow(button) {
+       const section = button.closest('.row.mt-4');
+       if (section) section.remove();
+   }
+   
+   function setConsignorDetails(index) {
+       const select = document.querySelector(`select[name="lr[${index}][consignor_id]"]`);
+       const gst = select.options[select.selectedIndex].dataset.gstConsignor || '';
+       const address = select.options[select.selectedIndex].dataset.addressConsignor || '';
+       document.getElementById(`consignor_gst_${index}`).value = gst;
+       document.getElementById(`consignor_loading_${index}`).value = address;
+   }
 </script>
-
+   
+   
+   <script>
+      function setConsigneeDetails(index) {
+          const select = document.getElementById(`consignee_id_${index}`);
+          const gst = select.options[select.selectedIndex].dataset.gstConsignee || '';
+          const address = select.options[select.selectedIndex].dataset.addressConsignee || '';
+          document.getElementById(`consignee_gst_${index}`).value = gst;
+          document.getElementById(`consignee_unloading_${index}`).value = address;
+      }
+      </script>
+      
 @endsection
