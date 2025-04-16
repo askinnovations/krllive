@@ -33,7 +33,7 @@
             <!-- CUSTOMER NAME DROPDOWN -->
             <div class="col-md-3">
                <div class="mb-3">
-                  <label class="form-label">👤 CUSTOMER NAME</label>
+                  <label class="form-label">👤 Freight A/c </label>
                   <select name="customer_id" id="customer_id" class="form-select" onchange="setCustomerDetails()" required>
                      <option value="">Select Customer</option>
                      @foreach($users as $user)
@@ -79,14 +79,19 @@
             <div class="col-md-3">
                <div class="mb-3">
                   <label class="form-label">📊 Order Type</label>
+                  
                   <select name="order_type" class="form-select" required>
-                     <option value="">Select Order</option>
+                     <option value="">Select Order Type</option>
                      @php
                      $orderType = old('order_type', isset($order) ? $order->order_type : '');
+                     
                      @endphp
-                     <option value="Back Date" {{ $orderType === 'Back Date' ? 'selected' : '' }}>Back Date</option>
-                     <option value="Future" {{ $orderType === 'Future' ? 'selected' : '' }}>Future</option>
-                     <option value="Normal" {{ $orderType === 'Normal' ? 'selected' : '' }}>Normal</option>
+                    
+                     <option value="import" {{ $orderType === 'import' ? 'selected' : '' }}>Import</option>
+                     <option value="import-restoff" {{ $orderType === 'import-restoff' ? 'selected' : '' }}>Import Restoff</option>
+                     <option value="export" {{ $orderType === 'export' ? 'selected' : '' }}>Export</option>
+                     <option value="export_restoff" {{ $orderType === 'export-restoff' ? 'selected' : '' }}>Export Restoff</option>
+                     <option value="domestic" {{ $orderType === 'domestic' ? 'selected' : '' }}>Domestic</option>
                   </select>
                </div>
             </div>
@@ -231,12 +236,22 @@
             <div class="row">
                <!-- LR Date -->
                <div class="col-md-4">
-                  <div class="mb-3">
-                     <label class="form-label">📅 Vehicle Date</label>
-                     <input type="date" name="lr[{{ $index }}][vehicle_date]" class="form-control" value="{{ $lr['vehicle_date'] ?? '' }}" required>
-
-                     <!-- <input type="date" name="lr[${counter}][vehicle_date]" class="form-control" value="{{ $lr['vehicle_date'] ?? '' }}" required> -->
-                  </div>
+                  <label class="form-label">🚛 Vehicle Number</label>
+                  <select name="lr[{{ $index }}][vehicle_id]" 
+                     id="vehicle_id_{{ $index }}" 
+                     class="form-select" 
+                     onchange="fillVehicleDetails({{ $index }})">
+                     <option value="">Select Vehicle</option>
+                     @foreach ($vehicles as $vehicle)
+                     <option 
+                     value="{{ $vehicle->id }}" 
+                     
+                     data-no="{{ $vehicle->vehicle_no }}"
+                     {{ old("lr.$index.vehicle_id", $lr['vehicle_id']) == $vehicle->id ? 'selected' : '' }}>
+                     {{ $vehicle->vehicle_no }}
+                     </option>
+                     @endforeach
+                  </select>
                </div>
                <!-- Vehicle Type (Vehicle ID from vehicles table) -->
                @php
@@ -254,9 +269,9 @@
                      <option 
                      value="{{ $vehicle->id }}" 
                      data-type="{{ $vehicle->vehicle_type }}" 
-                     data-no="{{ $vehicle->vehicle_no }}"
+                   
                      {{ old("lr.$index.vehicle_id", $lr['vehicle_id']) == $vehicle->id ? 'selected' : '' }}>
-                     {{ $vehicle->vehicle_type }} - {{ $vehicle->vehicle_no }}
+                     {{ $vehicle->vehicle_type }}
                      </option>
                      @endforeach
                   </select>
@@ -544,7 +559,15 @@
        let options = '<option value="">Select Vehicle</option>';
        vehicles.forEach(function(vehicle) {
            // यहाँ आप अपनी आवश्यकता के अनुसार vehicle का display नाम बना सकते हैं
-           options += `<option value="${vehicle.id}">${vehicle.vehicle_type} - ${vehicle.vehicle_no}</option>`;
+           options += `<option value="${vehicle.id}">${vehicle.vehicle_type} </option>`;
+       });
+       return options;
+   }
+   function generateVehicle_noOptions() {
+       let options = '<option value="">Select Vehicle No.</option>';
+       vehicles.forEach(function(vehicle) {
+           // यहाँ आप अपनी आवश्यकता के अनुसार vehicle का display नाम बना सकते हैं
+           options += `<option value="${vehicle.id}"> ${vehicle.vehicle_no}</option>`;
        });
        return options;
    }
@@ -674,15 +697,18 @@
                      <label class="form-label">Consignee GST</label>
                      <input type="text" name="lr[${lrIndex}][consignee_gst]" id="consignee_gst_${lrIndex}" class="form-control" placeholder="Enter GST number" required>
                   </div>
-                  
+
             </div>
    
            <!-- Vehicle & Delivery Info -->
            <div class="row">
-               <div class="col-md-4 mb-3">
-                   <label class="form-label">📅 Vehicle Date</label>
-                   <input type="date" name="lr[${lrIndex}][vehicle_date]" class="form-control" required>
-               </div>
+               
+                <div class="col-md-4 mb-3">
+                  <label class="form-label">🚚 Vehicle Number</label>
+                     <select name="lr[${lrIndex}][vehicle_no]" class="form-select" required>
+                              ${generateVehicle_noOptions()}
+                        </select>
+                  </div>
                <div class="col-md-4 mb-3">
                    <label class="form-label">🚛 Vehicle Type</label>
                    <select name="lr[${lrIndex}][vehicle_id]" class="form-select" required>
