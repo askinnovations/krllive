@@ -22,7 +22,7 @@
                                         <div class="row">
                                             <div class="col-md-4">
                                                 <label class="form-label">Vehicle Type</label>
-                                                <input type="text" class="form-control" name="vehicle_type" value="{{ old('vehicle_type') }}" placeholder="Enter vehicle type" required>
+                                                <input type="text" class="form-control" name="vehicle_type" value="{{ old('vehicle_type') }}" placeholder="XX MT" style="text-transform: uppercase;"  required>
                                                 @error('vehicle_type')
                                                 <span class="text-danger">{{ $message }}</span>
                                                @enderror
@@ -46,7 +46,7 @@
                                         <div class="row">
                                             <div class="col-md-4">
                                                 <label class="form-label">Vehicle No</label>
-                                                <input type="text" class="form-control" name="vehicle_no" placeholder="Enter vehicle number"  required>
+                                                <input type="text" class="form-control" name="vehicle_no" placeholder="Enter vehicle number" style="text-transform: uppercase;"   required>
                                                 @error('vehicle_no')
                                                 <span class="text-danger">{{ $message }}</span>
                                                @enderror

@@ -28,9 +28,8 @@ class ConsignmentNoteController extends Controller
 
     
 public function store(Request $request){
-    
     $order = new Order();
-
+// return $request->all();
     // Auto generate order_id
     $order->order_id = 'ORD-' . time();
     
@@ -54,19 +53,20 @@ public function store(Request $request){
             ];
         }
     }
-      // ✅ Auto-generate LR number if not provided
+      
     $lrNumber = $request->lr_number ?? 'LR-' . strtoupper(uniqid());
 
     // Step 2: Prepare single LR data
     $lrData = [
         'lr_number'           => $lrNumber,
         'lr_date'             => $request->lr_date,
-        'vehicle_date'        => $request->vehicle_date,
+        'vehicle_no'        => $request->vehicle_no,
         'vehicle_id'          => $request->vehicle_type,
         'vehicle_ownership'   => $request->vehicle_ownership,
         'delivery_mode'       => $request->delivery_mode,
         'from_location'       => $request->from_location,
         'to_location'         => $request->to_location,
+        'insurance_description'   => $request->insurance_description,
     
         // Consignor
         'consignor_id'        => $request->consignor_id,
@@ -108,11 +108,12 @@ public function store(Request $request){
 
   public function update(Request $request, $order_id)
 {
+    
+
     // 1. Find existing order by order_id
     $order = Order::where('order_id', $order_id)->firstOrFail();
 
-    // ✅ Do not regenerate order_id — keep it same
-    // ✅ Optional: You can update other main order-level fields here if needed
+    
 
     // 2. Prepare cargo array
     $cargoArray = [];
@@ -139,12 +140,13 @@ public function store(Request $request){
     $lrData = [
         'lr_number'           => $request->lr_number ?? 'LR-' . strtoupper(uniqid()),
         'lr_date'             => $request->lr_date,
-        'vehicle_date'        => $request->vehicle_date,
+        'vehicle_no'        => $request->vehicle_no,
         'vehicle_id'          => $request->vehicle_type,
         'vehicle_ownership'   => $request->vehicle_ownership,
         'delivery_mode'       => $request->delivery_mode,
         'from_location'       => $request->from_location,
         'to_location'         => $request->to_location,
+        'insurance_description'   => $request->insurance_description,
 
         // Consignor
         'consignor_id'        => $request->consignor_id,
