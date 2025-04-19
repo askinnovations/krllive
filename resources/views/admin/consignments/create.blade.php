@@ -131,28 +131,34 @@
                                     <div class="row">
                                         <!-- Date -->
                                         <div class="col-md-4">
+                                         
                                             <div class="mb-3">
-                                                <label class="form-label">📅  Vehicle Date</label>
-                                                <input name="vehicle_date" type="date" class="form-control" required>
-                                            </div>
-                                        </div>
-
-                                        <!-- Vehicle Type -->
-                                        <div class="col-md-4">
-                                            <div class="mb-3">
-                                                <label class="form-label">🚛 Vehicle Type</label>
-                                                <select name="vehicle_type" class="form-select" required>
-                                                    <option selected>Select Type</option>
+                                                <label class="form-label">🚚 Vehicle Number</label>
+                                                <select name="vehicle_no" id="vehicle_no" class="form-select" required>
+                                                    <option selected>Select Vehicle NO.</option>
                                                     @foreach ($vehicles as $vehicle)
-                                                    <option value="{{ $vehicle->vehicle_type }}|{{ $vehicle->vehicle_no }}">
-                                                        {{ $vehicle->vehicle_type }} - {{ $vehicle->vehicle_no }}
-                                                    </option>
-                                                    @endforeach
+                                                        <option value="{{ $vehicle->vehicle_no }}" data-type="{{ $vehicle->vehicle_type }}">
+                                                            {{ $vehicle->vehicle_no }}
+                                                        </option>
+                                                    @endforeach              
                                                 </select>
-
                                             </div>
+                                       
                                         </div>
-
+                                        <div class="col-md-4">
+                                        <!-- Vehicle Type -->
+                                        <div class="mb-3">
+                                            <label class="form-label">🚛 Vehicle Type</label>
+                                            <select name="vehicle_type" id="vehicle_type" class="form-select" required>
+                                                <option selected>Select Type</option>
+                                                @foreach ($vehicles as $vehicle)
+                                                    <option value="{{ $vehicle->vehicle_type }}">
+                                                        {{ $vehicle->vehicle_type }}
+                                                    </option>
+                                                @endforeach
+                                            </select>
+                                        </div>
+                                        </div>
                                         <!-- Vehicle Ownership -->
                                         <div class="col-md-4">
                                             <label class="form-label">🛻 Vehicle Ownership</label>
@@ -209,6 +215,38 @@
                                                 </select>
                                             </div>
                                         </div>
+                                        <div class="mb-3">
+                                            <label class="form-label">🛡️ Insurance?</label><br>
+                                            <div class="form-check form-check-inline">
+                                                <input class="form-check-input create-insurance-yes" type="radio" name="create_insurance" value="yes" id="createInsuranceYes">
+                                                <label class="form-check-label" for="createInsuranceYes">Yes</label>
+                                            </div>
+                                            <div class="form-check form-check-inline">
+                                                <input class="form-check-input" type="radio" name="create_insurance" value="no" id="createInsuranceNo" checked>
+                                                <label class="form-check-label" for="createInsuranceNo">No</label>
+                                            </div>
+                                        </div>
+                                        <!-- Modal -->
+                                        <div class="modal fade" id="insuranceModal" tabindex="-1" aria-labelledby="insuranceModalLabel" aria-hidden="true">
+                                            <div class="modal-dialog">
+                                            <div class="modal-content">
+                                                <div class="modal-header">
+                                                <h5 class="modal-title" id="insuranceModalLabel">Insurance Description</h5>
+                                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                </div>
+                                                <div class="modal-body">
+                                                <textarea name="insurance_description" class="form-control" rows="4" placeholder="Enter insurance details..."></textarea>
+                                                </div>
+                                                <div class="modal-footer">
+                                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                                {{-- Optional save button if needed --}}
+                                                </div>
+                                            </div>
+                                            </div>
+                                        </div>
+                                        
+ 
+ 
                                     </div>
 
                                     <!-- Cargo Description Section -->
@@ -225,6 +263,7 @@
                                                         <input class="form-check-input" type="radio" name="cargo_description_type" id="multipleDoc" value="multiple" required>
                                                         <label class="form-check-label" for="multipleDoc">Multiple Documents</label>
                                                     </div>
+                                                    
                                             </div>
 
                                             <!-- Cargo Details Table -->
@@ -356,8 +395,27 @@
                             </div>
                         </div>
                     </div>
+<script>
+    document.getElementById('createInsuranceYes').addEventListener('click', function () {
+        let myModal = new bootstrap.Modal(document.getElementById('insuranceModal'));
+        myModal.show();
+    });
+</script>
+<script>
+    document.getElementById('vehicle_no').addEventListener('change', function () {
+        const selectedOption = this.options[this.selectedIndex];
+        const type = selectedOption.getAttribute('data-type');
 
-              
+        const typeSelect = document.getElementById('vehicle_type');
+        for (let i = 0; i < typeSelect.options.length; i++) {
+            if (typeSelect.options[i].value === type) {
+                typeSelect.selectedIndex = i;
+                break;
+            }
+        }
+    });
+</script>
+
 <script>
     function addRow() {
         let table = document.getElementById('cargoTableBody');

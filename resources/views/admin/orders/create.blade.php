@@ -56,7 +56,7 @@
             <!-- CUSTOMER NAME DROPDOWN -->
             <div class="col-md-3">
                <div class="mb-3">
-                  <label class="form-label">👤 CUSTOMER NAME</label>
+                  <label class="form-label">👤 Freight A/c</label>
                   <select name="customer_id" id="customer_id" class="form-select" onchange="setCustomerDetails()" required>
                      <option value="">Select Customer</option>
                      @foreach($users as $user)
@@ -102,9 +102,11 @@
                   <label class="form-label">📊 Order Type</label>
                   <select name="order_type" class="form-select" required>
                      <option value="">Select Order</option>
-                     <option value="Back Date">Back Date</option>
-                     <option value="Future">Future</option>
-                     <option value="Normal">Normal</option>
+                     <option value="import"> Import</option>
+                     <option value="import-restoff">Import Restoff</option>
+                     <option value="export">Export</option>
+                     <option value="export-restoff">Export Restoff</option>
+                     <option value="domestic">Domestic</option>
                   </select>
                </div>
             </div>
@@ -142,7 +144,15 @@
        let options = '<option value="">Select Vehicle</option>';
        vehicles.forEach(function(vehicle) {
            // यहाँ आप अपनी आवश्यकता के अनुसार vehicle का display नाम बना सकते हैं
-           options += `<option value="${vehicle.id}">${vehicle.vehicle_type} - ${vehicle.vehicle_no}</option>`;
+           options += `<option value="${vehicle.id}">${vehicle.vehicle_type}</option>`;
+       });
+       return options;
+   }
+   function generateVehicle_typeOptions() {
+       let options = '<option value="">Select Vehicle</option>';
+       vehicles.forEach(function(vehicle) {
+           // यहाँ आप अपनी आवश्यकता के अनुसार vehicle का display नाम बना सकते हैं
+           options += `<option value="${vehicle.id}">${vehicle.vehicle_no}</option>`;
        });
        return options;
    }
@@ -261,8 +271,10 @@
                  <!-- LR Date -->
                  <div class="col-md-4">
                    <div class="mb-3">
-                     <label class="form-label">📅 Vehicle Date</label>
-                     <input type="date" name="lr[${counter}][vehicle_date]" class="form-control" required>
+                     <label class="form-label">🚚 Vehicle Number</label>
+                    <select name="lr[${counter}][vehicle_no]" class="form-select" required>
+                                       ${generateVehicle_typeOptions()}
+                      </select>
                    </div>
                  </div>
                  
@@ -332,7 +344,7 @@
                    </div>
                  </div>
                </div>
-   
+             
                 <!-- Cargo Description Section -->
                 <div class="row mt-4">
                      <div class="col-12">
