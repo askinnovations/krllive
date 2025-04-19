@@ -41,10 +41,10 @@
                                             <tr>
                                             <th>#</th>
                                                 <th>Customer Name</th>
-                                                <th>Phone Number</th>
-                                                <th>Email</th>
-                                                <th>GST Numbers</th>
-                                                <th>Addresses</th>
+                                                <th>PAN Number</th>
+                                                <th>TAN Number</th>
+                                                <!-- <th>GST Numbers</th> -->
+                                                <th class="w-25">Location</th>
                                                 <th>Actions</th>
                                             </tr>
                                         </thead>
@@ -53,22 +53,44 @@
                                             <tr class="customer-row" data-id="1">
                                                 <td>{{ $user->id }}</td>
                                                 <td>{{ $user->name }}</td>
-                                                <td>{{ $user->mobile_number }}</td>
-                                                <td>{{ $user->email }}</td>
-                                                <td>{{ $user->gst_number }}</td>
-                                                <td>
+                                                <td>{{ $user->pan_number }}</td>
+                                                <td>{{ $user->tan_number }}</td>
+                                                <!-- <td class="w-25">
+                                                    <div class="text-wrap">
+                                                        @php
+                                                            $gstNumbers = json_decode($user->gst_number, true);
+                                                        @endphp
+
+                                                        @if (!empty($gstNumbers) && is_array($gstNumbers))
+                                                            @foreach ($gstNumbers as $gst)
+                                                                <div class="">
+                                                                    <strong>GST:</strong> {{ $gst }}
+                                                                </div>
+                                                            @endforeach
+                                                        @else
+                                                            <p class="text-muted">No GST Available</p>
+                                                        @endif
+                                                    </div>
+                                                </td> -->
+                                                <td class="w-25">
                                                     @php
                                                             $addresses = json_decode($user->address, true);
                                                         @endphp
 
                                                         @if (!empty($addresses) && is_array($addresses))
                                                             @foreach ($addresses as $address)
+                                                            <div class="text-wrap">
                                                                 <p>
-                                                                    <strong>Address:</strong> 
-                                                                    {{ $address['full_address'] ?? '' }},
-                                                                    {{ $address['city'] ?? '' }},
-                                                                    {{ $address['pincode'] ?? '' }}
+                                                                    <strong>{{ $address['city'] ?? '' }},</strong> 
+                                                                    </br>
+                                                                    <span>{{ $address['gstin'] ?? '' }},
+                                                                    {{ $address['billing_address'] ?? '' }},
+                                                                    {{ $address['consignment_address'] ?? '' }}
+                                                                    {{ $address['mobile_number'] ?? '' }}
+                                                                    {{ $address['email'] ?? '' }}
+                                                                    {{ $address['poc'] ?? '' }}</span>
                                                                 </p>
+                                                            </div>
                                                             @endforeach
                                                         @else
                                                             <p>No Address Available</p>
@@ -121,39 +143,49 @@
                                                     <input type="text" name="name" class="form-control"
                                                         placeholder="Enter customer name">
                                                 </div>
+
                                                 <div class="mb-3">
-                                                    <label class="form-label">Phone Number</label>
-                                                    <input type="text" name="mobile_number" class="form-control"
-                                                        placeholder="Enter phone number">
+                                                    <label class="form-label">Pan Number</label>
+                                                    <input type="text" name="pan_number" class="form-control"
+                                                        placeholder="Enter pan number">
                                                 </div>
                                                 <div class="mb-3">
-                                                    <label class="form-label">Email</label>
-                                                    <input type="email" name="email"class="form-control" placeholder="Enter email">
+                                                    <label class="form-label">Tan Number</label>
+                                                    <input type="text" name="tan_number"class="form-control" placeholder="Enter Tan Number">
                                                 </div>
                                             </div>
 
                                             <!-- Address & GST -->
                                             <div class="col-md-6">
-                                                <h5>🏠 Address & GST</h5>
+                                                <h5>🏠 Location</h5>
 
                                                 <!-- Address Section -->
-                                                <label class="form-label">Address</label>
+                                                
                                                 <div id="addressContainer">
                                                     <div class="mb-3 address-group">
-                                                        <input type="text" name="address[0][full_address]" class="form-control mb-2" placeholder="Full Address" required>
+                                                    
                                                         <input type="text" name="address[0][city]" class="form-control mb-2" placeholder="City" required>
-                                                        <input type="text" name="address[0][pincode]" class="form-control mb-2" placeholder="Pincode" required>
+                                                        <input type="text" name="address[0][gstin]" class="form-control mb-2" placeholder="GSTIN" required>
+                                                        <input type="text" name="address[0][billing_address]" class="form-control mb-2" placeholder="Billing Address" required>
+                                                        <input type="text" name="address[0][consignment_address]" class="form-control mb-2" placeholder="Consignment Address" required>
+                                                        <input type="text" name="address[0][mobile_number]" class="form-control mb-2" placeholder="Mobile Number" required>
+                                                        <input type="text" name="address[0][email]" class="form-control mb-2" placeholder="Email" required>
+                                                        <input type="text" name="address[0][poc]" class="form-control mb-2" placeholder="Point Of Contact" required>
                                                         <button type="button" class="btn btn-success" onclick="addAddress()">➕ Add More</button>
                                                     </div>
                                                 </div>
 
                                                 <!-- GST Section -->
-                                                <label class="form-label">GST</label>
+                                                <!-- <label class="form-label">GST</label>
                                                 <div id="gstContainer">
-                                                    <div class="mb-3 d-flex">
-                                                    <input type="text" name="gst_number"class="form-control" placeholder="Enter GST number">
+                                                    <div class="mb-3 d-flex gst-group">
+                                                        
+                                                        <input type="text" name="gst_numbers[0]" class="form-control me-2" placeholder="Enter GST number">
                                                     </div>
-                                                </div>
+                                                </div> -->
+                                                <!-- Add More GST Button -->
+                                                <!-- <button type="button" class="btn btn-success mb-3" onclick="addGST()">➕ Add More GST</button> -->
+
                                             </div>
                                         </div>
 
@@ -186,12 +218,12 @@
                                     </button>
                                 </div>
                                 <div class="card-body">
-                                    <p><strong>Customer ID:</strong> <span id="viewCustomerId"></span></p>
+
                                     <p><strong>Customer Name:</strong> <span id="viewCustomerName"></span></p>
-                                    <p><strong>Phone Number:</strong> <span id="viewCustomerPhone"></span></p>
-                                    <p><strong>Email:</strong> <span id="viewCustomerEmail"></span></p>
-                                    <p><strong>Addresses:</strong> <span id="viewCustomerAddresses"></span></p>
-                                    <p><strong>GST Numbers:</strong> <span id="viewCustomerGST"></span></p>
+                                    <p><strong>Pan Number :</strong> <span id="viewCustomerPhone"></span></p>
+                                    <p><strong>Tan Number :</strong> <span id="viewCustomerEmail"></span></p>
+                                   
+                                    <p><strong>Address:</strong> <span id="viewCustomerGST"></span></p>
                                 </div>
                             </div>
                         </div>
@@ -218,8 +250,6 @@
 
                         <form id="editCustomerForm" method="POST">
                             @csrf
-                            @method('PUT') <!-- Laravel PUT Method for Update -->
-
                             <div class="modal-body">
                                 <input type="hidden" id="editCustomerId" name="id">
 
@@ -229,24 +259,18 @@
                                 </div>
 
                                 <div class="mb-3">
-                                    <label class="form-label">Phone Number</label>
-                                    <input type="text" name="mobile_number" id="editCustomerPhone" class="form-control" required>
+                                    <label class="form-label">PAN Number</label>
+                                    <input type="text" name="pan_number" id="editCustomerPhone" class="form-control" required>
                                 </div>
 
                                 <div class="mb-3">
-                                    <label class="form-label">Email</label>
-                                    <input type="email" name="email" id="editCustomerEmail" class="form-control" required>
+                                    <label class="form-label">TAN Number</label>
+                                    <input type="text" name="tan_number" id="editCustomerEmail" class="form-control" required>
                                 </div>
 
-                                <div class="mb-3">
-                                    <label class="form-label">GST Number</label>
-                                    <input type="text" name="gst_number" id="editCustomerGST" class="form-control">
-                                </div>
-
-                                <!-- 📌 Address Section (Now Editable) -->
                                 <div class="mb-3">
                                     <label class="form-label">Address</label>
-                                    <input type="text" name="address" id="editCustomerAddress" class="form-control">
+                                    <textarea name="address" id="editCustomerAddress" class="form-control"></textarea>
                                 </div>
 
                             </div>
@@ -255,13 +279,13 @@
                                 <button type="submit" class="btn btn-primary">Save Changes</button>
                             </div>
                         </form>
+
                     </div>
                 </div>
             </div>
 
              <!-- edit modal -->
-              <!-- delete -->
- <!-- Delete Category Modal -->
+           
  <!-- Delete Confirmation Modal -->
 <div class="modal fade" id="deleteUserModal" tabindex="-1" aria-labelledby="deleteUserLabel" aria-hidden="true">
     <div class="modal-dialog">
@@ -290,38 +314,34 @@ document.addEventListener("DOMContentLoaded", function () {
 
             let customerId = row.children[0].innerText.trim();
             let customerName = row.children[1].innerText.trim();
-            let customerPhone = row.children[2].innerText.trim();
-            let customerEmail = row.children[3].innerText.trim();
-            let customerGST = row.children[4].innerText.trim();
-            let customerAddress = row.children[5].innerText.trim(); 
+            let panNumber = row.children[2].innerText.trim();
+            let tanNumber = row.children[3].innerText.trim();
+            let addressData = row.children[4].innerText.trim(); // Now 4th index after removing GST
 
             document.getElementById("editCustomerId").value = customerId;
             document.getElementById("editCustomerName").value = customerName;
-            document.getElementById("editCustomerPhone").value = customerPhone;
-            document.getElementById("editCustomerEmail").value = customerEmail;
-            document.getElementById("editCustomerGST").value = customerGST;
+            document.getElementById("editCustomerPhone").value = panNumber;
+            document.getElementById("editCustomerEmail").value = tanNumber;
 
-            // ✅ Address JSON को Parse करके Input Field में Show करें
-            let addressInput = document.getElementById("editCustomerAddress");
-            try {
-                let parsedAddress = JSON.parse(customerAddress);
-                addressInput.value = parsedAddress[0]?.full_address ?? customerAddress;
-            } catch (error) {
-                console.error("Address JSON Parse Error:", error);
-                addressInput.value = customerAddress; 
-            }
+            // Just clean up the "Address: " prefix if present
+            let cleanAddress = addressData.replace(/Address:\s*/g, "").trim();
+            document.getElementById("editCustomerAddress").value = cleanAddress;
 
-            // ✅ Form Action URL Update
             let updateUrl = "{{ route('admin.users.update', ':id') }}".replace(":id", customerId);
             document.getElementById("editCustomerForm").setAttribute("action", updateUrl);
 
-            // ✅ Bootstrap Modal Show
             let editModal = new bootstrap.Modal(document.getElementById("editCustomerModal"));
             editModal.show();
         });
     });
 });
 </script>
+
+
+
+
+
+
   <!-- edit -->
 <script>
 document.addEventListener("DOMContentLoaded", function () {
@@ -340,12 +360,12 @@ document.addEventListener("DOMContentLoaded", function () {
             let customerAddresses = row.children[5].innerHTML; // Address को भी लोड करें
 
             // View Page में डाटा भरें
-            document.getElementById("viewCustomerId").innerText = customerId;
+            
             document.getElementById("viewCustomerName").innerText = customerName;
             document.getElementById("viewCustomerPhone").innerText = customerPhone;
             document.getElementById("viewCustomerEmail").innerText = customerEmail;
             document.getElementById("viewCustomerGST").innerText = customerGST;
-            document.getElementById("viewCustomerAddresses").innerHTML = customerAddresses;
+           
 
             // View Section को दिखाएं और Listing Page को छुपाएँ
             document.querySelector(".listing-form").style.display = "none";
@@ -400,12 +420,12 @@ document.addEventListener("DOMContentLoaded", function () {
             viewButtons.forEach(button => {
                 button.addEventListener("click", function () {
                     const row = this.closest(".customer-row"); // Get the row
-                    document.getElementById("viewCustomerId").textContent = row.dataset.id;
+                   
                     document.getElementById("viewCustomerName").textContent = row.children[1].textContent;
                     document.getElementById("viewCustomerPhone").textContent = row.children[2].textContent;
                     document.getElementById("viewCustomerEmail").textContent = row.children[3].textContent;
                     document.getElementById("viewCustomerGST").textContent = row.children[4].textContent;
-                    document.getElementById("viewCustomerAddresses").textContent = row.children[5].textContent;
+                   
     
                     listingForm.style.display = "none";
                     viewForm.style.display = "block";
@@ -428,9 +448,13 @@ document.addEventListener("DOMContentLoaded", function () {
         let div = document.createElement("div");
         div.classList.add("mb-3", "address-group");
         div.innerHTML = `
-            <input type="text" name="address[${addressIndex}][full_address]" class="form-control mb-2" placeholder="Full Address" required>
             <input type="text" name="address[${addressIndex}][city]" class="form-control mb-2" placeholder="City" required>
-            <input type="text" name="address[${addressIndex}][pincode]" class="form-control mb-2" placeholder="Pincode" required>
+            <input type="text" name="address[${addressIndex}][gstin]" class="form-control mb-2" placeholder="GSTIN" required>
+            <input type="text" name="address[${addressIndex}][billing_address]" class="form-control mb-2" placeholder="Billing Address" required>
+            <input type="text" name="address[${addressIndex}][consignment_address]" class="form-control mb-2" placeholder="Consignment Address"required>
+            <input type="text" name="address[${addressIndex}][mobile_number]" class="form-control mb-2" placeholder="Mobile Number" required>
+            <input type="text" name="address[${addressIndex}][email]" class="form-control mb-2"  placeholder="Email" required>
+            <input type="text" name="address[${addressIndex}][poc]" class="form-control mb-2" placeholder="Point Of Contact" required>
             <button type="button" class="btn btn-danger" onclick="removeElement(this)">❌ Remove</button>
         `;
         container.appendChild(div);
@@ -440,6 +464,25 @@ document.addEventListener("DOMContentLoaded", function () {
     function removeElement(btn) {
         btn.parentElement.remove();
     }
+
+    // ✅ New GST logic
+    // let gstIndex = 1; // First GST field is already 0
+
+    // function addGST() {
+    //     let container = document.getElementById("gstContainer");
+    //     let div = document.createElement("div");
+    //     div.classList.add("mb-3", "d-flex", "gst-group");
+    //     div.innerHTML = `
+    //         <input type="text" name="gst_numbers[${gstIndex}]" class="form-control me-2" placeholder="Enter GST number">
+    //         <button type="button" class="btn btn-danger" onclick="removeElement(this)">❌ Remove</button>
+    //     `;
+    //     container.appendChild(div);
+    //     gstIndex++;
+    // }
+
+    // function removeElement(btn) {
+    //     btn.parentElement.remove();
+    // }
 </script>
 
 

@@ -21,6 +21,8 @@ class User extends Authenticatable
     protected $fillable = [
         'name',
         'email',
+        'pan_number',
+        'tan_number',
         'gst_number',
         'mobile_number',
         'address',
@@ -28,6 +30,7 @@ class User extends Authenticatable
     // ✅ JSON से Array में Convert करने के लिए
     protected $casts = [
         'address' => 'array',
+        'gst_number' => 'array',
     ];
 
     /**
@@ -52,4 +55,10 @@ class User extends Authenticatable
             'password' => 'hashed',
         ];
     }
+    // User.php
+public function contracts()
+{
+    return $this->hasMany(Contract::class);
+}
+
 }

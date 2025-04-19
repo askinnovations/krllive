@@ -34,6 +34,9 @@
                     <li><a href="{{ route('admin.vehicles.index') }}" data-key="t-vehicles">Vehicles</a></li>
                     <li><a href="{{ route('admin.maintenance.index') }}" data-key="t-maintenance">Maintenance</a></li>
                     <li><a href="{{ route('admin.tyres.index') }}" data-key="t-tyres">Tyres</a></li>
+                    <li><a href="{{ route('admin.packagetype.index') }}" data-key="t-tyres">Package Type</a></li>
+                    <li><a href="{{ route('admin.destination.index') }}" data-key="t-destination">Destination</a></li>
+                    <li><a href="{{ route('admin.contract.index') }}" data-key="t-Contract">Contract </a></li>
                 </ul>
             </li>
                         <li>
@@ -76,6 +79,13 @@
                                 <li><a href="{{ route('admin.stock.index') }}" data-key="t-stock-transfer">Stock In/Transfer/Out</a>
                                 </li>
                 </ul>
+            </li>
+            <li>
+                <a href="{{ route('admin.settings.index') }}" class="has-arrow">
+                                <i data-feather="database"></i>
+                                <span data-key="t-warehouse">Settings</span>
+                </a>
+                
             </li>
 
             

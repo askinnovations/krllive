@@ -2,10 +2,10 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\{
-    EmployeeController, PayrollController, Auth\LoginController, AdminDashboardController,
-    UserController, TyreController, WarehouseController, OrderController,
+    EmployeeController, PayrollController, Auth\LoginController, AdminDashboardController,DestinationController,
+    UserController, TyreController, WarehouseController, OrderController,PackageTypeController,
     ConsignmentNoteController, FreightBillController, StockTransferController, DriverController,
-    AttendanceController, MaintenanceController, VehicleController,TaskManagmentController
+    AttendanceController, MaintenanceController, VehicleController,TaskManagmentController,ContractController,SettingsController
 };
 
 Route::get('/', function () {
@@ -53,6 +53,43 @@ Route::prefix('admin')->group(function () {
         Route::get('/delete/{id}', [TyreController::class, 'destroy'])->name('admin.tyres.delete');
        
     });
+    
+    // PackageTypeController
+    Route::prefix('packagetype')->group(function () {
+        Route::get('/', [PackageTypeController::class, 'index'])->name('admin.packagetype.index');
+        Route::post('/store', [PackageTypeController::class, 'store'])->name('admin.packagetype.store');
+        Route::put('/update/{id}', [PackageTypeController::class, 'update'])->name('admin.packagetype.update');
+        Route::get('/delete/{id}', [PackageTypeController::class, 'destroy'])->name('admin.packagetype.delete');
+       
+    });
+
+    // DestinationController
+    Route::prefix('destination')->group(function () {
+        Route::get('/', [DestinationController::class, 'index'])->name('admin.destination.index');
+        Route::post('/store', [DestinationController::class, 'store'])->name('admin.destination.store');
+        Route::put('/update/{id}', [DestinationController::class, 'update'])->name('admin.destination.update');
+        Route::get('/delete/{id}', [DestinationController::class, 'destroy'])->name('admin.destination.delete');
+       
+    });
+
+
+    // ContractController
+    Route::prefix('contract')->group(function () {
+        Route::get('/', [ContractController::class, 'index'])->name('admin.contract.index');
+        Route::get('/view/{id}', [ContractController::class, 'show'])->name('admin.contract.view');
+        Route::post('/store', [ContractController::class, 'store'])->name('admin.contract.store');
+    });
+
+
+    // SettingsController
+
+    Route::prefix('settings')->group(function () {
+        Route::get('/', [SettingsController::class, 'index'])->name('admin.settings.index');
+        
+    });
+
+    
+
 
     // Warehouse Management
     Route::prefix('warehouse')->group(function () {
