@@ -327,9 +327,6 @@
 
                     </div>
                 </div>
-
-
-
                 <div class="notice" style="display: flex; gap: 12px;  font-size: 14px; align-items: stretch;">
                     <div style="align-self: center;">
                         <p style="margin: 0; font-weight: bold;">GST to be paid by</p>
@@ -390,43 +387,73 @@
 
                     
                 </div>
-
+                @php
+                $total_actual_weight = 0;
+                $total_charged_weight = 0;
+            
+                foreach($lrEntries['cargo'] as $cargo) {
+                    $isValid = !empty($cargo['packages_no']) || !empty($cargo['package_type']) || !empty($cargo['package_description']) || !empty($cargo['actual_weight']) || !empty($cargo['charged_weight']);
+                    
+                    if ($isValid) {
+                        $total_actual_weight += $cargo['actual_weight'] ?? 0;
+                        $total_charged_weight += $cargo['charged_weight'] ?? 0;
+                    }
+                }
+            @endphp
                 <table border="1" style="border-collapse: collapse; width: 100%; text-align: center;">
-    <thead>
-        <tr>
-            <th rowspan="2">No. of Packages</th>
-            <th rowspan="2">Method of Packing</th>
-            <th rowspan="2">Description Said to contain</th>
-            <th colspan="2">Weight</th>
-        </tr>
-        <tr>
-            <th>Actual Weight</th>
-            <th>Charged Weight</th>
-        </tr>
-    </thead>
-    <tbody>
-    
-    @foreach($lrEntries['cargo'] as $cargo)
-    @php
-        // Check if at least one field is filled
-        $isValid = !empty($cargo['packages_no']) || !empty($cargo['package_type']) || !empty($cargo['package_description']) || !empty($cargo['actual_weight']) || !empty($cargo['charged_weight']);
-    @endphp
-
-    @if($isValid)
-        <tr>
-            <td>{{ $cargo['packages_no'] ?? '' }}</td>
-            <td>{{ $cargo['package_type'] ?? '' }}</td>
-            <td>{{ $cargo['package_description'] ?? '' }}</td>
-            <td>{{ $cargo['actual_weight'] ?? '' }}</td>
-            <td>{{ $cargo['charged_weight'] ?? '' }}</td>
-        </tr>
-    @endif
-@endforeach
-
-</tbody>
-
-</table>
-
+                    <thead>
+                        <tr>
+                            <th rowspan="2">No. of Packages</th>
+                            <th rowspan="2">Method of Packing</th>
+                            <th rowspan="2">Description Said to contain</th>
+                            <th colspan="2">Weight</th>
+                        </tr>
+                        <tr>
+                            <th>Actual Weight</th>
+                            <th>Charged Weight</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @php
+                            $firstRow = true; // Flag to control when to display Actual and Charged Weight
+                            $totalActualWeight = 0; // Variable to store the total of Actual Weight
+                            $totalChargedWeight = 0; // Variable to store the total of Charged Weight
+                        @endphp
+                
+                        @foreach($lrEntries['cargo'] as $cargo)
+                            @php
+                                // Check if at least one field is filled
+                                $isValid = !empty($cargo['packages_no']) || !empty($cargo['package_type']) || !empty($cargo['package_description']);
+                            @endphp
+                
+                            @if($isValid)
+                                <tr>
+                                    <td>{{ $cargo['packages_no'] ?? '' }}</td>
+                                    <td>{{ $cargo['package_type'] ?? '' }}</td>
+                                    <td>{{ $cargo['package_description'] ?? '' }}</td>
+                
+                                    <!-- Show Actual and Charged Weight only in the first row -->
+                                    @if($firstRow)
+                                        <td>{{ $total_actual_weight ?? 0 }}</td> <!-- Actual Weight -->
+                                        <td>{{ $total_charged_weight ?? 0 }}</td> <!-- Charged Weight -->
+                                        @php
+                                            $totalActualWeight += $cargo['actual_weight'] ?? 0; // Add to Actual Weight total
+                                            $totalChargedWeight += $cargo['charged_weight'] ?? 0; // Add to Charged Weight total
+                                            $firstRow = false; // Disable the display for the rest of the rows
+                                        @endphp
+                                    @else
+                                      
+                                    @endif
+                                </tr>
+                            @endif
+                        @endforeach
+                    </tbody>
+                </table>
+                
+                <!-- Display the totals below the table -->
+               
+                
+                
 
 @php
     if (!function_exists('toArray')) {
@@ -453,7 +480,8 @@
 @endphp
 
 @php
-    $lr = $lrEntries; // Single LR Entry already set from controller
+    $lr = $lrEntries; 
+    
 @endphp
 
 <p style="margin-top: 10px;">
@@ -471,7 +499,7 @@
     $lr = $lrEntries;
 
     // Find vehicle details
-    $vehicle = collect($vehicles)->firstWhere('id', $lr['vehicle_id'] ?? null);
+    // $vehicle = collect($vehicles)->firstWhere('id', $lr['vehicle_no'] ?? null);
 @endphp
 
 <p><strong>L.R. No:</strong> {{ $lr['lr_number'] ?? '-' }}</p>
@@ -479,12 +507,25 @@
 <p class="date" style="font-size: 16px;">
     <strong>Dated:</strong> {{ $lr['lr_date'] ?? '-' }}
 </p>
-
-<p><strong>Vehicle:</strong> {{ $vehicle->vehicle_no ?? 'N/A' }}</p>
+{{-- @dd($lr); --}}
+<p><strong>Vehicle:</strong>{{ $lr['vehicle_no'] ?? 'N/A' }} </p>
 
 <p><strong>Vehicle Type:</strong> {{ $vehicle->vehicle_type ?? 'N/A' }}</p>
 
-<p><strong>Delivery Mode:</strong> {{ $lr['delivery_mode'] ?? 'N/A' }}</p>
+{{-- <p><strong>Delivery Mode:</strong> {{ $lr['delivery_mode'] ?? 'N/A' }}</p> --}}
+<p><strong>Delivery Mode:</strong>
+    @if(isset($lr['delivery_mode']))
+        @if($lr['delivery_mode'] == 'door_delivery')
+            Door Delivery
+        @elseif($lr['delivery_mode'] == 'godwon_delivery')
+            Godwon Delivery
+        @else
+            {{ ucfirst(str_replace('_', ' ', $lr['delivery_mode'])) }}
+        @endif
+    @else
+        N/A
+    @endif
+</p>
 
 <p><strong>From:</strong> {{ $lr['from_location'] ?? '-' }}</p>
 

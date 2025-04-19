@@ -154,6 +154,7 @@ Route::prefix('admin')->group(function () {
         Route::post('/store', [OrderController::class, 'store'])->name('admin.orders.store');
         Route::get('/edit/{order_id}', [OrderController::class, 'edit'])->name('admin.orders.edit');
         Route::get('/view/{order_id}', [OrderController::class, 'show'])->name('admin.orders.view');
+        Route::get('/documents/{order_id}', [OrderController::class, 'docView'])->name('admin.orders.documents');
         Route::post('/update/{order_id}', [OrderController::class, 'update'])->name('admin.orders.update');
         Route::delete('/delete/{order_id}', [OrderController::class, 'destroy'])->name('admin.orders.delete');
     });
@@ -166,6 +167,7 @@ Route::prefix('admin')->group(function () {
         Route::post('/store', [ConsignmentNoteController::class, 'store'])->name('admin.consignments.store');
         Route::get('/edit/{order_id}', [ConsignmentNoteController::class, 'edit'])->name('admin.consignments.edit');
         Route::get('/view/{id}', [ConsignmentNoteController::class, 'show'])->name('admin.consignments.view');
+        Route::get('/documents/{id}', [ConsignmentNoteController::class, 'docView'])->name('admin.consignments.documents');
         Route::post('/update/{order_id}', [ConsignmentNoteController::class, 'update'])->name('admin.consignments.update');
         Route::delete('/delete/{order_id}', [ConsignmentNoteController::class, 'destroy'])->name('admin.consignments.delete');
     });

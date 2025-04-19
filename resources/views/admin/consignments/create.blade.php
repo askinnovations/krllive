@@ -135,9 +135,9 @@
                                             <div class="mb-3">
                                                 <label class="form-label">🚚 Vehicle Number</label>
                                                 <select name="vehicle_no" id="vehicle_no" class="form-select" required>
-                                                    <option selected>Select Vehicle NO.</option>
+                                                    <option >Select Vehicle NO.</option>
                                                     @foreach ($vehicles as $vehicle)
-                                                        <option value="{{ $vehicle->vehicle_no }}" data-type="{{ $vehicle->vehicle_type }}">
+                                                        <option value="{{ $vehicle->vehicle_no }}">
                                                             {{ $vehicle->vehicle_no }}
                                                         </option>
                                                     @endforeach              
@@ -147,17 +147,37 @@
                                         </div>
                                         <div class="col-md-4">
                                         <!-- Vehicle Type -->
-                                        <div class="mb-3">
-                                            <label class="form-label">🚛 Vehicle Type</label>
-                                            <select name="vehicle_type" id="vehicle_type" class="form-select" required>
-                                                <option selected>Select Type</option>
-                                                @foreach ($vehicles as $vehicle)
-                                                    <option value="{{ $vehicle->vehicle_type }}">
-                                                        {{ $vehicle->vehicle_type }}
-                                                    </option>
-                                                @endforeach
-                                            </select>
-                                        </div>
+                                    @php 
+                                        $vehicleOptions = [
+                                            "3MT / LCV",
+                                            "5MT",
+                                            "7.5MT",
+                                            "9MT",
+                                            "12MT",
+                                            "20MT / Multiaxle",
+                                            "25MT",
+                                            "19MT / 32FT Container",
+                                            "30MT",
+                                            "35MT",
+                                            "20FT Trailer - 20FT Container",
+                                            "40FT Container"
+                                        ];
+
+                                        $selectedVehicle = old("vehicle_type", $lr['vehicle_type'] ?? '');
+                                    @endphp
+
+                                    <div class="mb-3">
+                                        <label class="form-label">🚛 Vehicle Type</label>
+                                        <select name="vehicle_type"  class="form-select" required>
+                                            <option value="">Select Type</option>
+                                            @foreach ($vehicleOptions as $type)
+                                                <option value="{{ $type }}" {{ $selectedVehicle == $type ? 'selected' : '' }}>
+                                                    {{ $type }}
+                                                </option>
+                                            @endforeach
+                                        </select>
+                                    </div>
+
                                         </div>
                                         <!-- Vehicle Ownership -->
                                         <div class="col-md-4">
@@ -183,9 +203,9 @@
                                                 <label class="form-label">🚢 Delivery Mode</label>
                                                 <select name="delivery_mode" class="form-select" required>
                                                     <option selected>Select Mode</option>
-                                                    <option>Road</option>
-                                                    <option>Rail</option>
-                                                    <option>Air</option>
+                                                    <option value="door_delivery">Door Delivery</option>
+                                                    <option value="godwon_deliver">Dodwon  Deliver</option>
+                                                   
                                                 </select>
                                             </div>
                                         </div>
@@ -215,38 +235,28 @@
                                                 </select>
                                             </div>
                                         </div>
-                                        <div class="mb-3">
-                                            <label class="form-label">🛡️ Insurance?</label><br>
+                                        <div class="mb-3 d-flex align-items-center gap-3 flex-wrap">
+                                            <label class="form-label mb-0">🛡️ Insurance?</label>
+                                        
                                             <div class="form-check form-check-inline">
-                                                <input class="form-check-input create-insurance-yes" type="radio" name="create_insurance" value="yes" id="createInsuranceYes">
+                                                <input class="form-check-input" type="radio" name="insurance_status" value="yes" id="createInsuranceYes" {{ old('insurance_status') == 'yes' ? 'checked' : '' }}>
                                                 <label class="form-check-label" for="createInsuranceYes">Yes</label>
                                             </div>
+                                        
                                             <div class="form-check form-check-inline">
-                                                <input class="form-check-input" type="radio" name="create_insurance" value="no" id="createInsuranceNo" checked>
+                                                <input class="form-check-input" type="radio" name="insurance_status" value="no" id="createInsuranceNo" {{ old('insurance_status', 'no') == 'no' ? 'checked' : '' }}>
                                                 <label class="form-check-label" for="createInsuranceNo">No</label>
                                             </div>
-                                        </div>
-                                        <!-- Modal -->
-                                        <div class="modal fade" id="insuranceModal" tabindex="-1" aria-labelledby="insuranceModalLabel" aria-hidden="true">
-                                            <div class="modal-dialog">
-                                            <div class="modal-content">
-                                                <div class="modal-header">
-                                                <h5 class="modal-title" id="insuranceModalLabel">Insurance Description</h5>
-                                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                                                </div>
-                                                <div class="modal-body">
-                                                <textarea name="insurance_description" class="form-control" rows="4" placeholder="Enter insurance details..."></textarea>
-                                                </div>
-                                                <div class="modal-footer">
-                                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                                                {{-- Optional save button if needed --}}
-                                                </div>
-                                            </div>
-                                            </div>
-                                        </div>
                                         
- 
- 
+                                            <!-- Insurance input field -->
+                                            <input type="text" class="form-control {{ old('insurance_status') != 'yes' ? 'd-none' : '' }}" 
+                                                   name="insurance_description" 
+                                                   id="insuranceInput" 
+                                                   placeholder="Enter Insurance Number" 
+                                                   style="max-width: 450px;" 
+                                                   value="{{ old('insurance_description') }}">
+                                        </div>
+                                         
                                     </div>
 
                                     <!-- Cargo Description Section -->
@@ -274,14 +284,18 @@
                                                             <th>No. of Packages</th>
                                                             <th>Packaging Type</th>
                                                             <th>Description</th>
-                                                            <th>Weight (kg)</th>
+                                                        
                                                             <th>Actual Weight (kg)</th>
                                                             <th>Charged Weight (kg)</th>
+                                                            <th>Unit</th>
                                                             <th>Document No.</th>
                                                             <th>Document Name</th>
                                                             <th>Document Date</th>
+                                                            <th>Document Upload</th>
                                                             <th>Eway Bill</th>
                                                             <th>Valid Upto</th>
+                                                            <th>Declared value</th>
+                                                            
                                                             <th>Action</th>
                                                         </tr>
                                                     </thead>
@@ -296,14 +310,22 @@
                                                                 </select>
                                                             </td>
                                                             <td><input type="text" name="cargo[0][package_description]" class="form-control" placeholder="Enter description" required></td>
-                                                            <td><input name="cargo[0][weight]" type="number" class="form-control" placeholder="0" required></td>
                                                             <td><input name="cargo[0][actual_weight]" type="number" class="form-control" placeholder="0" required></td>
                                                             <td><input name="cargo[0][charged_weight]" type="number" class="form-control" placeholder="0" required></td>
+                                                            <td>
+                                                                <select class="form-select" name="cargo[0][unit]" required>
+                                                                  <option value="">Select Unit</option>
+                                                                  <option value="kg">Kg</option>
+                                                                  <option value="ton">Ton</option>
+                                                                </select>
+                                                              </td>
                                                             <td><input name="cargo[0][document_no]" type="text" class="form-control" placeholder="Doc No." required></td>
                                                             <td><input name="cargo[0][document_name]" type="text" class="form-control" placeholder="Doc Name" required></td>
                                                             <td><input name="cargo[0][document_date]" type="date" class="form-control" required></td>
+                                                            <td><input name="cargo[0][document_file]" type="file" class="form-control" required></td>
                                                             <td><input name="cargo[0][eway_bill]" type="text" class="form-control" placeholder="Eway Bill No." required></td>
                                                             <td><input name="cargo[0][valid_upto]" type="date" class="form-control" required></td>
+                                                            <td><input name="cargo[0][declared_value]" type="number" class="form-control" placeholder="0" required></td>
                                                             <td>
                                                                 <button class="btn btn-danger btn-sm" onclick="removeRow(this)">🗑</button>
                                                             </td>
@@ -325,11 +347,25 @@
                                         <div class="col-12">
                                             <h5 class=" pb-3">🚚 Freight Details</h5>
 
-                                            
+                                            <div class="mb-3 d-flex gap-3">
+                                                <div class="form-check form-check-inline">
+                                                    <input class="form-check-input freight-type" type="radio" name="freightType" id="freightPaid" value="paid" onchange="toggleFreightTable()" checked>
+                                                  <label class="form-check-label" for="freightPaid">Paid</label>
+                                                </div>
+                                                <div class="form-check form-check-inline">
+                                                   <input class="form-check-input freight-type" type="radio" name="freightType" id="freightToPay" value="to_pay" onchange="toggleFreightTable()">
+                                                 
+                                                  <label class="form-check-label" for="freightToPay">To Pay</label>
+                                                </div>
+                                                <div class="form-check form-check-inline">
+                                                     <input class="form-check-input freight-type" type="radio" name="freightType" id="freightToBeBilled" value="to_be_billed" onchange="toggleFreightTable()">
 
+                                                  <label class="form-check-label" for="freightToBeBilled">To Be Billed</label>
+                                                </div>
+                                              </div>
                                             <!-- Freight Charges Table -->
                                             <div class="table-responsive">
-                                                <table class="table table-bordered align-middle text-center">
+                                                <table class="table table-bordered align-middle text-center" id="freight-table">
                                                     <thead>
                                                         <tr>
                                                             <th>Freight</th>
@@ -342,7 +378,7 @@
                                                             <th>Balance Freight</th>
                                                         </tr>
                                                     </thead>
-                                                    <tbody>
+                                                    <tbody id="freightBody">
                                                         <tr>
                                                             <td><input name="freight_amount" type="number" class="form-control"
                                                                     placeholder="Enter Freight Amount" required></td>
@@ -372,13 +408,13 @@
                                         <!-- Declared Value -->
                                         <div class="col-md-6 mt-3">
                                             <div class="mb-3">
-                                                <label class="form-label " style="font-weight: bold;">💰 Declared Value
+                                                <label class="form-label " style="font-weight: bold;">💰Total Declared Value
                                                     (Rs.)</label>
-                                                <input type="number" name="declared_value" class="form-control" required>
+                                                <input type="number" id="totalDeclaredValue" name="total_declared_value" class="form-control"readonly>
                                             </div>
                                         </div>
                                     </div>
-
+                                  
                                     <div class="row">
                                         
                                          <!-- Submit Button -->
@@ -395,28 +431,77 @@
                             </div>
                         </div>
                     </div>
-<script>
-    document.getElementById('createInsuranceYes').addEventListener('click', function () {
-        let myModal = new bootstrap.Modal(document.getElementById('insuranceModal'));
-        myModal.show();
-    });
-</script>
-<script>
-    document.getElementById('vehicle_no').addEventListener('change', function () {
-        const selectedOption = this.options[this.selectedIndex];
-        const type = selectedOption.getAttribute('data-type');
+                    
+                    <script>
+                        function toggleFreightTable() {
+                            const tbody = document.getElementById('freightBody');
+                      
+                            const selectedFreightType = document.querySelector('input[name="freightType"]:checked').value;
+                      
+                            if (selectedFreightType === 'to_be_billed') {
+                                tbody.style.display = 'none';
+                                const inputs = tbody.querySelectorAll('input');
+                                inputs.forEach(input => input.removeAttribute('required'));
+                            } else {
+                                tbody.style.display = 'table-row-group';
+                                const inputs = tbody.querySelectorAll('input');
+                                inputs.forEach(input => input.setAttribute('required', 'required'));
+                            }
+                        }
+                      
+                        // Auto-call this function on page load (to show/hide based on preselected value)
+                        document.addEventListener('DOMContentLoaded', function () {
+                            toggleFreightTable();
+                        });
+                      </script>
+                      
+                    <script>
+                        const yesRadio = document.getElementById('createInsuranceYes');
+                        const noRadio = document.getElementById('createInsuranceNo');
+                        const insuranceInput = document.getElementById('insuranceInput');
+                    
+                        function toggleInsuranceField() {
+                            if (yesRadio.checked) {
+                                insuranceInput.classList.remove('d-none');
+                            } else {
+                                insuranceInput.classList.add('d-none');
+                                insuranceInput.value = '';
+                            }
+                        }
+                    
+                        // Run on load
+                        window.addEventListener('DOMContentLoaded', toggleInsuranceField);
+                    
+                        // Run on change
+                        yesRadio.addEventListener('change', toggleInsuranceField);
+                        noRadio.addEventListener('change', toggleInsuranceField);
+                    </script>
+                    <script>
+                        document.getElementById('vehicle_no').addEventListener('change', function () {
+                            const selectedOption = this.options[this.selectedIndex];
+                            const type = selectedOption.getAttribute('data-type');
 
-        const typeSelect = document.getElementById('vehicle_type');
-        for (let i = 0; i < typeSelect.options.length; i++) {
-            if (typeSelect.options[i].value === type) {
-                typeSelect.selectedIndex = i;
-                break;
-            }
-        }
-    });
-</script>
-
+                            const typeSelect = document.getElementById('vehicle_type');
+                            for (let i = 0; i < typeSelect.options.length; i++) {
+                                if (typeSelect.options[i].value === type) {
+                                    typeSelect.selectedIndex = i;
+                                    break;
+                                }
+                            }
+                        });
+                    </script>
 <script>
+    function calculateTotal() {
+        const declaredValues = document.querySelectorAll('.declared-value');
+        let total = 0;
+
+        declaredValues.forEach(input => {
+            total += parseFloat(input.value) || 0;
+        });
+
+        document.getElementById('totalDeclaredValue').value = total;
+    }
+
     function addRow() {
         let table = document.getElementById('cargoTableBody');
         let rowCount = table.rows.length;
@@ -429,10 +514,17 @@
                 const field = name.match(/\[([a-zA-Z_]+)\]/)[1];
                 input.setAttribute('name', `cargo[${rowCount}][${field}]`);
                 input.value = '';
+
+                // Check for declared_value field
+                if (field === 'declared_value') {
+                    input.classList.add('declared-value');
+                    input.addEventListener('input', calculateTotal);
+                }
             }
         });
 
         table.appendChild(newRow);
+        calculateTotal(); // Recalculate after adding
     }
 
     function removeRow(button) {
@@ -451,9 +543,23 @@
                     }
                 });
             });
+
+            calculateTotal(); // Recalculate after removing
         }
     }
+
+    // Bind first declared value field on page load
+    document.addEventListener('DOMContentLoaded', function () {
+        const input = document.querySelector('input[name="cargo[0][declared_value]"]');
+        if (input) {
+            input.classList.add('declared-value');
+            input.addEventListener('input', calculateTotal);
+        }
+
+        calculateTotal();
+    });
 </script>
+
 
 <script>
    function setConsignorDetails() {

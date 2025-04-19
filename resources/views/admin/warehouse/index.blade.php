@@ -58,6 +58,7 @@
                                         <thead>
                                             <tr>
                                                 <th>S.No</th>
+                                                <th>Warhouse ID</th>
                                                 <th>Name</th>
                                                 <th>Address</th>
                                                 <th>Incharge</th>
@@ -68,7 +69,8 @@
                                             @foreach ($warehouses as $warehouse)
                             
                                             <tr>
-                                                <td>{{$warehouse->id}}</td>
+                                                <td>{{$loop->iteration}}</td>
+                                                <td>WH##{{$warehouse->id}}</td>
                                                 <td>{{$warehouse->warehouse_name}}</td>
                                                 <td>{{$warehouse->address}}</td>
                                                 <td>{{$warehouse->incharge}}</td>
