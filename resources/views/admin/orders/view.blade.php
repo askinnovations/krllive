@@ -30,6 +30,7 @@
                <option value="Cancelled" {{ $order->status == 'Cancelled' ? 'selected' : '' }}>Cancelled</option>
                </select>
             </div>
+            
             <!-- CUSTOMER NAME DROPDOWN -->
             <div class="col-md-3">
                <div class="mb-3">
@@ -79,17 +80,71 @@
             <div class="col-md-3">
                <div class="mb-3">
                   <label class="form-label">📊 Order Type</label>
-                  <select name="order_type" class="form-select" required readonly>
-                     <option value="">Select Order</option>
+                  
+                  <select name="order_type" class="form-select" required>
+                     <option value="">Select Order Type</option>
                      @php
                      $orderType = old('order_type', isset($order) ? $order->order_type : '');
+                     
                      @endphp
-                     <option value="Back Date" {{ $orderType === 'Back Date' ? 'selected' : '' }}>Back Date</option>
-                     <option value="Future" {{ $orderType === 'Future' ? 'selected' : '' }}>Future</option>
-                     <option value="Normal" {{ $orderType === 'Normal' ? 'selected' : '' }}>Normal</option>
+                    
+                     <option value="import" {{ $orderType === 'import' ? 'selected' : '' }}>Import</option>
+                     <option value="import-restoff" {{ $orderType === 'import-restoff' ? 'selected' : '' }}>Import Restoff</option>
+                     <option value="export" {{ $orderType === 'export' ? 'selected' : '' }}>Export</option>
+                     <option value="export_restoff" {{ $orderType === 'export-restoff' ? 'selected' : '' }}>Export Restoff</option>
+                     <option value="domestic" {{ $orderType === 'domestic' ? 'selected' : '' }}>Domestic</option>
                   </select>
                </div>
             </div>
+            <div class="col-md-3">
+               <div class="mb-3">
+                  <label class="form-label">📍 PICKUP ADDRESS</label>
+                  <input type="text" name="pickup_addresss" id="pickup_addresss" value="{{ old('pickup_addresss', isset($order) ? $order->pickup_addresss : '') }}" class="form-control"  placeholder="Pickup Addresss" readonly>
+               </div>
+            </div>
+            
+            <!-- DEliver adddress   -->
+            <div class="col-md-3">
+               <div class="mb-3">
+                  <label class="form-label">📍DELEIEIVER ADDRESS</label>
+                  <input type="text" name="deleiver_addresss" id="deleiver_addresss" class="form-control" value="{{ old('deleiver_addresss', isset($order) ? $order->deleiver_addresss : '') }}"  placeholder="Deleiver Addresss" readonly>
+               </div>
+            </div>
+            @php
+               $method = old('order_method', $order->order_method ?? '');
+               $orderAmount = old('order_amount', $order->byorder ?? '');
+               $contractNumber = old('contract_number', $order->bycontract?? '');
+               @endphp
+
+           <div class="col-md-3">
+           <div class="mb-3">
+               <label class="form-label">📑 Order Method</label><br>
+
+               <div class="form-check form-check-inline">
+               <input 
+                   class="form-check-input" 
+                   type="radio" 
+                   name="order_method" 
+                   id="byOrder" 
+                   value="order" 
+                   onclick="toggleOrderMethod()" 
+                   {{ $method == 'order' ? 'checked' : '' }}>
+               <label class="form-check-label" for="byOrder">By Order</label>
+               </div>
+
+               <div class="form-check form-check-inline">
+               <input 
+                   class="form-check-input" 
+                   type="radio" 
+                   name="order_method" 
+                   id="byContract" 
+                   value="contract" 
+                   onclick="toggleOrderMethod()" 
+                   {{ $method == 'contract' ? 'checked' : '' }}>
+               <label class="form-check-label" for="byContract">By Contract</label>
+               </div>
+           </div>
+
          </div>
          <!-- lr  -->
          @php
@@ -222,33 +277,55 @@
             </div>
             <div class="row">
                <!-- LR Date -->
+              
                <div class="col-md-4">
-                  <div class="mb-3">
-                     <label class="form-label">📅 Vehicle Date</label>
-                     <input readonly type="date" name="lr[${counter}][vehicle_date]" class="form-control" value="{{ $lr['vehicle_date'] ?? '' }}" required>
-                  </div>
-               </div>
+                  <label class="form-label">🚛 Vehicle Number</label>
+                  <select name="lr[{{ $index }}][vehicle_no]" class="form-select">
+                      <option value="">Select Vehicle</option>
+                      @foreach ($vehicles as $vehicle)
+                          <option value="{{ $vehicle->vehicle_no }}" 
+                              {{ (isset($lr['vehicle_no']) && $lr['vehicle_no'] == $vehicle->vehicle_no) ? 'selected' : '' }}>
+                              {{ $vehicle->vehicle_no }}
+                          </option>
+                      @endforeach
+                  </select>
+              </div>
                <!-- Vehicle Type (Vehicle ID from vehicles table) -->
-               @php
-               $selectedVehicle = collect($vehicles)->firstWhere('id', $lr['vehicle_id']);
-               @endphp
+               
                <!-- Vehicle Dropdown -->
                <div class="col-md-4">
                   <label class="form-label">🚛 Vehicle</label>
-                  <select name="lr[{{ $index }}][vehicle_id]" readonly
-                     id="vehicle_id_{{ $index }}" 
+                  @php 
+                  $vehicleOptions = [
+                     "3MT / LCV",
+                     "5MT",
+                     "7.5MT",
+                     "9MT",
+                     "12MT",
+                     "20MT / Multiaxle",
+                     "25MT",
+                     "19MT / 32FT Container",
+                     "30MT",
+                     "35MT",
+                     "20FT Trailer - 20FT Container",
+                     "40FT Container"
+                 ];
+             
+                 $selectedVehicle = old("lr.$index.vehicle_type", $lr['vehicle_type'] ?? '');
+             @endphp
+             
+             <select name="lr[{{ $index }}][vehicle_type]" 
+                     
                      class="form-select" 
-                     onchange="fillVehicleDetails({{ $index }})">
-                     <option value="">Select Vehicle</option>
-                     @foreach ($vehicles as $vehicle)
-                     <option 
-                     value="{{ $vehicle->id }}" 
-                     data-type="{{ $vehicle->vehicle_type }}" 
-                     data-no="{{ $vehicle->vehicle_no }}"
-                     {{ old("lr.$index.vehicle_id", $lr['vehicle_id']) == $vehicle->id ? 'selected' : '' }}>
-                     {{ $vehicle->vehicle_type }} - {{ $vehicle->vehicle_no }}
+                     onchange="fillVehicleDetails({{ $index }})"
+                     readonly>
+                 <option value="">Select Vehicle</option>
+             
+                 @foreach ($vehicleOptions as $option)
+                     <option value="{{ $option }}" {{ $selectedVehicle == $option ? 'selected' : '' }}>
+                         {{ $option }}
                      </option>
-                     @endforeach
+                 @endforeach
                   </select>
                </div>
                <!-- Vehicle Ownership -->
@@ -281,11 +358,11 @@
                <div class="col-md-4">
                   <div class="mb-3">
                      <label class="form-label">🚢 Delivery Mode</label>
-                     <select name="lr[{{ $index }}][delivery_mode]" class="form-select" required readonly>
+                     <select name="lr[{{ $index }}][delivery_mode]" class="form-select" required>
                         <option value="">Select Mode</option>
-                        <option value="Road" {{ old("lr.$index.delivery_mode", $lr['delivery_mode']) == 'Road' ? 'selected' : '' }}>Road</option>
-                        <option value="Rail" {{ old("lr.$index.delivery_mode", $lr['delivery_mode']) == 'Rail' ? 'selected' : '' }}>Rail</option>
-                        <option value="Air" {{ old("lr.$index.delivery_mode", $lr['delivery_mode']) == 'Air' ? 'selected' : '' }}>Air</option>
+                        <option value="Road" {{ old("lr.$index.delivery_mode", $lr['delivery_mode']) == 'door delivery' ? 'selected' : '' }}>Door Deliver</option>
+                        <option value="Rail" {{ old("lr.$index.delivery_mode", $lr['delivery_mode']) == 'godwon_deliver' ? 'selected' : '' }}>Godwon Deliver</option>
+                        
                      </select>
                   </div>
                </div>
@@ -330,14 +407,16 @@
                               <th>No. of Packages</th>
                               <th>Packaging Type</th>
                               <th>Description</th>
-                              <th>Weight (kg)</th>
+                              {{-- <th>Weight (kg)</th> --}}
                               <th>Actual Weight (kg)</th>
                               <th>Charged Weight (kg)</th>
+                              <th>&nbsp;Unit&nbsp;&nbsp;</th>
                               <th>Document No.</th>
                               <th>Document Name</th>
                               <th>Document Date</th>
                               <th>Eway Bill</th>
                               <th>Valid Upto</th>
+                              <th>Declared value</th>
                               <th>Action</th>
                            </tr>
                         </thead>
@@ -353,14 +432,30 @@
                                  </select>
                               </td>
                               <td><input type="text" name="lr[{{ $lrIndex }}][cargo][{{ $cargoIndex }}][package_description]" class="form-control" value="{{ $cargo['package_description'] }}" required readonly></td>
-                              <td><input type="number" name="lr[{{ $lrIndex }}][cargo][{{ $cargoIndex }}][weight]" class="form-control" value="{{ $cargo['weight'] }}" required readonly></td>
+                              {{-- <td><input type="number" name="lr[{{ $lrIndex }}][cargo][{{ $cargoIndex }}][weight]" class="form-control" value="{{ $cargo['weight'] }}" required readonly></td> --}}
                               <td><input type="number" name="lr[{{ $lrIndex }}][cargo][{{ $cargoIndex }}][actual_weight]" class="form-control" value="{{ $cargo['actual_weight'] }}" required readonly></td>
                               <td><input type="number" name="lr[{{ $lrIndex }}][cargo][{{ $cargoIndex }}][charged_weight]" class="form-control" value="{{ $cargo['charged_weight'] }}" required readonly></td>
+                              <td>
+                                 <select class="form-select" name="lr[{{ $lrIndex }}][cargo][0][unit]" required>
+                                     <option value="">Select Unit</option>
+                                     <option value="kg" {{ ($cargo['unit'] ?? '') == 'kg' ? 'selected' : '' }}>Kg</option>
+                                     <option value="ton" {{ ($cargo['unit'] ?? '') == 'ton' ? 'selected' : '' }}>Ton</option>
+                                 </select>
+                                </td>
                               <td><input type="text" name="lr[{{ $lrIndex }}][cargo][{{ $cargoIndex }}][document_no]" class="form-control" value="{{ $cargo['document_no'] }}" required readonly></td>
                               <td><input type="text" name="lr[{{ $lrIndex }}][cargo][{{ $cargoIndex }}][document_name]" class="form-control" value="{{ $cargo['document_name'] }}" required readonly></td>
                               <td><input type="date" name="lr[{{ $lrIndex }}][cargo][{{ $cargoIndex }}][document_date]" class="form-control" value="{{ $cargo['document_date'] }}" required readonly></td>
                               <td><input type="text" name="lr[{{ $lrIndex }}][cargo][{{ $cargoIndex }}][eway_bill]" class="form-control" value="{{ $cargo['eway_bill'] }}" required readonly></td>
                               <td><input type="date" name="lr[{{ $lrIndex }}][cargo][{{ $cargoIndex }}][valid_upto]" class="form-control" value="{{ $cargo['valid_upto'] }}" required readonly></td>
+                              <td>
+                                 <input  name="lr[{{ $index }}][cargo][{{ $cargoIndex }}][declared_value]"
+                                       type="number" 
+                                       value="{{ $cargo['declared_value'] }}" 
+                                       class="form-control declared-value"  
+                                       readonly 
+                                      ></td>
+                                 
+                               
                               <td>
                                  <button type="button" class="btn btn-danger btn-sm" onclick="removeRow(this)">🗑</button>
                               </td>
@@ -380,6 +475,42 @@
                <div class="row mt-4">
                   <div class="col-12">
                      <h5 class="pb-3">🚚 Freight Details (LR {{ $lrIndex + 1 }})</h5>
+                     @php $freightType = $lr['freightType'] ?? 'paid'; @endphp
+
+                     <div class="mb-3 d-flex gap-3">
+                         <div class="form-check form-check-inline">
+                             <input class="form-check-input freight-type"
+                                    type="radio"
+                                    name="lr[freightType]"
+                                    id="freightPaid"
+                                    value="paid"
+                                    onchange="toggleFreightTable()"
+                                    {{ $freightType === 'paid' ? 'checked' : '' }}>
+                             <label class="form-check-label" for="freightPaid">Paid</label>
+                         </div>
+                     
+                         <div class="form-check form-check-inline">
+                             <input class="form-check-input freight-type"
+                                    type="radio"
+                                    name="lr[freightType]"
+                                    id="freightToPay"
+                                    value="to_pay"
+                                    onchange="toggleFreightTable()"
+                                    {{ $freightType === 'to_pay' ? 'checked' : '' }}>
+                             <label class="form-check-label" for="freightToPay">To Pay</label>
+                         </div>
+                     
+                         <div class="form-check form-check-inline">
+                             <input class="form-check-input freight-type"
+                                    type="radio"
+                                    name="lr[freightType]"
+                                    id="freightToBeBilled"
+                                    value="to_be_billed"
+                                    onchange="toggleFreightTable()"
+                                    {{ $freightType === 'to_be_billed' ? 'checked' : '' }}>
+                             <label class="form-check-label" for="freightToBeBilled">To Be Billed</label>
+                         </div>
+                     </div>
                      <div class="table-responsive">
                         <table class="table table-bordered align-middle text-center">
                            <thead>
@@ -423,8 +554,9 @@
                   <div class="col-md-6">
                      <div class="mb-3">
                         <label class="form-label" style="font-weight: bold;">💰 Declared Value (Rs.)</label>
-                        <input type="number" name="lr[{{ $lrIndex }}][declared_value]" readonly
-                           value="{{ $lr['declared_value'] ?? '' }}" class="form-control" required>
+                       
+                        <input type="text" id="totalDeclaredValue-{{ $index }}" name="lr[{{ $index }}][total_declared_value]" value="{{ $lr['total_declared_value'] ?? '' }}" class="form-control" readonly>
+
                      </div>
                   </div>
                </div>

@@ -95,7 +95,67 @@
                   </select>
                </div>
             </div>
-         </div>
+            <div class="col-md-3">
+                <div class="mb-3">
+                   <label class="form-label">📍 PICKUP ADDRESS</label>
+                   <input type="text" name="pickup_addresss" id="pickup_addresss" value="{{ old('pickup_addresss', isset($order) ? $order->pickup_addresss : '') }}" class="form-control"  placeholder="Pickup Addresss" required>
+                </div>
+             </div>
+             <!-- DEliver adddress   -->
+             <div class="col-md-3">
+                <div class="mb-3">
+                   <label class="form-label">📍DELEIEIVER ADDRESS</label>
+                   <input type="text" name="deleiver_addresss" id="deleiver_addresss" class="form-control" value="{{ old('deleiver_addresss', isset($order) ? $order->deleiver_addresss : '') }}"  placeholder="Deleiver Addresss" required>
+                </div>
+             </div>
+             @php
+                $method = old('order_method', $order->order_method ?? '');
+                $orderAmount = old('order_amount', $order->byorder ?? '');
+                $contractNumber = old('contract_number', $order->bycontract?? '');
+                @endphp
+
+            <div class="col-md-3">
+            <div class="mb-3">
+                <label class="form-label">📑 Order Method</label><br>
+
+                <div class="form-check form-check-inline">
+                <input 
+                    class="form-check-input" 
+                    type="radio" 
+                    name="order_method" 
+                    id="byOrder" 
+                    value="order" 
+                    onclick="toggleOrderMethod()" 
+                    {{ $method == 'order' ? 'checked' : '' }}>
+                <label class="form-check-label" for="byOrder">By Order</label>
+                </div>
+
+                <div class="form-check form-check-inline">
+                <input 
+                    class="form-check-input" 
+                    type="radio" 
+                    name="order_method" 
+                    id="byContract" 
+                    value="contract" 
+                    onclick="toggleOrderMethod()" 
+                    {{ $method == 'contract' ? 'checked' : '' }}>
+                <label class="form-check-label" for="byContract">By Contract</label>
+                </div>
+            </div>
+
+  <!-- Order Amount Input -->
+        <div class="mb-3 {{ $method == 'order' ? '' : 'd-none' }}" id="orderAmountDiv">
+            <label class="form-label">💰 Order Amount</label>
+            <input type="number" name="byOrder" class="form-control" value="{{ $orderAmount }}" placeholder="Enter Amount" {{ $method == 'order' ? 'required' : '' }}>
+        </div>
+
+        <!-- Contract Number Input -->
+        <div class="mb-3 {{ $method == 'contract' ? '' : 'd-none' }}" id="contractNumberDiv">
+            <label class="form-label">📄 Contract Number</label>
+            <input type="text" name="byContract" class="form-control" value="{{ $contractNumber }}" placeholder="Enter Contract Number" {{ $method == 'contract' ? 'required' : '' }}>
+        </div>
+        </div>
+      </div>
          <!-- lr  -->
          @php
          $lrData = is_array($order->lr) ? $order->lr : json_decode($order->lr, true);
@@ -237,43 +297,60 @@
                <!-- LR Date -->
                <div class="col-md-4">
                   <label class="form-label">🚛 Vehicle Number</label>
-                  <select name="lr[{{ $index }}][vehicle_id]" 
-                     id="vehicle_id_{{ $index }}" 
-                     class="form-select" 
-                     onchange="fillVehicleDetails({{ $index }})">
-                     <option value="">Select Vehicle</option>
-                     @foreach ($vehicles as $vehicle)
-                     <option 
-                     value="{{ $vehicle->id }}" 
-                     
-                     data-no="{{ $vehicle->vehicle_no }}"
-                     {{ old("lr.$index.vehicle_id", $lr['vehicle_id']) == $vehicle->id ? 'selected' : '' }}>
-                     {{ $vehicle->vehicle_no }}
-                     </option>
-                     @endforeach
+                  <select name="lr[{{ $index }}][vehicle_no]" 
+                          id="vehicle_id_{{ $index }}" 
+                          class="form-select" 
+                          onchange="fillVehicleDetails({{ $index }})">
+                      <option value="">Select Vehicle</option>
+                      @foreach ($vehicles as $vehicle)
+                          <option 
+                              value="{{ $vehicle->vehicle_no }}"
+                              data-no="{{ $vehicle->vehicle_no }}"
+                              {{ old("lr.$index.vehicle_no", isset($lr['vehicle_no']) ? $lr['vehicle_no'] : '') == $vehicle->id ? 'selected' : '' }}>
+                              {{ $vehicle->vehicle_no }}
+                          </option>
+                      @endforeach
                   </select>
-               </div>
+              </div>
+              
                <!-- Vehicle Type (Vehicle ID from vehicles table) -->
-               @php
+               {{-- @php
                $selectedVehicle = collect($vehicles)->firstWhere('id', $lr['vehicle_id']);
-               @endphp
+               @endphp --}}
                <!-- Vehicle Dropdown -->
                <div class="col-md-4">
                   <label class="form-label">🚛 Vehicle</label>
-                  <select name="lr[{{ $index }}][vehicle_id]" 
-                     id="vehicle_id_{{ $index }}" 
+                  @php 
+                  $vehicleOptions = [
+                     "3MT / LCV",
+                     "5MT",
+                     "7.5MT",
+                     "9MT",
+                     "12MT",
+                     "20MT / Multiaxle",
+                     "25MT",
+                     "19MT / 32FT Container",
+                     "30MT",
+                     "35MT",
+                     "20FT Trailer - 20FT Container",
+                     "40FT Container"
+                 ];
+             
+                 $selectedVehicle = old("lr.$index.vehicle_type", $lr['vehicle_type'] ?? '');
+             @endphp
+             
+             <select name="lr[{{ $index }}][vehicle_type]" 
+                     
                      class="form-select" 
-                     onchange="fillVehicleDetails({{ $index }})">
-                     <option value="">Select Vehicle</option>
-                     @foreach ($vehicles as $vehicle)
-                     <option 
-                     value="{{ $vehicle->id }}" 
-                     data-type="{{ $vehicle->vehicle_type }}" 
-                   
-                     {{ old("lr.$index.vehicle_id", $lr['vehicle_id']) == $vehicle->id ? 'selected' : '' }}>
-                     {{ $vehicle->vehicle_type }}
+                     onchange="fillVehicleDetails({{ $index }})"
+                     required>
+                 <option value="">Select Vehicle</option>
+             
+                 @foreach ($vehicleOptions as $option)
+                     <option value="{{ $option }}" {{ $selectedVehicle == $option ? 'selected' : '' }}>
+                         {{ $option }}
                      </option>
-                     @endforeach
+                 @endforeach
                   </select>
                </div>
                <!-- Vehicle Ownership -->
@@ -308,9 +385,9 @@
                      <label class="form-label">🚢 Delivery Mode</label>
                      <select name="lr[{{ $index }}][delivery_mode]" class="form-select" required>
                         <option value="">Select Mode</option>
-                        <option value="Road" {{ old("lr.$index.delivery_mode", $lr['delivery_mode']) == 'Road' ? 'selected' : '' }}>Road</option>
-                        <option value="Rail" {{ old("lr.$index.delivery_mode", $lr['delivery_mode']) == 'Rail' ? 'selected' : '' }}>Rail</option>
-                        <option value="Air" {{ old("lr.$index.delivery_mode", $lr['delivery_mode']) == 'Air' ? 'selected' : '' }}>Air</option>
+                        <option value="Road" {{ old("lr.$index.delivery_mode", $lr['delivery_mode']) == 'door delivery' ? 'selected' : '' }}>Door Deliver</option>
+                        <option value="Rail" {{ old("lr.$index.delivery_mode", $lr['delivery_mode']) == 'godwon_deliver' ? 'selected' : '' }}>Godwon Deliver</option>
+                        
                      </select>
                   </div>
                </div>
@@ -339,6 +416,27 @@
                   </div>
                </div>
             </div>
+            <div class="mb-3 d-flex align-items-center gap-3 flex-wrap">
+               <label class="form-label mb-0">🛡️ Insurance?</label>
+           
+               <div class="form-check form-check-inline">
+                   <input class="form-check-input" type="radio" name="insurance_status" value="yes" id="createInsuranceYes" {{ old('insurance_status') == 'yes' ? 'checked' : '' }}>
+                   <label class="form-check-label" for="createInsuranceYes">Yes</label>
+               </div>
+           
+               <div class="form-check form-check-inline">
+                   <input class="form-check-input" type="radio" name="insurance_status" value="no" id="createInsuranceNo" {{ old('insurance_status', 'no') == 'no' ? 'checked' : '' }}>
+                   <label class="form-check-label" for="createInsuranceNo">No</label>
+               </div>
+           
+               <!-- Insurance input field -->
+               <input type="text" class="form-control {{ old('insurance_status') != 'yes' ? 'd-none' : '' }}" 
+                      name="lr[{{ $index }}][insurance_description]" 
+                      id="insuranceInput" 
+                      placeholder="Enter Insurance Number" 
+                      style="max-width: 450px;" 
+                      value="{{ old('insurance_description') }}">
+           </div>
             <div class="row mt-4">
                @php
                $lrIndex = $loop->index ?? 0;
@@ -355,19 +453,21 @@
                               <th>No. of Packages</th>
                               <th>Packaging Type</th>
                               <th>Description</th>
-                              <th>Weight (kg)</th>
                               <th>Actual Weight (kg)</th>
                               <th>Charged Weight (kg)</th>
+                              <th>&nbsp;Unit&nbsp;&nbsp;</th>
                               <th>Document No.</th>
                               <th>Document Name</th>
                               <th>Document Date</th>
+                              <th>Document Upload</th>
                               <th>Eway Bill</th>
                               <th>Valid Upto</th>
+                              <th>Declared value</th>
                               <th>Action</th>
                            </tr>
                         </thead>
-                        <tbody id="cargoTableBody-{{ $lrIndex }}">
-                           {{-- @foreach ($cargoData as $cargoIndex => $cargo) --}}
+                        <tbody id="cargoTableBody-{{ $index }}">
+                           
                            @foreach ($lr['cargo'] as $cargoIndex => $cargo)
                            <tr>
                               
@@ -380,14 +480,47 @@
                                    </select>
                                </td>
                                <td><input type="text" name="lr[{{ $index }}][cargo][{{ $cargoIndex }}][package_description]" class="form-control" value="{{ $cargo['package_description'] }}" required></td>
-                               <td><input type="number" name="lr[{{ $index }}][cargo][{{ $cargoIndex }}][weight]" class="form-control" value="{{ $cargo['weight'] }}" required></td>
+                              
                                <td><input type="number" name="lr[{{ $index }}][cargo][{{ $cargoIndex }}][actual_weight]" class="form-control" value="{{ $cargo['actual_weight'] }}" required></td>
                                <td><input type="number" name="lr[{{ $index }}][cargo][{{ $cargoIndex }}][charged_weight]" class="form-control" value="{{ $cargo['charged_weight'] }}" required></td>
+                               <td>
+                                <select class="form-select" name="lr[{{ $lrIndex }}][cargo][0][unit]" required>
+                                    <option value="">Select Unit</option>
+                                    <option value="kg" {{ ($cargo['unit'] ?? '') == 'kg' ? 'selected' : '' }}>Kg</option>
+                                    <option value="ton" {{ ($cargo['unit'] ?? '') == 'ton' ? 'selected' : '' }}>Ton</option>
+                                </select>
+                               </td>
                                <td><input type="text" name="lr[{{ $index }}][cargo][{{ $cargoIndex }}][document_no]" class="form-control" value="{{ $cargo['document_no'] }}" required></td>
                                <td><input type="text" name="lr[{{ $index }}][cargo][{{ $cargoIndex }}][document_name]" class="form-control" value="{{ $cargo['document_name'] }}" required></td>
                                <td><input type="date" name="lr[{{ $index }}][cargo][{{ $cargoIndex }}][document_date]" class="form-control" value="{{ $cargo['document_date'] }}" required></td>
+                               <td>
+                                 <input type="file" name="lr[{{ $index }}][cargo][{{ $cargoIndex }}][document_file]" class="form-control" value="" >
+                                 {{-- <div>
+                                    @if($cargo['document_file'])
+                                    <button type="button" 
+                                    class="btn  openImageModal"
+                                    data-image="{{ asset('storage/'.$cargo['document_file']) }}"
+                                    data-bs-toggle="modal"
+                                    data-bs-target="#imageModal">
+                                   <p  class="text-info"> View </p>
+                                </button>
+                                    @endif
+                                </div> --}}
+                        
+                                 {{-- <img src="{{ asset('storage/' .$cargo['document_file']) }}" width="150" class="img-thumbnail" alt="Document Image"> --}}
+                           
+                               </td>
                                <td><input type="text" name="lr[{{ $index }}][cargo][{{ $cargoIndex }}][eway_bill]" class="form-control" value="{{ $cargo['eway_bill'] }}" required></td>
                                <td><input type="date" name="lr[{{ $index }}][cargo][{{ $cargoIndex }}][valid_upto]" class="form-control" value="{{ $cargo['valid_upto'] }}" required></td>
+                               <td>
+                                 <input  name="lr[{{ $index }}][cargo][{{ $cargoIndex }}][declared_value]"
+                                       type="number" 
+                                       value="{{ $cargo['declared_value'] }}" 
+                                       class="form-control declared-value" 
+                                       placeholder="0" 
+                                       required 
+                                       oninput="calculateTotalDeclaredValue({{ $index }})"></td>
+                                 
                                <td>
                                    <button type="button" class="btn btn-danger btn-sm" onclick="removeRow(this)">🗑</button>
                                </td>
@@ -398,7 +531,7 @@
                      </table>
                      <!-- Add Row Button for this LR -->
                      <div class="text-end mt-2">
-                        <button type="button" class="btn btn-sm btn-primary" onclick="addRow({{ $lrIndex }})">
+                        <button type="button" class="btn btn-sm btn-primary" onclick="addRow({{ $index }})">
                         ➕ Add Row
                         </button>
                      </div>
@@ -408,8 +541,44 @@
                <div class="row mt-4">
                   <div class="col-12">
                      <h5 class="pb-3">🚚 Freight Details </h5>
+                     @php $freightType = $lr['freightType'] ?? 'paid'; @endphp
+
+                     <div class="mb-3 d-flex gap-3">
+                         <div class="form-check form-check-inline">
+                             <input class="form-check-input freight-type"
+                                    type="radio"
+                                    name="lr[freightType]"
+                                    id="freightPaid"
+                                    value="paid"
+                                    onchange="toggleFreightTable()"
+                                    {{ $freightType === 'paid' ? 'checked' : '' }}>
+                             <label class="form-check-label" for="freightPaid">Paid</label>
+                         </div>
+                     
+                         <div class="form-check form-check-inline">
+                             <input class="form-check-input freight-type"
+                                    type="radio"
+                                    name="lr[freightType]"
+                                    id="freightToPay"
+                                    value="to_pay"
+                                    onchange="toggleFreightTable()"
+                                    {{ $freightType === 'to_pay' ? 'checked' : '' }}>
+                             <label class="form-check-label" for="freightToPay">To Pay</label>
+                         </div>
+                     
+                         <div class="form-check form-check-inline">
+                             <input class="form-check-input freight-type"
+                                    type="radio"
+                                    name="lr[freightType]"
+                                    id="freightToBeBilled"
+                                    value="to_be_billed"
+                                    onchange="toggleFreightTable()"
+                                    {{ $freightType === 'to_be_billed' ? 'checked' : '' }}>
+                             <label class="form-check-label" for="freightToBeBilled">To Be Billed</label>
+                         </div>
+                     </div>
                      <div class="table-responsive">
-                        <table class="table table-bordered align-middle text-center">
+                        <table class="table table-bordered align-middle text-center" id="freight-table">
                            <thead>
                               <tr>
                                  <th>Freight</th>
@@ -422,7 +591,7 @@
                                  <th>Balance Freight</th>
                               </tr>
                            </thead>
-                           <tbody>
+                           <tbody id="freightBody">
                               <tr>
                                  
                                  <td><input name="lr[{{ $index }}][freight_amount]" type="number" class="form-control"
@@ -450,10 +619,9 @@
                <!-- Declared Value -->
                <div class="row mt-3">
                   <div class="col-md-6">
-                     <div class="mb-3">
-                        <label class="form-label" style="font-weight: bold;">💰 Declared Value (Rs.)</label>
-                        <input type="number" name="lr[{{ $index }}][declared_value]"
-                           value="{{ $lr['declared_value'] ?? '' }}" class="form-control" required>
+                     <div class="mt-3">
+                        <label><strong>💰 Total Declared Value (Rs.)</strong></label>
+                        <input type="text" id="totalDeclaredValue-{{ $index }}" name="lr[{{ $index }}][total_declared_value]" class="form-control" readonly>
                      </div>
                   </div>
                </div>
@@ -481,10 +649,24 @@
                      </div>
                   </div>
                </div>
-         
       </div>
    </div>
 </form>
+{{-- image view --}}
+<div class="modal fade" id="imageModal" tabindex="-1" aria-hidden="true">
+   <div class="modal-dialog modal-dialog-centered">
+       <div class="modal-content">
+           <div class="modal-header">
+               <h5 class="modal-title">Document Image</h5>
+               <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+           </div>
+           <div class="modal-body text-center">
+               <img id="modalImage" src="" alt="Document" class="img-fluid" />
+           </div>
+       </div>
+   </div>
+</div>
+
 <script>
    function setCustomerDetails() {
        const selected = document.getElementById('customer_id');
@@ -554,15 +736,27 @@
 <script>
    var vehicles = @json($vehicles);
    
-   // Function जो vehicles array से options generate करेगा
+ 
    function generateVehicleOptions() {
-       let options = '<option value="">Select Vehicle</option>';
-       vehicles.forEach(function(vehicle) {
-           // यहाँ आप अपनी आवश्यकता के अनुसार vehicle का display नाम बना सकते हैं
-           options += `<option value="${vehicle.id}">${vehicle.vehicle_type} </option>`;
-       });
-       return options;
-   }
+  const vehicleOptions = [
+    "3MT / LCV",
+    "5MT",
+    "7.5MT",
+    "9MT",
+    "12MT",
+    "20MT / Multiaxle",
+    "25MT",
+    "19MT / 32FT Container",
+    "30MT",
+    "35MT",
+    "20FT Trailer - 20FT Container",
+    "40FT Container"
+  ];
+
+  let options = '<option value="">Select Vehicle</option>';
+  options += vehicleOptions.map(option => `<option value="${option}">${option}</option>`).join('');
+  return options;
+}
    function generateVehicle_noOptions() {
        let options = '<option value="">Select Vehicle No.</option>';
        vehicles.forEach(function(vehicle) {
@@ -573,41 +767,99 @@
    }
 </script>
 
+<script>
+   const yesRadio = document.getElementById('createInsuranceYes');
+   const noRadio = document.getElementById('createInsuranceNo');
+   const insuranceInput = document.getElementById('insuranceInput');
 
+   function toggleInsuranceField() {
+       if (yesRadio.checked) {
+           insuranceInput.classList.remove('d-none');
+       } else {
+           insuranceInput.classList.add('d-none');
+           insuranceInput.value = '';
+       }
+   }
+
+   // Run on load
+   window.addEventListener('DOMContentLoaded', toggleInsuranceField);
+
+   // Run on change
+   yesRadio.addEventListener('change', toggleInsuranceField);
+   noRadio.addEventListener('change', toggleInsuranceField);
+</script>
 <!-- JS -->
 <script>
-   function addRow(lrIndex) {
-      const tableBody = document.getElementById(`cargoTableBody-${lrIndex}`);
-      const rowCount = tableBody.rows.length;
-      const newRow = tableBody.rows[0].cloneNode(true);
-   
-      // Update name attributes and clear values
-      [...newRow.querySelectorAll('input, select')].forEach((input) => {
-         if (input.name) {
-            input.name = input.name.replace(
-               /lr\[\d+]\[cargo]\[\d+]/,
-               `lr[${lrIndex}][cargo][${rowCount}]`
-            );
-            input.value = '';
-         }
-      });
-   
-      tableBody.appendChild(newRow);
+   function calculateTotalDeclaredValue(index) {
+       let total = 0;
+       document.querySelectorAll(`#cargoTableBody-${index} .declared-value`).forEach(input => {
+           total += parseFloat(input.value) || 0;
+       });
+       document.getElementById(`totalDeclaredValue-${index}`).value = total;
    }
    
-   function removeRow(button) {
-      const row = button.closest('tr');
-      const tbody = row.parentElement;
-      if (tbody.rows.length > 1) {
-         row.remove();
+   function addRow(index) {
+       const tbody = document.getElementById(`cargoTableBody-${index}`);
+       const row = document.createElement('tr');
+   
+       row.innerHTML = `
+           <td><input type="number" name="cargo[${index}][][packages_no]" class="form-control"></td>
+           <td>
+               <select name="cargo[${index}][][package_type]" class="form-select">
+                   <option value="Pallets">Pallets</option>
+                   <option value="Cartons">Cartons</option>
+                   <option value="Bags">Bags</option>
+               </select>
+           </td>
+           <td><input type="text" name="cargo[${index}][][package_description]" class="form-control"></td>
+           <td><input type="number" name="cargo[${index}][][actual_weight]" class="form-control"></td>
+           <td><input type="number" name="cargo[${index}][][charged_weight]" class="form-control"></td>
+           <td><input type="text" name="cargo[${index}][][document_no]" class="form-control"></td>
+           <td><input type="text" name="cargo[${index}][][document_name]" class="form-control"></td>
+           <td><input type="date" name="cargo[${index}][][document_date]" class="form-control"></td>
+           <td><input type="file" name="cargo[${index}][][document_file]" class="form-control"></td>
+           <td><input type="text" name="cargo[${index}][][eway_bill]" class="form-control"></td>
+           <td><input type="date" name="cargo[${index}][][valid_upto]" class="form-control"></td>
+           <td><input type="number" name="cargo[${index}][][declared_value]" class="form-control declared-value" oninput="calculateTotalDeclaredValue(${index})" required></td>
+           <td><button type="button" class="btn btn-danger btn-sm" onclick="removeRow(this, ${index})">🗑</button></td>
+       `;
+   
+       tbody.appendChild(row);
+       calculateTotalDeclaredValue(index);
+   }
+   
+   function removeRow(button, index) {
+       button.closest('tr').remove();
+       calculateTotalDeclaredValue(index);
+   }
+   
+   // Initial bind for declared inputs (existing ones loaded via Blade)
+   document.addEventListener('DOMContentLoaded', function () {
+       document.querySelectorAll('[id^="cargoTableBody-"]').forEach(tbody => {
+           const index = tbody.id.split('-')[1];
+   
+           tbody.querySelectorAll('input[name$="[declared_value]"]').forEach(input => {
+               input.classList.add('declared-value');
+               input.addEventListener('input', () => calculateTotalDeclaredValue(index));
+           });
+   
+           calculateTotalDeclaredValue(index); // Initial calculation
+       });
+   });
+   </script>
+   
+   
+   
+   <script>
+      function setConsigneeDetails(index) {
+          const select = document.getElementById(`consignee_id_${index}`);
+          const gst = select.options[select.selectedIndex].dataset.gstConsignee || '';
+          const address = select.options[select.selectedIndex].dataset.addressConsignee || '';
+          document.getElementById(`consignee_gst_${index}`).value = gst;
+          document.getElementById(`consignee_unloading_${index}`).value = address;
       }
-   }
-</script>
-<!-- add cargo row -->
-
-
-<!-- lr scritp -->
-<script>
+      </script>
+      <script>
    let lrIndex = {{ count($lrData) }}; // Start from existing count
    
    function addLrRow() {
@@ -711,7 +963,7 @@
                   </div>
                <div class="col-md-4 mb-3">
                    <label class="form-label">🚛 Vehicle Type</label>
-                   <select name="lr[${lrIndex}][vehicle_id]" class="form-select" required>
+                   <select name="lr[${lrIndex}][vehicle_type]" class="form-select" required>
                        ${generateVehicleOptions()}
                    </select>
                </div>
@@ -735,9 +987,8 @@
                    <label class="form-label">🚢 Delivery Mode</label>
                    <select name="lr[${lrIndex}][delivery_mode]" class="form-select" required>
                        <option value="">Select Mode</option>
-                       <option value="Road">Road</option>
-                       <option value="Rail">Rail</option>
-                       <option value="Air">Air</option>
+                       <option value="door_delivery">Door Delivery</option>
+                       <option value="godwon_deliver">Dodwon  Deliver</option>
                    </select>
                </div>
                <div class="col-md-4 mb-3">
@@ -782,18 +1033,20 @@
                                    <th>No. of Packages</th>
                                    <th>Packaging Type</th>
                                    <th>Description</th>
-                                   <th>Weight (kg)</th>
                                    <th>Actual Weight (kg)</th>
                                    <th>Charged Weight (kg)</th>
+                                    <th> &nbsp;Unit&nbsp;&nbsp; </th>
                                    <th>Document No.</th>
                                    <th>Document Name</th>
                                    <th>Document Date</th>
+                                    <th>Document Upload</th>
                                    <th>Eway Bill</th>
                                    <th>Valid Upto</th>
+                                   <th>declared value</th>
                                    <th>Action</th>
                                </tr>
                            </thead>
-                           <tbody id="cargoTableBody-${lrIndex}">
+                           <tbody id="cargoTableBody-0">
                                <tr>
                                    <td><input type="number" class="form-control" name="lr[${lrIndex}][cargo][0][packages_no]" placeholder="0" required></td>
                                    <td>
@@ -804,23 +1057,34 @@
                                        </select>
                                    </td>
                                    <td><input type="text" class="form-control" name="lr[${lrIndex}][cargo][0][package_description]" placeholder="Enter description" required></td>
-                                   <td><input type="number" class="form-control" name="lr[${lrIndex}][cargo][0][weight]" placeholder="0" required></td>
+                                  
                                    <td><input type="number" class="form-control" name="lr[${lrIndex}][cargo][0][actual_weight]" placeholder="0" required></td>
                                    <td><input type="number" class="form-control" name="lr[${lrIndex}][cargo][0][charged_weight]" placeholder="0" required></td>
+                                    <td>
+                                    <select class="form-select" name="lr[${lrIndex}][cargo][0][unit]" required>
+                                            <option value="">Select Unit</option>
+                                            <option value="kg">Kg</option>
+                                            <option value="ton">Ton</option>
+                                    </select>
+                                   </td>
                                    <td><input type="text" class="form-control" name="lr[${lrIndex}][cargo][0][document_no]" placeholder="Doc No." required></td>
                                    <td><input type="text" class="form-control" name="lr[${lrIndex}][cargo][0][document_name]" placeholder="Doc Name" required></td>
                                    <td><input type="date" class="form-control" name="lr[${lrIndex}][cargo][0][document_date]" required></td>
+                                   <td><input type="file" class="form-control" name="lr[${lrIndex}][cargo][0][document_file]" required></td>
                                    <td><input type="text" class="form-control" name="lr[${lrIndex}][cargo][0][eway_bill]" placeholder="Eway Bill No." required></td>
                                    <td><input type="date" class="form-control" name="lr[${lrIndex}][cargo][0][valid_upto]" required></td>
+                                  <td> <input type="number" name="lr[${lrIndex}][cargo][0][declared_value]" class="form-control declared-value" oninput="calculateTotalDeclaredValue(${lrIndex})" placeholder="0">
+                                    </td>
+
                                    <td><button class="btn btn-danger btn-sm" onclick="removeRow(this)">🗑</button></td>
                                </tr>
                            </tbody>
                        </table>
                    </div>
                    <div class="text-end mt-2">
-                       <button type="button" class="btn btn-sm" style="background: #ca2639; color: white;" onclick="addRow(${lrIndex})">
-                           <span style="filter: invert(1);">➕</span> Add Row
-                       </button>
+                       <button type="button" class="btn btn-sm" style="background: #ca2639; color: white;" onclick="addRow(0)">
+        <span style="filter: invert(1);">➕</span> Add Row
+    </button>
                    </div>
                </div>
            </div>
@@ -829,8 +1093,39 @@
            <div class="row mt-4">
                <div class="col-12">
                    <h5 class="pb-3">🚚 Freight Details</h5>
+                   <div class="mb-3 d-flex gap-3">
+                  <div class="form-check form-check-inline">
+                     <input class="form-check-input freight-type"
+                           type="radio"
+                           name="lr[${lrIndex}][freightType]"
+                           id="freightPaid-${lrIndex}"
+                           value="paid"
+                           checked
+                           onchange="toggleFreightTable(${lrIndex})">
+                     <label class="form-check-label" for="freightPaid-${lrIndex}">Paid</label>
+                  </div>
+                  <div class="form-check form-check-inline">
+                     <input class="form-check-input freight-type"
+                           type="radio"
+                           name="lr[${lrIndex}][freightType]"
+                           id="freightToPay-${lrIndex}"
+                           value="to_pay"
+                           onchange="toggleFreightTable(${lrIndex})">
+                     <label class="form-check-label" for="freightToPay-${lrIndex}">To Pay</label>
+                  </div>
+                  <div class="form-check form-check-inline">
+                     <input class="form-check-input freight-type"
+                           type="radio"
+                           name="lr[${lrIndex}][freightType]"
+                           id="freightToBeBilled-${lrIndex}"
+                           value="to_be_billed"
+                           onchange="toggleFreightTable(${lrIndex})">
+                     <label class="form-check-label" for="freightToBeBilled-${lrIndex}">To Be Billed</label>
+                  </div>
+                  </div>
+
                    <div class="table-responsive">
-                       <table class="table table-bordered align-middle text-center">
+                      <table class="table table-bordered align-middle text-center">
                            <thead>
                                <tr>
                                    <th>Freight</th>
@@ -843,7 +1138,7 @@
                                    <th>Balance Freight</th>
                                </tr>
                            </thead>
-                           <tbody>
+                          <tbody id="freightTableBody-${lrIndex}">
                                <tr>
                                    <td><input type="number" name="lr[${lrIndex}][freight_amount]" class="form-control" required></td>
                                    <td><input type="number" name="lr[${lrIndex}][lr_charges]" class="form-control" required></td>
@@ -863,8 +1158,11 @@
            <!-- Declared Value -->
            <div class="row mt-3">
                <div class="col-md-6">
-                   <label class="form-label"><strong>💰 Declared Value (Rs.)</strong></label>
-                   <input type="number" name="lr[${lrIndex}][declared_value]" class="form-control" required>
+                   <label class="form-label"><strong>💰 Total Declared Value (Rs.)</strong></label>
+                   
+                  <input type="number" class="form-control" id="totalDeclaredValue-${lrIndex}" name="lr[${lrIndex}][total_declared_value]" placeholder="0" readonly>
+
+
                </div>
            </div>
             <div class="row mt-3">
@@ -892,16 +1190,158 @@
        document.getElementById(`consignor_loading_${index}`).value = address;
    }
 </script>
+<script>
+   function addRow(lrIndex) {
+       const tbody = document.getElementById(`cargoTableBody-${lrIndex}`);
+       const rows = tbody.querySelectorAll('tr');
+       const newIndex = rows.length;
    
+       const newRow = rows[0].cloneNode(true);
    
+       newRow.querySelectorAll('input, select').forEach(input => {
+           const name = input.getAttribute('name');
+           if (name) {
+               input.setAttribute('name', name.replace(/\[cargo\]\[\d+\]/, `[cargo][${newIndex}]`));
+           }
+   
+           // Reset values
+           if (input.type === 'file') {
+               input.value = ''; // File inputs can't be set to empty string in all browsers
+           } else if (input.tagName === 'SELECT') {
+               input.selectedIndex = 0;
+           } else {
+               input.value = '';
+           }
+   
+           input.removeAttribute('id'); // Prevent duplicate IDs
+       });
+   
+       tbody.appendChild(newRow);
+       calculateTotalDeclaredValue(lrIndex);
+   }
+   
+   function removeRow(button) {
+       const row = button.closest('tr');
+       const tbody = row.closest('tbody');
+       const lrIndex = tbody.id.split('-')[1];
+   
+       if (tbody.querySelectorAll('tr').length > 1) {
+           row.remove();
+           calculateTotalDeclaredValue(lrIndex);
+       } else {
+           alert('At least one cargo row is required.');
+       }
+   }
+   
+   function calculateTotalDeclaredValue(lrIndex) {
+       const inputs = document.querySelectorAll(`#cargoTableBody-${lrIndex} .declared-value`);
+       let total = 0;
+   
+       inputs.forEach(input => {
+           total += parseFloat(input.value) || 0;
+       });
+   
+       const totalInput = document.getElementById(`totalDeclaredValue-${lrIndex}`);
+       if (totalInput) {
+           totalInput.value = total.toFixed(2);
+       }
+   }
+ 
+   </script>
+   
+
+
    <script>
-      function setConsigneeDetails(index) {
-          const select = document.getElementById(`consignee_id_${index}`);
-          const gst = select.options[select.selectedIndex].dataset.gstConsignee || '';
-          const address = select.options[select.selectedIndex].dataset.addressConsignee || '';
-          document.getElementById(`consignee_gst_${index}`).value = gst;
-          document.getElementById(`consignee_unloading_${index}`).value = address;
+      $(document).ready(function () {
+          $(document).on('click', '.openImageModal', function () {
+              var imageUrl = $(this).data('image');
+              console.log("Image URL:", imageUrl); // Should log to console
+              $('#modalImage').attr('src', imageUrl);
+          });
+      });
+  </script>
+  <script>
+   function toggleFreightTable() {
+       const tbody = document.getElementById('freightBody');
+       const paid = document.getElementById('freightPaid');
+       const toPay = document.getElementById('freightToPay');
+       const toBeBilled = document.getElementById('freightToBeBilled');
+   
+       const inputs = tbody.querySelectorAll('input');
+   
+       if (toBeBilled.checked) {
+           tbody.style.display = 'none';
+           inputs.forEach(input => input.removeAttribute('required'));
+       } else {
+           tbody.style.display = 'table-row-group';
+           inputs.forEach(input => input.setAttribute('required', 'required'));
+       }
+   
+       if (toPay.checked) {
+           inputs.forEach(input => input.value = '');
+       }
+   }
+   
+   document.addEventListener("DOMContentLoaded", function () {
+       toggleFreightTable();
+   });
+    </script>
+   
+   {{-- <script>
+      function toggleFreightTable(lrIndex) {
+        const toPayRadio = document.getElementById(`freightToPay-${lrIndex}`);
+        const toBeBilledRadio = document.getElementById(`freightToBeBilled-${lrIndex}`);
+        const tableBody = document.querySelector(`#freightTableBody-${lrIndex}`);
+    
+        if (!tableBody) return;
+    
+        const inputs = tableBody.querySelectorAll('input');
+    
+        // Hide table and remove required if "to_pay" or "to_be_billed" is selected
+        if (toPayRadio.checked || toBeBilledRadio.checked) {
+          tableBody.style.display = 'none';
+          inputs.forEach(input => {
+            input.removeAttribute('required');
+            if (toPayRadio.checked) {
+              input.value = ''; // Clear values only if 'to_pay'
+            }
+          });
+        } else {
+          tableBody.style.display = '';
+          inputs.forEach(input => {
+            input.setAttribute('required', 'required');
+          });
+        }
       }
+    </script> --}}
+    <script>
+        function toggleOrderMethod() {
+          const orderRadio = document.getElementById('byOrder');
+          const contractRadio = document.getElementById('byContract');
+          const orderAmountDiv = document.getElementById('orderAmountDiv');
+          const contractNumberDiv = document.getElementById('contractNumberDiv');
+      
+          if (orderRadio.checked) {
+            orderAmountDiv.classList.remove('d-none');
+            orderAmountDiv.querySelector('input').setAttribute('required', 'required');
+      
+            contractNumberDiv.classList.add('d-none');
+            contractNumberDiv.querySelector('input').removeAttribute('required');
+          } else if (contractRadio.checked) {
+            contractNumberDiv.classList.remove('d-none');
+            contractNumberDiv.querySelector('input').setAttribute('required', 'required');
+      
+            orderAmountDiv.classList.add('d-none');
+            orderAmountDiv.querySelector('input').removeAttribute('required');
+          }
+        }
+      
+        document.addEventListener('DOMContentLoaded', function () {
+          toggleOrderMethod(); // Run once on load
+        });
       </script>
       
+    
+   <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
 @endsection

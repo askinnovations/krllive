@@ -29,20 +29,28 @@ class ConsignmentNoteController extends Controller
     
 public function store(Request $request){
     $order = new Order();
-// return $request->all();
-    // Auto generate order_id
+    
+
     $order->order_id = 'ORD-' . time();
     
-    // Step 1: Prepare cargo array
+  
     $cargoArray = [];
     
     if (isset($request->cargo) && is_array($request->cargo)) {
         foreach ($request->cargo as $cargo) {
+            $documentFilePath = null;
+    
+            // Handle image file upload
+            if (isset($cargo['document_file']) && $cargo['document_file']->isValid()) {
+                $documentFile = $cargo['document_file'];
+               
+                $documentFilePath = $documentFile->store('orders/cargo_documents/', 'public');
+            }
             $cargoArray[] = [
                 'packages_no'         => $cargo['packages_no'] ?? null,
                 'package_type'        => $cargo['package_type'] ?? null,
                 'package_description' => $cargo['package_description'] ?? null,
-                'weight'              => $cargo['weight'] ?? null,
+                          
                 'actual_weight'       => $cargo['actual_weight'] ?? null,
                 'charged_weight'      => $cargo['charged_weight'] ?? null,
                 'document_no'         => $cargo['document_no'] ?? null,
@@ -50,6 +58,8 @@ public function store(Request $request){
                 'document_date'       => $cargo['document_date'] ?? null,
                 'eway_bill'           => $cargo['eway_bill'] ?? null,
                 'valid_upto'          => $cargo['valid_upto'] ?? null,
+                'declared_value'          => $cargo['declared_value'] ?? null,
+                'document_file'       => $documentFilePath, 
             ];
         }
     }
@@ -61,7 +71,7 @@ public function store(Request $request){
         'lr_number'           => $lrNumber,
         'lr_date'             => $request->lr_date,
         'vehicle_no'        => $request->vehicle_no,
-        'vehicle_id'          => $request->vehicle_type,
+        'vehicle_type'          => $request->vehicle_type,
         'vehicle_ownership'   => $request->vehicle_ownership,
         'delivery_mode'       => $request->delivery_mode,
         'from_location'       => $request->from_location,
@@ -80,6 +90,7 @@ public function store(Request $request){
     
         // Charges
         'freight_amount'      => $request->freight_amount,
+        'freightType'      => $request->freightType,
         'lr_charges'          => $request->lr_charges,
         'hamali'              => $request->hamali,
         'other_charges'       => $request->other_charges,
@@ -87,7 +98,7 @@ public function store(Request $request){
         'total_freight'       => $request->total_freight,
         'less_advance'        => $request->less_advance,
         'balance_freight'     => $request->balance_freight,
-        'declared_value'      => $request->declared_value,
+        'total_declared_value'      => $request->total_declared_value,
     
         // Cargo list
         'cargo'               => $cargoArray,
@@ -108,23 +119,29 @@ public function store(Request $request){
 
   public function update(Request $request, $order_id)
 {
-    
-
-    // 1. Find existing order by order_id
+    // return $request->all();
     $order = Order::where('order_id', $order_id)->firstOrFail();
 
     
 
-    // 2. Prepare cargo array
+    
     $cargoArray = [];
 
     if (isset($request->cargo) && is_array($request->cargo)) {
         foreach ($request->cargo as $cargo) {
+            $documentFilePath = null;
+    
+           
+            if (isset($cargo['document_file']) && $cargo['document_file']->isValid()) {
+                $documentFile = $cargo['document_file'];
+               
+                $documentFilePath = $documentFile->store('orders/cargo_documents/', 'public');
+            }
             $cargoArray[] = [
                 'packages_no'         => $cargo['packages_no'] ?? null,
                 'package_type'        => $cargo['package_type'] ?? null,
                 'package_description' => $cargo['package_description'] ?? null,
-                'weight'              => $cargo['weight'] ?? null,
+                'declared_value'       => $cargo['declared_value'] ?? null,
                 'actual_weight'       => $cargo['actual_weight'] ?? null,
                 'charged_weight'      => $cargo['charged_weight'] ?? null,
                 'document_no'         => $cargo['document_no'] ?? null,
@@ -132,6 +149,7 @@ public function store(Request $request){
                 'document_date'       => $cargo['document_date'] ?? null,
                 'eway_bill'           => $cargo['eway_bill'] ?? null,
                 'valid_upto'          => $cargo['valid_upto'] ?? null,
+                'document_file'       => $documentFilePath, 
             ];
         }
     }
@@ -141,7 +159,7 @@ public function store(Request $request){
         'lr_number'           => $request->lr_number ?? 'LR-' . strtoupper(uniqid()),
         'lr_date'             => $request->lr_date,
         'vehicle_no'        => $request->vehicle_no,
-        'vehicle_id'          => $request->vehicle_type,
+        'vehicle_type'          => $request->vehicle_type,
         'vehicle_ownership'   => $request->vehicle_ownership,
         'delivery_mode'       => $request->delivery_mode,
         'from_location'       => $request->from_location,
@@ -159,6 +177,8 @@ public function store(Request $request){
         'consignee_unloading' => $request->consignee_unloading,
 
         // Charges
+        
+        'freightType'      => $request->freightType,
         'freight_amount'      => $request->freight_amount,
         'lr_charges'          => $request->lr_charges,
         'hamali'              => $request->hamali,
@@ -167,7 +187,7 @@ public function store(Request $request){
         'total_freight'       => $request->total_freight,
         'less_advance'        => $request->less_advance,
         'balance_freight'     => $request->balance_freight,
-        'declared_value'      => $request->declared_value,
+        'total_declared_value'     => $request->total_declared_value,
 
         // Cargo list
         'cargo'               => $cargoArray,
@@ -216,7 +236,32 @@ public function show($id)
 }
 
 
+public function docView($id)
+{
+    $orders = DB::table('orders')->get();
 
+    foreach ($orders as $order) {
+        $lrData = json_decode($order->lr, true);
+
+       
+        if (!is_array($lrData)) {
+            $lrData = json_decode(json_decode($order->lr), true);
+        }
+
+        // dd($lrData); 
+
+        if (is_array($lrData)) {
+            foreach ($lrData as $entry) {
+                if (isset($entry['lr_number']) && $entry['lr_number'] == $id) {
+                    $lrEntries = $entry;
+                    return view('admin.consignments.documents', compact( 'lrEntries'));
+                }
+            }
+        }
+    }
+
+    return redirect()->back()->with('error', 'LR Number not found.');
+}
 
 
 

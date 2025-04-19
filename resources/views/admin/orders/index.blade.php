@@ -40,7 +40,7 @@
                            <th>Order ID</th>
                            <th>Consignment Details</th>
                            <th>Consignment Pickup Date</th>
-                           <th>Status</th>
+                           <th>Status   </th>
                            <th>Action</th>
                         </tr>
                      </thead>
@@ -59,6 +59,8 @@
                                 @else
                                     <span class="badge bg-secondary">{{ ucfirst($order->status) }}</span>
                                 @endif
+                                <a href="{{ route('admin.orders.documents', $order->order_id) }}">documents
+                              </a>
                             </td>
                             <td>
                            

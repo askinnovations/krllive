@@ -13,6 +13,7 @@
    <a href="{{ route('admin.consignments.index') }}" class="btn" id="backToListBtn"
       style="background-color: #ca2639; color: white; border: none;">
    ⬅ Back to Listing
+   
    </a>
 </div>
 <!-- LR / Consignment add Form -->
@@ -34,6 +35,7 @@
             <div class="card-body">
                @php
                $lrList = is_array($order->lr) ? $order->lr : json_decode($order->lr, true);
+              
                $lrData = $lrList[0] ?? []; 
                
                @endphp
@@ -131,13 +133,13 @@
                    
                      <div class="mb-3">
                         <label class="form-label">🚚 Vehicle Number</label>
-                        <select name="vehicle_id" class="form-select">
+                        <select name="vehicle_no" class="form-select">
                            @foreach ($vehicles as $vehicle)
                               <option 
-                                    value="{{ $vehicle->id }}" 
+                                    value="{{ $vehicle->vehicle_no }}" 
                                     data-type="{{ $vehicle->vehicle_no }}" 
                                  
-                                    {{ old('vehicle_id', $lrData['vehicle_id']) == $vehicle->id ? 'selected' : '' }}>
+                                    {{ old('vehicle_no', $lrData['vehicle_no']) == $vehicle->vehicle_no ? 'selected' : '' }}>
                                     {{ $vehicle->vehicle_no }}
                               </option>
                            @endforeach
@@ -146,41 +148,53 @@
                   </div>
                   <!-- Vehicle Type -->
                   <div class="col-md-4">
-                     <div class="mb-3">
-                        <label class="form-label">🚛 Vehicle Type</label>
-                        @php
-                           $selectedVehicle = collect($vehicles)->firstWhere('id', $lrData['vehicle_id']);
-                        @endphp
-
-               <select name="vehicle_id" class="form-select">
-                  @foreach ($vehicles as $vehicle)
-                     <option 
-                           value="{{ $vehicle->id }}" 
-                           data-type="{{ $vehicle->vehicle_type }}" 
-                        
-                           {{ old('vehicle_id', $lrData['vehicle_id']) == $vehicle->id ? 'selected' : '' }}>
-                           {{ $vehicle->vehicle_type }}
-                     </option>
-                  @endforeach
-               </select>
-
-                     </div>
-                  </div>
+                     @php 
+                     $vehicleOptions = [
+                         "3MT / LCV",
+                         "5MT",
+                         "7.5MT",
+                         "9MT",
+                         "12MT",
+                         "20MT / Multiaxle",
+                         "25MT",
+                         "19MT / 32FT Container",
+                         "30MT",
+                         "35MT",
+                         "20FT Trailer - 20FT Container",
+                         "40FT Container"
+                     ];
+                 
+                     $selectedVehicle = old("lr.vehicle_type", $lrData['vehicle_type'] ?? '');
+                 @endphp
+                 
+                 <div class="mb-3">
+                     <label class="form-label">🚛 Vehicle Type</label>
+                     <select name="vehicle_type" class="form-select" required>
+                         <option value="">Select Type</option>
+                         @foreach ($vehicleOptions as $type)
+                             <option value="{{ $type }}" {{ $selectedVehicle == $type ? 'selected' : '' }}>
+                                 {{ $type }}
+                             </option>
+                         @endforeach
+                     </select>
+                 </div>
+                 
+               </div>
                   <!-- Vehicle Ownership -->
-                  <div class="col-md-4">
-                     <label class="form-label">🛻 Vehicle Ownership</label>
-                     <div class="d-flex gap-3">
-    <div class="form-check">
-        <input class="form-check-input" type="radio" name="vehicle_ownership" value="Own"
-            {{ old('vehicle_ownership', $lrData['vehicle_ownership'] ?? '') == 'Own' ? 'checked' : '' }}>
-        <label class="form-check-label">Own</label>
-    </div>
-    <div class="form-check">
-        <input class="form-check-input" type="radio" name="vehicle_ownership" value="Other"
-            {{ old('vehicle_ownership', $lrData['vehicle_ownership'] ?? '') == 'Other' ? 'checked' : '' }}>
-        <label class="form-check-label">Other</label>
-    </div>
-</div>
+                              <div class="col-md-4">
+                                 <label class="form-label">🛻 Vehicle Ownership</label>
+                                 <div class="d-flex gap-3">
+               <div class="form-check">
+                  <input class="form-check-input" type="radio" name="vehicle_ownership" value="Own"
+                        {{ old('vehicle_ownership', $lrData['vehicle_ownership'] ?? '') == 'Own' ? 'checked' : '' }}>
+                  <label class="form-check-label">Own</label>
+               </div>
+               <div class="form-check">
+                  <input class="form-check-input" type="radio" name="vehicle_ownership" value="Other"
+                        {{ old('vehicle_ownership', $lrData['vehicle_ownership'] ?? '') == 'Other' ? 'checked' : '' }}>
+                  <label class="form-check-label">Other</label>
+               </div>
+            </div>
 
                   </div>
                </div>
@@ -191,9 +205,9 @@
          <label class="form-label">🚢 Delivery Mode</label>
          <select name="delivery_mode" class="form-select" required>
             <option value="">Select Mode</option>
-            <option value="Road" {{ old('delivery_mode', $lrData['delivery_mode'] ?? '') == 'Road' ? 'selected' : '' }}>Road</option>
-            <option value="Rail" {{ old('delivery_mode', $lrData['delivery_mode'] ?? '') == 'Rail' ? 'selected' : '' }}>Rail</option>
-            <option value="Air" {{ old('delivery_mode', $lrData['delivery_mode'] ?? '') == 'Air' ? 'selected' : '' }}>Air</option>
+            <option value="Road" {{ old('delivery_mode', $lrData['delivery_mode'] ?? '') == 'door_delivery' ? 'selected' : '' }}>Door Delivery</option>
+            <option value="Rail" {{ old('delivery_mode', $lrData['delivery_mode'] ?? '') == 'godwon_deliver' ? 'selected' : '' }}>Godwon Deliver</option>
+           
          </select>
       </div>
    </div>
@@ -221,44 +235,29 @@
          </select>
       </div>
    </div>
-   <div class="mb-3">
-      <label class="form-label">🛡️  Insurance?</label><br>
-  
-      @php
-          $insuranceDescription = $lrData['insurance_description'] ?? '';
-      @endphp
+   <div class="mb-3 d-flex align-items-center gap-3 flex-wrap">
+      <label class="form-label mb-0">🛡️ Insurance?</label>
   
       <div class="form-check form-check-inline">
-          <input class="form-check-input create-insurance-yes" type="radio" name="create_insurance"
-                 value="yes" id="createInsuranceYes"
-                 {{ $insuranceDescription ? 'checked' : '' }}>
+          <input class="form-check-input" type="radio" name="insurance_status" value="yes" id="createInsuranceYes" {{ old('insurance_status') == 'yes' ? 'checked' : '' }}>
           <label class="form-check-label" for="createInsuranceYes">Yes</label>
       </div>
   
       <div class="form-check form-check-inline">
-          <input class="form-check-input" type="radio" name="create_insurance"
-                 value="no" id="createInsuranceNo"
-                 {{ empty($insuranceDescription) ? 'checked' : '' }}>
+          <input class="form-check-input" type="radio" name="insurance_status" value="no" id="createInsuranceNo" {{ old('insurance_status', 'no') == 'no' ? 'checked' : '' }}>
           <label class="form-check-label" for="createInsuranceNo">No</label>
       </div>
+  
+      <!-- Insurance input field -->
+      <input type="text" class="form-control {{ old('insurance_status') != 'yes' ? 'd-none' : '' }}" 
+             name="insurance_description" 
+             id="insuranceInput" 
+             placeholder="Enter Insurance Number" 
+             style="max-width: 450px;" 
+             value="{{ old('insurance_description') }}">
   </div>
 {{-- insurence mode --}}
-      <div class="modal fade" id="insuranceModal" tabindex="-1" aria-labelledby="insuranceModalLabel" aria-hidden="true">
-         <div class="modal-dialog">
-         <div class="modal-content">
-            <div class="modal-header">
-            <h5 class="modal-title" id="insuranceModalLabel">Insurance Description</h5>
-            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-               <textarea name="insurance_description" class="form-control" rows="4" placeholder="Enter insurance details...">{{ old('insurance_description', $lrData['insurance_description'] ?? '') }}</textarea>
-            </div>
-            <div class="modal-footer">
-               <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-            </div>
-         </div>
-         </div>
-      </div>
+     
                <!-- Cargo Description Section -->
                <div class="row mt-4">
                   <div class="col-12">
@@ -282,14 +281,17 @@
                                  <th>No. of Packages</th>
                                  <th>Packaging Type</th>
                                  <th>Description</th>
-                                 <th>Weight (kg)</th>
+                                 
                                  <th>Actual Weight (kg)</th>
                                  <th>Charged Weight (kg)</th>
+                                 <th>Unit</th>
                                  <th>Document No.</th>
                                  <th>Document Name</th>
                                  <th>Document Date</th>
+                                 <th>Document Upload</th>
                                  <th>Eway Bill</th>
                                  <th>Valid Upto</th>
+                                 <th>Declared value</th>
                                  <th>Action</th>
                               </tr>
                            </thead>
@@ -308,14 +310,28 @@
                </select>
             </td>
             <td><input type="text" name="cargo[{{ $index }}][package_description]" class="form-control" value="{{ $cargo['package_description'] }}" required></td>
-            <td><input type="number" name="cargo[{{ $index }}][weight]" class="form-control" value="{{ $cargo['weight'] }}" required></td>
+            {{-- <td><input type="number" name="cargo[{{ $index }}][weight]" class="form-control" value="{{ $cargo['weight'] }}" required></td> --}}
             <td><input type="number" name="cargo[{{ $index }}][actual_weight]" class="form-control" value="{{ $cargo['actual_weight'] }}" required></td>
             <td><input type="number" name="cargo[{{ $index }}][charged_weight]" class="form-control" value="{{ $cargo['charged_weight'] }}" required></td>
+            <td>
+               <select class="form-select" name="cargo[{{ $index }}][unit]" required>
+                  <option value="">Select Unit</option>
+                  <option value="kg" {{ ($cargo['unit'] ?? '') == 'kg' ? 'selected' : '' }}>Kg</option>
+                  <option value="ton" {{ ($cargo['unit'] ?? '') == 'ton' ? 'selected' : '' }}>Ton</option>
+              </select>
+             </td>
             <td><input type="text" name="cargo[{{ $index }}][document_no]" class="form-control" value="{{ $cargo['document_no'] }}" required></td>
             <td><input type="text" name="cargo[{{ $index }}][document_name]" class="form-control" value="{{ $cargo['document_name'] }}" required></td>
             <td><input type="date" name="cargo[{{ $index }}][document_date]" class="form-control" value="{{ $cargo['document_date'] }}" required></td>
+            <td><input type="file" name="cargo[{{ $index }}][document_file]" class="form-control" value="" >
+              
+            <img src="{{ asset('storage/' .$cargo['document_file']) }}" width="150" class="img-thumbnail" alt="Document Image">
+
+            </td>
             <td><input type="text" name="cargo[{{ $index }}][eway_bill]" class="form-control" value="{{ $cargo['eway_bill'] }}" required></td>
             <td><input type="date" name="cargo[{{ $index }}][valid_upto]" class="form-control" value="{{ $cargo['valid_upto'] }}" required></td>
+            <td><input name="cargo[{{ $index }}][declared_value]" type="number" value="{{ $cargo['declared_value'] }}" class="form-control" placeholder="0" required></td>
+
             <td>
                <button type="button" class="btn btn-danger btn-sm" onclick="removeRow(this)">🗑</button>
             </td>
@@ -335,9 +351,37 @@
                <div class="row mt-4">
                   <div class="col-12">
                      <h5 class=" pb-3">🚚 Freight Details</h5>
+                     <div class="mb-3 d-flex gap-3">
+
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input freight-type" type="radio" name="freightType"
+                                id="freightPaid" value="paid"
+                                onchange="toggleFreightTable()"
+                                {{ (isset($lrData['freightType']) && $lrData['freightType'] == 'paid') ? 'checked' : '' }}>
+                            <label class="form-check-label" for="freightPaid">Paid</label>
+                        </div>
+                    
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input freight-type" type="radio" name="freightType"
+                                id="freightToPay" value="to_pay"
+                                onchange="toggleFreightTable()"
+                                {{ (isset($lrData['freightType']) && $lrData['freightType'] == 'to_pay') ? 'checked' : '' }}>
+                            <label class="form-check-label" for="freightToPay">To Pay</label>
+                        </div>
+                    
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input freight-type" type="radio" name="freightType"
+                                id="freightToBeBilled" value="to_be_billed"
+                                onchange="toggleFreightTable()"
+                                {{ (isset($lrData['freightType']) && $lrData['freightType'] == 'to_be_billed') ? 'checked' : '' }}>
+                            <label class="form-check-label" for="freightToBeBilled">To Be Billed</label>
+                        </div>
+                    
+                    </div>
+                    
                      <!-- Freight Charges Table -->
                      <div class="table-responsive">
-                        <table class="table table-bordered align-middle text-center">
+                        <table class="table table-bordered align-middle text-center" id="freight-table">
                            <thead>
                               <tr>
                                  <th>Freight</th>
@@ -350,7 +394,7 @@
                                  <th>Balance Freight</th>
                               </tr>
                            </thead>
-                           <tbody>
+                           <tbody id="freightBody">
                               <tr>
                                  <td><input name="freight_amount" type="number" class="form-control"
                                  value="{{ old('freight_amount', $lrData['freight_amount'] ?? '') }}"
@@ -396,9 +440,9 @@
                   <!-- Declared Value -->
                   <div class="col-md-6 mt-3">
                      <div class="mb-3">
-                        <label class="form-label " style="font-weight: bold;">💰 Declared Value
+                        <label class="form-label " style="font-weight: bold;">💰 Total Declared Value
                         (Rs.)</label>
-                        <input type="number"  required  value="{{ old('declared_value', $lrData['declared_value'] ?? '') }}"  name="declared_value" class="form-control">
+                        <input type="number" id="totalDeclaredValue"  required  value="{{ old('total_declared_value', $lrData['toatal_declared_value'] ?? '') }}"  name="total_declared_value" class="form-control">
                      </div>
                   </div>
                </div>
@@ -417,13 +461,81 @@
       </div>
    </div>
 </div>
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+{{-- image view --}}
+<div class="modal fade" id="imageModal" tabindex="-1" aria-hidden="true">
+   <div class="modal-dialog modal-dialog-centered">
+       <div class="modal-content">
+           <div class="modal-header">
+               <h5 class="modal-title">Document Image</h5>
+               <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+           </div>
+           <div class="modal-body text-center">
+               <img id="modalImage" src="" alt="Document" class="img-fluid" />
+           </div>
+       </div>
+   </div>
+</div>
+<script>
+   function toggleFreightTable() {
+       const tbody = document.getElementById('freightBody');
+ 
+       const selectedFreightType = document.querySelector('input[name="freightType"]:checked').value;
+ 
+       if (selectedFreightType === 'to_be_billed') {
+           tbody.style.display = 'none';
+           const inputs = tbody.querySelectorAll('input');
+           inputs.forEach(input => input.removeAttribute('required'));
+       } else {
+           tbody.style.display = 'table-row-group';
+           const inputs = tbody.querySelectorAll('input');
+           inputs.forEach(input => input.setAttribute('required', 'required'));
+       }
+   }
+ 
+   // Auto-call this function on page load (to show/hide based on preselected value)
+   document.addEventListener('DOMContentLoaded', function () {
+       toggleFreightTable();
+   });
+ </script>
+<script>
+   const yesRadio = document.getElementById('createInsuranceYes');
+   const noRadio = document.getElementById('createInsuranceNo');
+   const insuranceInput = document.getElementById('insuranceInput');
+
+   function toggleInsuranceField() {
+       if (yesRadio.checked) {
+           insuranceInput.classList.remove('d-none');
+       } else {
+           insuranceInput.classList.add('d-none');
+           insuranceInput.value = '';
+       }
+   }
+
+   // Run on load
+   window.addEventListener('DOMContentLoaded', toggleInsuranceField);
+
+   // Run on change
+   yesRadio.addEventListener('change', toggleInsuranceField);
+   noRadio.addEventListener('change', toggleInsuranceField);
+</script>
 <script>
    let cargoIndex = {{ count($cargoData) }};
-   
+
+   function calculateTotalDeclaredValue() {
+       let total = 0;
+       const inputs = document.querySelectorAll('.declared-value');
+
+       inputs.forEach(input => {
+           total += parseFloat(input.value) || 0;
+       });
+
+       document.getElementById('totalDeclaredValue').value = total;
+   }
+
    function addRow() {
        const tbody = document.getElementById('cargoTableBody');
        const row = document.createElement('tr');
+
        row.innerHTML = `
            <td><input type="number" name="cargo[${cargoIndex}][packages_no]" class="form-control"></td>
            <td>
@@ -434,24 +546,39 @@
                </select>
            </td>
            <td><input type="text" name="cargo[${cargoIndex}][package_description]" class="form-control"></td>
-           <td><input type="number" name="cargo[${cargoIndex}][weight]" class="form-control"></td>
            <td><input type="number" name="cargo[${cargoIndex}][actual_weight]" class="form-control"></td>
            <td><input type="number" name="cargo[${cargoIndex}][charged_weight]" class="form-control"></td>
            <td><input type="text" name="cargo[${cargoIndex}][document_no]" class="form-control"></td>
            <td><input type="text" name="cargo[${cargoIndex}][document_name]" class="form-control"></td>
            <td><input type="date" name="cargo[${cargoIndex}][document_date]" class="form-control"></td>
+           <td><input type="file" name="cargo[${cargoIndex}][document_file]" class="form-control"></td>
            <td><input type="text" name="cargo[${cargoIndex}][eway_bill]" class="form-control"></td>
            <td><input type="date" name="cargo[${cargoIndex}][valid_upto]" class="form-control"></td>
+           <td><input type="number" name="cargo[${cargoIndex}][declared_value]" class="form-control declared-value" oninput="calculateTotalDeclaredValue()" required></td>
            <td><button type="button" class="btn btn-danger btn-sm" onclick="removeRow(this)">🗑</button></td>
        `;
+
        tbody.appendChild(row);
        cargoIndex++;
+       calculateTotalDeclaredValue(); // Update total on row add
    }
 
    function removeRow(button) {
        button.closest('tr').remove();
+       calculateTotalDeclaredValue(); // Update total on row remove
    }
+
+   // Run once after DOM loads to handle existing rows
+   document.addEventListener('DOMContentLoaded', function () {
+       document.querySelectorAll('input[name$="[declared_value]"]').forEach(input => {
+           input.classList.add('declared-value');
+           input.addEventListener('input', calculateTotalDeclaredValue);
+       });
+
+       calculateTotalDeclaredValue();
+   });
 </script>
+
 <script>
    document.getElementById('createInsuranceYes').addEventListener('click', function () {
        let myModal = new bootstrap.Modal(document.getElementById('insuranceModal'));
@@ -494,4 +621,14 @@
        }
    });
 </script>
+<script>
+   $(document).ready(function () {
+       $(document).on('click', '.openImageModal', function () {
+           var imageUrl = $(this).data('image');
+           console.log("Image URL:", imageUrl); // Should log to console
+           $('#modalImage').attr('src', imageUrl);
+       });
+   });
+</script>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 @endsection
