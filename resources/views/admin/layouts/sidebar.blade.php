@@ -34,10 +34,7 @@
                     <li><a href="{{ route('admin.vehicles.index') }}" data-key="t-vehicles">Vehicles</a></li>
                     <li><a href="{{ route('admin.maintenance.index') }}" data-key="t-maintenance">Maintenance</a></li>
                     <li><a href="{{ route('admin.tyres.index') }}" data-key="t-tyres">Tyres</a></li>
-                    <li><a href="{{ route('admin.packagetype.index') }}" data-key="t-tyres">Package Type</a></li>
-                    <li><a href="{{ route('admin.destination.index') }}" data-key="t-destination">Destination</a></li>
-                    <li><a href="{{ route('admin.contract.index') }}" data-key="t-Contract">Contract </a></li>
-                </ul>
+                                    </ul>
             </li>
                         <li>
                 <a href="{{ route('admin.task_management.index') }}">
@@ -67,6 +64,11 @@
                 </a>
                 <ul class="sub-menu" aria-expanded="false">
                     <li><a href="{{ route('admin.users.index') }}" data-key="t-customer">Customer</a></li>
+                    <li><a href="{{ route('admin.packagetype.index') }}" data-key="t-tyres">Package Type</a></li>
+                    <li><a href="{{ route('admin.destination.index') }}" data-key="t-destination">Destination</a></li>
+                    <li><a href="{{ route('admin.contract.index') }}" data-key="t-Contract">Contract </a></li>
+                    <li><a href="{{ route('admin.vehicletype.index') }}" data-key="t-Contract">Vehicle Type </a></li>
+
                 </ul>
             </li>
             <li>

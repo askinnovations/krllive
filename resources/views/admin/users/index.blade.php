@@ -164,7 +164,7 @@
                                                 <div id="addressContainer">
                                                     <div class="mb-3 address-group">
                                                     
-                                                        <input type="text" name="address[0][city]" class="form-control mb-2" placeholder="City" required>
+                                                        <input type="text" name="address[0][city]" class="form-control mb-2" placeholder="Location" required>
                                                         <input type="text" name="address[0][gstin]" class="form-control mb-2" placeholder="GSTIN" required>
                                                         <input type="text" name="address[0][billing_address]" class="form-control mb-2" placeholder="Billing Address" required>
                                                         <input type="text" name="address[0][consignment_address]" class="form-control mb-2" placeholder="Consignment Address" required>
@@ -448,7 +448,7 @@ document.addEventListener("DOMContentLoaded", function () {
         let div = document.createElement("div");
         div.classList.add("mb-3", "address-group");
         div.innerHTML = `
-            <input type="text" name="address[${addressIndex}][city]" class="form-control mb-2" placeholder="City" required>
+            <input type="text" name="address[${addressIndex}][city]" class="form-control mb-2" placeholder="Location" required>
             <input type="text" name="address[${addressIndex}][gstin]" class="form-control mb-2" placeholder="GSTIN" required>
             <input type="text" name="address[${addressIndex}][billing_address]" class="form-control mb-2" placeholder="Billing Address" required>
             <input type="text" name="address[${addressIndex}][consignment_address]" class="form-control mb-2" placeholder="Consignment Address"required>

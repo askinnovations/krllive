@@ -5,7 +5,7 @@ use App\Http\Controllers\{
     EmployeeController, PayrollController, Auth\LoginController, AdminDashboardController,DestinationController,
     UserController, TyreController, WarehouseController, OrderController,PackageTypeController,
     ConsignmentNoteController, FreightBillController, StockTransferController, DriverController,
-    AttendanceController, MaintenanceController, VehicleController,TaskManagmentController,ContractController,SettingsController
+    AttendanceController, MaintenanceController, VehicleController,TaskManagmentController,ContractController,SettingsController,VehicleTypeController
 };
 
 Route::get('/', function () {
@@ -78,14 +78,27 @@ Route::prefix('admin')->group(function () {
         Route::get('/', [ContractController::class, 'index'])->name('admin.contract.index');
         Route::get('/view/{id}', [ContractController::class, 'show'])->name('admin.contract.view');
         Route::post('/store', [ContractController::class, 'store'])->name('admin.contract.store');
+        Route::put('/update/{id}', [ContractController::class, 'update'])->name('admin.contract.update');
+        Route::get('/delete/{id}', [ContractController::class, 'destroy'])->name('admin.contract.delete');
     });
+
+    // VehicleTypeController
+    Route::prefix('vehicletype')->group(function () {
+        Route::get('/', [VehicleTypeController::class, 'index'])->name('admin.vehicletype.index');
+        Route::post('/store', [VehicleTypeController::class, 'store'])->name('admin.vehicletype.store');
+        Route::put('/update/{id}', [VehicleTypeController::class, 'update'])->name('admin.vehicletype.update');
+        Route::get('/delete/{id}', [VehicleTypeController::class, 'destroy'])->name('admin.vehicletype.delete');
+    }); 
+
+    
 
 
     // SettingsController
 
     Route::prefix('settings')->group(function () {
         Route::get('/', [SettingsController::class, 'index'])->name('admin.settings.index');
-        
+        Route::post('/store', [SettingsController::class, 'store'])->name('admin.settings.store');
+
     });
 
     

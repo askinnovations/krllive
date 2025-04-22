@@ -10,8 +10,7 @@ class Contract extends Model
     use HasFactory;
 
     protected $fillable = [
-        'user_id',
-        'vehicle_id',
+        'type_id',
         'rate',
         'to_destination_id', // Add the to_destination_id field
         'from_destination_id', // Add the from_destination_id field
@@ -23,13 +22,12 @@ class Contract extends Model
         return $this->belongsTo(User::class, 'user_id');
     }
 
-    // Vehicle relationship
+    
+
     public function vehicle()
     {
-        return $this->belongsTo(Vehicle::class, 'vehicle_id');
+        return $this->belongsTo(VehicleType::class, 'type_id');
     }
-
-    
 
     // To Destination relationship (for to_destination_id)
     public function toDestination()

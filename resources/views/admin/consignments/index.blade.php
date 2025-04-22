@@ -34,7 +34,7 @@
                   </a>
 
                   
-                  <form id="lrForm" action="{{ route('admin.freight-bill.view') }}" method="post" style="display: inline;">
+                <form id="lrForm" action="{{ route('admin.freight-bill.view') }}" method="post" style="display: inline;">
                     @csrf
                         <input type="hidden" id="lrInputVisible" readonly style="width: 300px;">
                         <input type="hidden" name="lr[]" id="lrInputHidden">

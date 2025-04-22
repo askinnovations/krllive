@@ -79,7 +79,7 @@
                               <div class="d-flex align-items-center gap-2">
                               <a href="{{ route('admin.contract.view', $user->id) }}" class="btn btn-sm btn-light view-btn">
                                 <i class="fas fa-eye text-primary"></i>
-                            </a>
+                              </a>
 
                               </div>
                            </td>

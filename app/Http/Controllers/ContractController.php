@@ -8,6 +8,7 @@ use App\Models\User;
 use App\Models\Vehicle;
 use App\Models\Destination;
 use App\Models\Contract;
+use App\Models\VehicleType;
 
 class ContractController extends Controller
 {
@@ -19,8 +20,8 @@ class ContractController extends Controller
         $users = User::all();
         $contracts = Contract::all();
         // Fetch related data for mapping
-    $vehicles = \App\Models\Vehicle::pluck('vehicle_type', 'id')->toArray(); // [id => type]
-    $locations = \App\Models\Destination::pluck('destination', 'id')->toArray(); // [id => name]
+        $vehicles = \App\Models\VehicleType::pluck('vehicletype', 'id')->toArray(); // [id => type]
+        $locations = \App\Models\Destination::pluck('destination', 'id')->toArray(); // [id => name]
         $contracts = Contract::with('vehicle', 'fromDestination', 'toDestination')->get();
 
         return view('admin.contract.index', compact('users','contracts','vehicles','locations'));
@@ -33,10 +34,9 @@ class ContractController extends Controller
     public function show($id)
     {
         $user = User::findOrFail($id); 
-        $vehicles = Vehicle::all();
+        $vehicles = VehicleType::all();
         $destinations = Destination::all();
-        // Contracts के साथ vehicle और destination डेटा भी लाओ
-    $contracts = Contract::with('vehicle', 'fromDestination', 'toDestination')->get();
+        $contracts = Contract::with('vehicle', 'fromDestination', 'toDestination')->get();
     
         return view('admin.contract.view', compact('user', 'vehicles', 'destinations','contracts'));
     }
@@ -50,7 +50,7 @@ class ContractController extends Controller
     
         $from = $request->input('from');
         $to = $request->input('to');
-        $vehicleTypes = $request->input('vehicle_type'); // array of arrays
+        $vehicleTypes = $request->input('vehicletype'); // array of arrays
         $rates = $request->input('rate'); // array of arrays
     
         // Loop through each block (from-to section)
@@ -78,7 +78,7 @@ class ContractController extends Controller
                     \Log::info('Storing Contract:', [
                         'from_destination_id' => $fromDestination,
                         'to_destination_id' => $toDestination,
-                        'vehicle_id' => $vehicleType,
+                        'type_id' => $vehicleType,
                         'rate' => $rate
                     ]);
     
@@ -86,7 +86,7 @@ class ContractController extends Controller
                     \App\Models\Contract::create([
                         'from_destination_id' => $fromDestination,
                         'to_destination_id' => $toDestination,
-                        'vehicle_id' => $vehicleType,
+                        'type_id' => $vehicleType,
                         'rate' => $rate,
                     ]);
                 }
@@ -102,24 +102,44 @@ class ContractController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(string $id)
-    {
-        //
-    }
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, string $id)
-    {
-        //
-    }
+     public function update(Request $request, $id)
+     {
+         $request->validate([
+             'vehicletype' => 'required|integer|exists:vehicle_types,id',
+             'from'        => 'required|integer|exists:destinations,id',
+             'to'          => 'required|integer|exists:destinations,id',
+             'rate'        => 'required|numeric',
+         ]);
+ 
+         $contract = Contract::findOrFail($id);
+         $contract->type_id               = $request->vehicletype;
+         $contract->from_destination_id   = $request->from;
+         $contract->to_destination_id     = $request->to;
+         $contract->rate                  = $request->rate;
+         $contract->save();
+ 
+         return redirect()->back()->with('success','Contract updated successfully.');
+     }
+    
+    
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(string $id)
+    public function destroy($id)
     {
-        //
+        try {
+
+            $tyre = Contract::findOrFail($id);
+
+            if ($tyre->delete()) {
+                return redirect()->route('admin.contract.index')->with('success', 'Destination deleted successfully!');
+            }
+
+            return redirect()->route('admin.contract.index')->with('error', 'Failed to delete the tyre.');
+        } catch (Exception $e) {
+            return redirect()->route('admin.contract.index')->with('error', 'Something went wrong: ' . $e->getMessage());
+        }
     }
 }
