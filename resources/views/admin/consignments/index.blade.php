@@ -91,10 +91,18 @@
                                 {{ $consigneeName }}
                             </td>
                             <td>{{ $lr['lr_date'] ?? '-' }}</td>
-                            <td>{{ $lr['from_location'] ?? '-' }}</td>
-                            <td>{{ $lr['to_location'] ?? '-' }} <a href="{{ route('admin.consignments.documents', $lr['lr_number']) }}" >Documents</a></td>
+                            @php
+                            $fromDestination = \App\Models\Destination::find($lr['from_location']);
+                            $toDestination = \App\Models\Destination::find($lr['to_location']);
+                        @endphp
+                        
+                        <td>{{ $fromDestination->destination ?? '-' }}</td>
+                        <td>{{ $toDestination->destination ?? '-' }}</td>
+                                {{-- <a href="{{ route('admin.consignments.documents', $lr['lr_number']) }}" >Documents</a></td> --}}
                             
                             <td>
+                                <a href="{{ route('admin.consignments.documents', $lr['lr_number']) }}" class="btn btn-sm btn-light view-btn"><i class="fas fa-file-alt text-primary"></i>
+                                </a>
                                 <a href="{{ route('admin.consignments.view', $lr['lr_number']) }}" class="btn btn-sm btn-light view-btn"><i class="fas fa-eye text-primary"></i></a>
                                 <a href="{{ route('admin.consignments.edit', $order->order_id) }}" class="btn btn-sm btn-light edit-btn"><i class="fas fa-pen text-warning"></i></a>
                                 <a href="{{ route('admin.consignments.delete', $order->order_id) }}" class="btn btn-sm btn-light delete-btn"><i class="fas fa-trash text-danger"></i></a>

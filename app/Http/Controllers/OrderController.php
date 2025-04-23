@@ -11,6 +11,8 @@ use Illuminate\Support\Str;
 
 use App\Models\Order;
 use App\Models\Vehicle;
+use App\Models\VehicleType;
+use App\Models\Destination;
 use App\Models\User;
 
 
@@ -26,8 +28,11 @@ class OrderController extends Controller
     public function create()
    {
     $vehicles = Vehicle::all();
+   
+    $vehiclesType = VehicleType::all();
+    $destination = Destination::all();
     $users = User::all();
-    return view('admin.orders.create', compact('vehicles', 'users'));
+    return view('admin.orders.create', compact('vehicles', 'users','vehiclesType','destination'));
    }
 
    public function edit($order_id)
@@ -35,6 +40,8 @@ class OrderController extends Controller
        $vehicles = Vehicle::all();
        $users = User::all();
        $order = Order::where('order_id', $order_id)->first();
+       $vehiclesType = VehicleType::all();
+       $destination = Destination::all();
    
        
        if (is_string($order->lr)) {
@@ -43,7 +50,7 @@ class OrderController extends Controller
    
  
    
-       return view('admin.orders.edit', compact('order', 'vehicles', 'users'));
+       return view('admin.orders.edit', compact('order', 'vehicles', 'users','vehiclesType','destination'));
    }
    
 
@@ -74,123 +81,15 @@ class OrderController extends Controller
     }
 
     public function store(Request $request)
-    {
-      
-        $order = new Order();
-        $order->order_id = 'ORD-' . time();
-        $order->description = $request->description;
-        $order->order_date = $request->order_date;
-        $order->status = $request->status;
-        $order->order_type = $request->order_type;
-        $order->cargo_description_type = $request->cargo_description_type;
-    
-        $order->customer_id = $request->customer_id;
-        $order->customer_gst = $request->gst_number;
-        $order->customer_address = $request->customer_address;
-        
-        $order->deleiver_addresss = $request->deleiver_addresss;
-        $order->pickup_addresss = $request->pickup_addresss;
-        $order->order_method = $request->order_method;
-        $order->byorder = $request->byOrder;
-        $order->bycontract = $request->byContract;
-        
-    
-        // Prepare LR Data
-        $lrArray = [];
-    
-        foreach ($request->lr as $key => $lr) {
-            $cargoArray = [];
-    
-            // Loop through each cargo inside LR
-            if (isset($lr['cargo']) && is_array($lr['cargo'])) {
-                foreach ($lr['cargo'] as $cargo) {
-                    $documentFilePath = null;
-    
-                    // Handle image file upload
-                    if (isset($cargo['document_file']) && $cargo['document_file']->isValid()) {
-                        $documentFile = $cargo['document_file'];
-                       
-                        $documentFilePath = $documentFile->store('orders/cargo_documents/', 'public');
-                    }
-    
-                    $cargoArray[] = [
-                        'packages_no'         => $cargo['packages_no'] ?? null,
-                        'package_type'        => $cargo['package_type'] ?? null,
-                        'package_description' => $cargo['package_description'] ?? null,
-                        'actual_weight'       => $cargo['actual_weight'] ?? null,
-                        'charged_weight'      => $cargo['charged_weight'] ?? null,
-                        'document_no'         => $cargo['document_no'] ?? null,
-                        'document_name'       => $cargo['document_name'] ?? null,
-                        'document_date'       => $cargo['document_date'] ?? null,
-                        'document_file'       => $documentFilePath,  // Save the file path
-                        'declared_value'      => $cargo['declared_value'] ?? null,
-                        'eway_bill'           => $cargo['eway_bill'] ?? null,
-                        'valid_upto'          => $cargo['valid_upto'] ?? null,
-                        'unit'                => $cargo['unit'] ?? null,
-                    ];
-                }
-            }
-    
-            // Add the LR with cargo array
-            $lrArray[$key] = [
-                'lr_number'          => $lr['lr_number'] ?? ('LR-' . time() . '-' . $key),
-                'lr_date'            => $lr['lr_date'] ?? null,
-                'vehicle_no'         => $lr['vehicle_no'] ?? null,
-                'vehicle_type'       => $lr['vehicle_type'] ?? null,
-                'vehicle_ownership'  => $lr['vehicle_ownership'] ?? null,
-                'delivery_mode'      => $lr['delivery_mode'] ?? null,
-                'from_location'      => $lr['from_location'] ?? null,
-                'to_location'        => $lr['to_location'] ?? null,
-    
-                // Consignor
-                'consignor_id'       => $lr['consignor_id'] ?? null,
-                'consignor_gst'      => $lr['consignor_gst'] ?? null,
-                'consignor_loading'  => $lr['consignor_loading'] ?? null,
-    
-                // Consignee
-                'consignee_id'       => $lr['consignee_id'] ?? null,
-                'consignee_gst'      => $lr['consignee_gst'] ?? null,
-                'consignee_unloading'=> $lr['consignee_unloading'] ?? null,
-    
-                // Charges
-                'freightType'        => $lr['freightType'] ?? null,
-                'freight_amount'     => $lr['freight_amount'] ?? null,
-                'lr_charges'         => $lr['lr_charges'] ?? null,
-                'hamali'             => $lr['hamali'] ?? null,
-                'other_charges'      => $lr['other_charges'] ?? null,
-                'gst_amount'         => $lr['gst_amount'] ?? null,
-                'total_freight'      => $lr['total_freight'] ?? null,
-                'less_advance'       => $lr['less_advance'] ?? null,
-                'balance_freight'    => $lr['balance_freight'] ?? null,
-                'total_declared_value'=> $lr['total_declared_value'] ?? null,
-    
-                // Nested cargo
-                'cargo'              => $cargoArray,
-            ];
-        }
-    
-        // Save full LR array (associative) as JSON
-        $order->lr = $lrArray;
-    
-        $order->save();
-    
-        return redirect()->route('admin.orders.index')
-            ->with('success', 'Order stored with nested LR and cargo arrays successfully!');
-    }
-    
-
-public function update(Request $request, $order_id)
 {
-    //   return $request->all();
-   
-    $order = Order::findOrFail($order_id);
-
-    // Update order fields
+    $order = new Order();
+    $order->order_id = 'ORD-' . time();
     $order->description = $request->description;
     $order->order_date = $request->order_date;
     $order->status = $request->status;
     $order->order_type = $request->order_type;
     $order->cargo_description_type = $request->cargo_description_type;
+
     $order->customer_id = $request->customer_id;
     $order->customer_gst = $request->gst_number;
     $order->customer_address = $request->customer_address;
@@ -201,14 +100,128 @@ public function update(Request $request, $order_id)
     $order->byorder = $request->byOrder;
     $order->bycontract = $request->byContract;
 
-    // Existing LRs from DB
+    // Prepare LR Data
+    $lrArray = [];
+
+    foreach ($request->lr as $key => $lr) {
+        $cargoArray = [];
+
+        // Handle nested cargo
+        if (isset($lr['cargo']) && is_array($lr['cargo'])) {
+            foreach ($lr['cargo'] as $cargo) {
+                $documentFilePath = null;
+
+                if (isset($cargo['document_file']) && $cargo['document_file']->isValid()) {
+                    $documentFile = $cargo['document_file'];
+                    $documentFilePath = $documentFile->store('orders/cargo_documents/', 'public');
+                }
+
+                $cargoArray[] = [
+                    'packages_no'         => $cargo['packages_no'] ?? null,
+                    'package_type'        => $cargo['package_type'] ?? null,
+                    'package_description' => $cargo['package_description'] ?? null,
+                    'actual_weight'       => $cargo['actual_weight'] ?? null,
+                    'charged_weight'      => $cargo['charged_weight'] ?? null,
+                    'document_no'         => $cargo['document_no'] ?? null,
+                    'document_name'       => $cargo['document_name'] ?? null,
+                    'document_date'       => $cargo['document_date'] ?? null,
+                    'document_file'       => $documentFilePath,
+                    'declared_value'      => $cargo['declared_value'] ?? null,
+                    'eway_bill'           => $cargo['eway_bill'] ?? null,
+                    'valid_upto'          => $cargo['valid_upto'] ?? null,
+                    'unit'                => $cargo['unit'] ?? null,
+                ];
+            }
+        }
+
+        // Charges setup
+        $freight_amount = $lr_charges = $hamali = $other_charges = $gst_amount = $total_freight = $less_advance = $balance_freight = null;
+
+        if (($lr['freightType'] ?? null) !== 'to_be_billed') {
+            $freight_amount = $lr['freight_amount'] ?? null;
+            $lr_charges = $lr['lr_charges'] ?? null;
+            $hamali = $lr['hamali'] ?? null;
+            $other_charges = $lr['other_charges'] ?? null;
+            $gst_amount = $lr['gst_amount'] ?? null;
+            $total_freight = $lr['total_freight'] ?? null;
+            $less_advance = $lr['less_advance'] ?? null;
+            $balance_freight = $lr['balance_freight'] ?? null;
+        }
+
+        $lrArray[$key] = [
+            'lr_number'            => $lr['lr_number'] ?? ('LR-' . time() . '-' . $key),
+            'lr_date'              => $lr['lr_date'] ?? null,
+            'vehicle_no'           => $lr['vehicle_no'] ?? null,
+            'vehicle_type'         => $lr['vehicle_type'] ?? null,
+            'vehicle_ownership'    => $lr['vehicle_ownership'] ?? null,
+            'delivery_mode'        => $lr['delivery_mode'] ?? null,
+            'from_location'        => $lr['from_location'] ?? null,
+            'to_location'          => $lr['to_location'] ?? null,
+
+            // Consignor
+            'consignor_id'         => $lr['consignor_id'] ?? null,
+            'consignor_gst'        => $lr['consignor_gst'] ?? null,
+            'consignor_loading'    => $lr['consignor_loading'] ?? null,
+
+            // Consignee
+            'consignee_id'         => $lr['consignee_id'] ?? null,
+            'consignee_gst'        => $lr['consignee_gst'] ?? null,
+            'consignee_unloading'  => $lr['consignee_unloading'] ?? null,
+
+            // Charges
+            'freightType'          => $lr['freightType'] ?? null,
+            'freight_amount'       => $freight_amount,
+            'lr_charges'           => $lr_charges,
+            'hamali'               => $hamali,
+            'other_charges'        => $other_charges,
+            'gst_amount'           => $gst_amount,
+            'total_freight'        => $total_freight,
+            'less_advance'         => $less_advance,
+            'balance_freight'      => $balance_freight,
+            'total_declared_value' => $lr['total_declared_value'] ?? null,
+            'insurance_description'=> $lr['insurance_description'] ?? null,
+            'insurance_status'     => $lr['insurance_status'] ?? null,
+
+            // Cargo nested
+            'cargo'                => $cargoArray,
+        ];
+    }
+
+    // Save JSON
+    $order->lr = $lrArray;
+    $order->save();
+
+    return redirect()->route('admin.orders.index')
+        ->with('success', 'Order stored with nested LR and cargo arrays successfully!');
+}
+
+    
+
+public function update(Request $request, $order_id)
+{
+    $order = Order::findOrFail($order_id);
+
+    // Update basic order fields
+    $order->description = $request->description;
+    $order->order_date = $request->order_date;
+    $order->status = $request->status;
+    $order->order_type = $request->order_type;
+    $order->cargo_description_type = $request->cargo_description_type;
+    $order->customer_id = $request->customer_id;
+    $order->customer_gst = $request->gst_number;
+    $order->customer_address = $request->customer_address;
+    $order->deleiver_addresss = $request->deleiver_addresss;
+    $order->pickup_addresss = $request->pickup_addresss;
+    $order->order_method = $request->order_method;
+    $order->byorder = $request->byOrder;
+    $order->bycontract = $request->byContract;
+
+    // Map existing LRs if any
     $existingLrs = $order->lr ?? [];
     $existingLrMap = collect($existingLrs)->keyBy('lr_number')->toArray();
 
-    $updatedLrs = [];
-
     foreach ($request->lr as $lrKey => $lr) {
-        // Skip empty LRs
+        // Skip if essential LR info is missing
         if (
             empty($lr['lr_date']) &&
             empty($lr['consignor_id']) &&
@@ -218,10 +231,12 @@ public function update(Request $request, $order_id)
             continue;
         }
 
-        // Prepare cargos
         $cargoArray = [];
+
+        // Process cargo entries
         if (!empty($lr['cargo']) && is_array($lr['cargo'])) {
             foreach ($lr['cargo'] as $cargo) {
+                // Skip if no meaningful cargo data
                 if (
                     empty($cargo['packages_no']) &&
                     empty($cargo['package_type']) &&
@@ -231,84 +246,90 @@ public function update(Request $request, $order_id)
                 ) {
                     continue;
                 }
-                $documentFilePath = null;
 
+                // File handling logic
+                $documentFilePath = null;
                 if (
                     isset($cargo['document_file']) &&
                     $cargo['document_file'] instanceof \Illuminate\Http\UploadedFile &&
                     $cargo['document_file']->isValid()
                 ) {
-                    // New file uploaded — store it
-                    $documentFilePath = $cargo['document_file']->store('orders/cargo_documents', 'public');
-                } elseif (
-                    isset($cargo['document_file']) &&
-                    is_string($cargo['document_file'])
-                ) {
-                    // Already stored file path — just reuse it
-                    $documentFilePath = $cargo['document_file'];
+                    $documentFile = $cargo['document_file'];
+                    $documentFilePath = $documentFile->store('orders/cargo_documents/', 'public');
+                } elseif (!empty($cargo['old_document_file'])) {
+                    $documentFilePath = $cargo['old_document_file'];
                 }
+
                 $cargoArray[] = [
                     'packages_no'         => $cargo['packages_no'] ?? null,
                     'package_type'        => $cargo['package_type'] ?? null,
                     'package_description' => $cargo['package_description'] ?? null,
-                   
                     'actual_weight'       => $cargo['actual_weight'] ?? null,
                     'charged_weight'      => $cargo['charged_weight'] ?? null,
+                    'unit'                => $cargo['unit'] ?? null,
                     'document_no'         => $cargo['document_no'] ?? null,
                     'document_name'       => $cargo['document_name'] ?? null,
                     'document_date'       => $cargo['document_date'] ?? null,
                     'eway_bill'           => $cargo['eway_bill'] ?? null,
                     'valid_upto'          => $cargo['valid_upto'] ?? null,
                     'declared_value'      => $cargo['declared_value'] ?? null,
-                    'unit'      => $cargo['unit'] ?? null,
                     'document_file'       => $documentFilePath,
                 ];
             }
         }
 
-        // Get lr_number
+        // Generate LR number if missing
         $lrNumber = $lr['lr_number'] ?? 'LR-' . now()->format('YmdHis') . '-' . $lrKey;
 
-        // Prepare LR Data
+        // Construct LR data
         $lrData = [
-            'lr_number'           => $lrNumber,
-            'lr_date'             => $lr['lr_date'] ?? null,
-            'vehicle_no'        => $lr['vehicle_no'] ?? null,
-            'vehicle_type'          => $lr['vehicle_type'] ?? null,
-            'vehicle_ownership'   => $lr['vehicle_ownership'] ?? null,
-            'delivery_mode'       => $lr['delivery_mode'] ?? null,
-            'from_location'       => $lr['from_location'] ?? null,
-            'to_location'         => $lr['to_location'] ?? null,
-            'consignor_id'        => $lr['consignor_id'] ?? null,
-            'consignor_gst'       => $lr['consignor_gst'] ?? null,
-            'consignor_loading'   => $lr['consignor_loading'] ?? null,
-            'consignee_id'        => $lr['consignee_id'] ?? null,
-            'consignee_gst'       => $lr['consignee_gst'] ?? null,
-            'consignee_unloading' => $lr['consignee_unloading'] ?? null,
-            'freight_amount'      => $lr['freight_amount'] ?? null,
-            'lr_charges'          => $lr['lr_charges'] ?? null,
-            'hamali'              => $lr['hamali'] ?? null,
-            'other_charges'       => $lr['other_charges'] ?? null,
-            'gst_amount'          => $lr['gst_amount'] ?? null,
-            'total_freight'       => $lr['total_freight'] ?? null,
-            'less_advance'        => $lr['less_advance'] ?? null,
-            'balance_freight'     => $lr['balance_freight'] ?? null,
-            'total_declared_value'=> $lr['total_declared_value'] ?? null,
-            'cargo'               => $cargoArray,
+            'lr_number'            => $lrNumber,
+            'lr_date'              => $lr['lr_date'] ?? null,
+            'vehicle_no'           => $lr['vehicle_no'] ?? null,
+            'vehicle_type'         => $lr['vehicle_type'] ?? null,
+            'vehicle_ownership'    => $lr['vehicle_ownership'] ?? null,
+            'delivery_mode'        => $lr['delivery_mode'] ?? null,
+            'from_location'        => $lr['from_location'] ?? null,
+            'to_location'          => $lr['to_location'] ?? null,
+            'consignor_id'         => $lr['consignor_id'] ?? null,
+            'consignor_gst'        => $lr['consignor_gst'] ?? null,
+            'consignor_loading'    => $lr['consignor_loading'] ?? null,
+            'consignee_id'         => $lr['consignee_id'] ?? null,
+            'consignee_gst'        => $lr['consignee_gst'] ?? null,
+            'consignee_unloading'  => $lr['consignee_unloading'] ?? null,
+
+            // ✅ Fixed this line to handle "to_be_billed"
+            'freightType'          => isset($lr['freightType']) && $lr['freightType'] === 'to_be_billed'
+                                        ? 'To be Billed'
+                                        : ($lr['freightType'] ?? null),
+
+            'freight_amount'       => $lr['freight_amount'] ?? null,
+            'lr_charges'           => $lr['lr_charges'] ?? null,
+            'hamali'               => $lr['hamali'] ?? null,
+            'other_charges'        => $lr['other_charges'] ?? null,
+            'gst_amount'           => $lr['gst_amount'] ?? null,
+            'total_freight'        => $lr['total_freight'] ?? null,
+            'less_advance'         => $lr['less_advance'] ?? null,
+            'balance_freight'      => $lr['balance_freight'] ?? null,
+            'total_declared_value' => $lr['total_declared_value'] ?? null,
+            'insurance_description'=> $lr['insurance_description'] ?? null,
+            'insurance_status'     => $lr['insurance_status'] ?? null,
+            'cargo'                => $cargoArray,
         ];
 
-        // Update if exists or add as new
+        // Save or overwrite LR by number
         $existingLrMap[$lrNumber] = $lrData;
     }
 
-    // Save updated LR array
-    $order->lr = array_values($existingLrMap); // Re-index the array
+    $order->lr = array_values($existingLrMap);
     $order->save();
 
     return redirect()->route('admin.orders.index')
         ->with('success', 'Order and LRs updated successfully!');
 }
 
+
+    
 
 
 

@@ -59,14 +59,16 @@
                                 @else
                                     <span class="badge bg-secondary">{{ ucfirst($order->status) }}</span>
                                 @endif
-                                <a href="{{ route('admin.orders.documents', $order->order_id) }}">documents
-                              </a>
+                                {{-- <a href="{{ route('admin.orders.documents', $order->order_id) }}">documents
+                              </a> --}}
                             </td>
                             <td>
                            
+                            <a href="{{ route('admin.orders.documents', $order->order_id) }}" class="btn btn-sm btn-light view-btn"><i class="fas fa-file-alt text-primary"></i>
+
+                            </a>
                             <a href="{{ route('admin.orders.view', $order->order_id) }}" class="btn btn-sm btn-light view-btn"><i class="fas fa-eye text-primary"></i>
                             </a>
-
                             
                             <a href="{{ route('admin.orders.edit', $order->order_id) }}" class="btn btn-sm btn-light edit-btn">
                                  <i class="fas fa-pen text-warning"></i>

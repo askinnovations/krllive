@@ -403,52 +403,56 @@
                 <table border="1" style="border-collapse: collapse; width: 100%; text-align: center;">
                     <thead>
                         <tr>
-                            <th rowspan="2">No. of Packages</th>
-                            <th rowspan="2">Method of Packing</th>
-                            <th rowspan="2">Description Said to contain</th>
-                            <th colspan="2">Weight</th>
-                        </tr>
-                        <tr>
-                            <th>Actual Weight</th>
-                            <th>Charged Weight</th>
+                            <th>No. of Packages</th>
+                            <th>Method of Packing</th>
+                            <th>Description Said to contain</th>
+                            <th>Weight</th>
                         </tr>
                     </thead>
                     <tbody>
                         @php
-                            $firstRow = true; // Flag to control when to display Actual and Charged Weight
-                            $totalActualWeight = 0; // Variable to store the total of Actual Weight
-                            $totalChargedWeight = 0; // Variable to store the total of Charged Weight
+                            $totalActualWeight = 0;
+                            $totalChargedWeight = 0;
+                            $rowIndex = 0;
                         @endphp
                 
                         @foreach($lrEntries['cargo'] as $cargo)
                             @php
-                                // Check if at least one field is filled
                                 $isValid = !empty($cargo['packages_no']) || !empty($cargo['package_type']) || !empty($cargo['package_description']);
+                                $actual = $cargo['actual_weight'] ?? 0;
+                                $charged = $cargo['charged_weight'] ?? 0;
+                                $totalActualWeight += $actual;
+                                $totalChargedWeight += $charged;
                             @endphp
                 
                             @if($isValid)
                                 <tr>
                                     <td>{{ $cargo['packages_no'] ?? '' }}</td>
                                     <td>{{ $cargo['package_type'] ?? '' }}</td>
-                                    <td>{{ $cargo['package_description'] ?? '' }}</td>
-                
-                                    <!-- Show Actual and Charged Weight only in the first row -->
-                                    @if($firstRow)
-                                        <td>{{ $total_actual_weight ?? 0 }}</td> <!-- Actual Weight -->
-                                        <td>{{ $total_charged_weight ?? 0 }}</td> <!-- Charged Weight -->
-                                        @php
-                                            $totalActualWeight += $cargo['actual_weight'] ?? 0; // Add to Actual Weight total
-                                            $totalChargedWeight += $cargo['charged_weight'] ?? 0; // Add to Charged Weight total
-                                            $firstRow = false; // Disable the display for the rest of the rows
-                                        @endphp
-                                    @else
-                                      
-                                    @endif
+                                    <td style="text-align: left;">
+                                         {{ $cargo['package_description'] ?? '' }}<br>
+                                        <strong>Document No.:</strong> {{ $cargo['document_no'] ?? '' }}<br>
+                                        <strong>Document Name:</strong> {{ $cargo['document_name'] ?? '' }}<br>
+                                        <strong>Document Date:</strong>
+                                        {{ isset($cargo['document_date']) ? \Illuminate\Support\Carbon::parse($cargo['document_date'])->format('d/m/Y') : '' }}<br>
+                                        <strong>Eway Bill No:</strong> {{ $cargo['eway_bill'] ?? '' }}<br>
+
+                                    </td>
+                                    <td>
+                                        @if($rowIndex == 0)
+                                            <strong>Actual Weight:</strong>{{ $totalActualWeight }}
+                                        @elseif($rowIndex == 1)
+                                            <strong>Charged Weight:</strong>{{ $totalChargedWeight }}
+                                        @endif
+                                    </td>
                                 </tr>
+                                @php $rowIndex++; @endphp
                             @endif
                         @endforeach
                     </tbody>
                 </table>
+                
+                
                 
                 <!-- Display the totals below the table -->
                
@@ -485,7 +489,7 @@
 @endphp
 
 <p style="margin-top: 10px;">
-    <strong>Declared Value Rs.</strong> {{ $lr['declared_value'] ?? '-' }}
+    <strong>Declared Value Rs.</strong> {{ $lr['total_declared_value'] ?? '-' }}
 </p>
 
 </div>
@@ -526,10 +530,13 @@
         N/A
     @endif
 </p>
+@php
+    $fromDestination = \App\Models\Destination::find($lr['from_location']);
+    $toDestination = \App\Models\Destination::find($lr['to_location']);
+@endphp
 
-<p><strong>From:</strong> {{ $lr['from_location'] ?? '-' }}</p>
-
-<p><strong>To:</strong> {{ $lr['to_location'] ?? '-' }}</p>
+<p><strong>From:</strong> {{ $fromDestination->destination ?? '-' }}</p>
+<p><strong>To:</strong> {{ $toDestination->destination ?? '-' }}</p>
 
 <hr>
 
@@ -544,9 +551,9 @@
 @endphp
 
 <div class="section">
-    <label><input type="checkbox" {{ ($lr['freight_type'] ?? '') == 'PAID' ? 'checked' : '' }}> PAID</label>
-    <label><input type="checkbox" {{ ($lr['freight_type'] ?? '') == 'TO PAY' ? 'checked' : '' }}> TO PAY</label>
-    <label><input type="checkbox" {{ ($lr['freight_type'] ?? '') == 'TO BE BILLED' ? 'checked' : '' }}> TO BE BILLED</label>
+    <label><input type="checkbox" {{ ($lr['freightType'] ?? '') == 'paid' ? 'checked' : '' }}> PAID</label>
+    <label><input type="checkbox" {{ ($lr['freightType'] ?? '') == 'to_pay' ? 'checked' : '' }}> TO PAY</label>
+    <label><input type="checkbox" {{ ($lr['freightType'] ?? '') == 'to_be_billed' ? 'checked' : '' }}> TO BE BILLED</label>
 </div>
 
 <div class="section"><span>FREIGHT</span> <span>{{ $lr['freight_amount'] ?? '-' }}</span></div>

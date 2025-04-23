@@ -199,6 +199,8 @@ Route::prefix('admin')->group(function () {
     });
 
     Route::get('/stock-transfer/index', [StockTransferController::class, 'index'])->name('admin.stock.index');
+    // Route::post('/get-contract-rate', [ContractController::class, 'getRate'])->name('get.contract.rate');
+    Route::post('/get-rate', [ContractController::class, 'getRate']);
 
 
     
