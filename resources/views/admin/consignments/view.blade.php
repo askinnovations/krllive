@@ -400,57 +400,59 @@
                     }
                 }
             @endphp
-                <table border="1" style="border-collapse: collapse; width: 100%; text-align: center;">
-                    <thead>
-                        <tr>
-                            <th>No. of Packages</th>
-                            <th>Method of Packing</th>
-                            <th>Description Said to contain</th>
-                            <th>Weight</th>
-                        </tr>
-                    </thead>
-                    <tbody>
+             <table border="1" style="border-collapse: collapse; width: 100%; text-align: center;">
+                <thead>
+                    <tr>
+                        <th>No. of Packages</th>
+                        <th>Method of Packing</th>
+                        <th>Description Said to contain</th>
+                        <th>Weight</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @php
+                        $totalActualWeight = $totalChargedWeight = 0;
+                        $validCargos = collect($lrEntries['cargo'])->filter(function($cargo) {
+                            return !empty($cargo['packages_no']) || !empty($cargo['package_type']) || !empty($cargo['package_description']);
+                        })->values();
+                        $rowCount = $validCargos->count();
+                    @endphp
+            
+                    @foreach($validCargos as $index => $cargo)
                         @php
-                            $totalActualWeight = 0;
-                            $totalChargedWeight = 0;
-                            $rowIndex = 0;
+                            $totalActualWeight += $cargo['actual_weight'] ?? 0;
+                            $totalChargedWeight += $cargo['charged_weight'] ?? 0;
                         @endphp
-                
-                        @foreach($lrEntries['cargo'] as $cargo)
-                            @php
-                                $isValid = !empty($cargo['packages_no']) || !empty($cargo['package_type']) || !empty($cargo['package_description']);
-                                $actual = $cargo['actual_weight'] ?? 0;
-                                $charged = $cargo['charged_weight'] ?? 0;
-                                $totalActualWeight += $actual;
-                                $totalChargedWeight += $charged;
-                            @endphp
-                
-                            @if($isValid)
-                                <tr>
-                                    <td>{{ $cargo['packages_no'] ?? '' }}</td>
-                                    <td>{{ $cargo['package_type'] ?? '' }}</td>
-                                    <td style="text-align: left;">
-                                         {{ $cargo['package_description'] ?? '' }}<br>
-                                        <strong>Document No.:</strong> {{ $cargo['document_no'] ?? '' }}<br>
-                                        <strong>Document Name:</strong> {{ $cargo['document_name'] ?? '' }}<br>
-                                        <strong>Document Date:</strong>
-                                        {{ isset($cargo['document_date']) ? \Illuminate\Support\Carbon::parse($cargo['document_date'])->format('d/m/Y') : '' }}<br>
-                                        <strong>Eway Bill No:</strong> {{ $cargo['eway_bill'] ?? '' }}<br>
+                        <tr>
+                            <td>{{ $cargo['packages_no'] ?? '' }}</td>
+                            <td>{{ $cargo['package_type'] ?? '' }}</td>
+                            <td style="text-align: left;">
+                                {{ $cargo['package_description'] ?? '' }}
+                                </br>
+                                {{ isset($cargo['document_name']) ? \Illuminate\Support\Str::limit($cargo['document_name']) : '' }},
+                                     - {{ $cargo['document_no'] ?? '' }}, <strong>Dt:</strong> {{ isset($cargo['document_date']) ? \Illuminate\Support\Carbon::parse($cargo['document_date'])->format('d/m/Y') : '' }}
+                            </br>
+                                <strong>Eway Bill No:</strong> {{ $cargo['eway_bill'] ?? '' }}
+                            </td>
+            
+                            {{-- Display merged weight cell only for the first row --}}
+                            @if($index === 0)
+                                <td rowspan="{{ $rowCount }}" style="vertical-align: ; text-align: left; padding: 8px;">
+                                    <div style="padding-top: 5px;" >
+                                        <strong>Actual<br> Weight:</strong> {{ $totalActualWeight }}
+                                    </div>
+                                    <hr style="width: 100%; height: 3px; background-color: #003366; border: none; margin: 10px 0;">
 
-                                    </td>
-                                    <td>
-                                        @if($rowIndex == 0)
-                                            <strong>Actual Weight:</strong>{{ $totalActualWeight }}
-                                        @elseif($rowIndex == 1)
-                                            <strong>Charged Weight:</strong>{{ $totalChargedWeight }}
-                                        @endif
-                                    </td>
-                                </tr>
-                                @php $rowIndex++; @endphp
+                                    <div style="padding-top: 5px;">
+                                        <strong>Charged Weight:</strong> {{ $totalChargedWeight }}
+                                    </div>
+                                </td>
                             @endif
-                        @endforeach
-                    </tbody>
-                </table>
+                        </tr>
+                    @endforeach
+                </tbody>
+            </table>
+            
                 
                 
                 

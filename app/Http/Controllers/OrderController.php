@@ -209,7 +209,7 @@ public function update(Request $request, $order_id)
 
     // Prepare LR Data
     $lrArray = [];
-
+ if(!empty($request->lr)&& is_array($request->lr)){
     foreach ($request->lr as $key => $lr) {
         $cargoArray = [];
 
@@ -293,9 +293,9 @@ public function update(Request $request, $order_id)
             'cargo'                => $cargoArray,
         ];
     }
-
+ }
     // Save JSON
-    $order->lr = $lrArray;
+    $order->lr = $lrArray ?? [];
     $order->save();
 
     return redirect()->route('admin.orders.index')

@@ -72,50 +72,38 @@ class ContractController extends Controller
 
     public function store(Request $request)
     {
-        // return($request->all());
-
-        // Log incoming request for debugging
-        \Log::info('Request Data:', $request->all());
-    
         $from = $request->input('from');
         $to = $request->input('to');
         $vehicleTypes = $request->input('vehicletype'); // array of arrays
         $rates = $request->input('rate'); // array of arrays
+        $user_id = $request->input('user_id');
     
-        // Loop through each block (from-to section)
+        // Loop through each from-to pair
         for ($i = 0; $i < count($from); $i++) {
             $fromDestination = $from[$i];
             $toDestination = $to[$i];
     
-            // Validate block data if needed
+            // Check if both from and to exist
             if (empty($fromDestination) || empty($toDestination)) {
-                continue; // skip if any block is incomplete
+                continue;
             }
     
-            // Loop through each vehicle + rate pair inside this block
+            // Check if vehicle and rate blocks exist for this from-to pair
             if (isset($vehicleTypes[$i]) && isset($rates[$i])) {
                 for ($j = 0; $j < count($vehicleTypes[$i]); $j++) {
                     $vehicleType = $vehicleTypes[$i][$j];
                     $rate = $rates[$i][$j];
     
-                    // Skip empty rows
                     if (empty($vehicleType) || !is_numeric($rate)) {
-                        continue; // Only store valid numeric rates
+                        continue;
                     }
     
-                    // Log the rate before creating the contract
-                    \Log::info('Storing Contract:', [
-                        'from_destination_id' => $fromDestination,
-                        'to_destination_id' => $toDestination,
-                        'type_id' => $vehicleType,
-                        'rate' => $rate
-                    ]);
-    
-                    // Store the contract
+                    // Store in DB
                     \App\Models\Contract::create([
+                        'type_id' => $vehicleType,
                         'from_destination_id' => $fromDestination,
                         'to_destination_id' => $toDestination,
-                        'type_id' => $vehicleType,
+                        'user_id' => $user_id,
                         'rate' => $rate,
                     ]);
                 }
@@ -124,6 +112,7 @@ class ContractController extends Controller
     
         return redirect()->route('admin.contract.index')->with('success', 'Contract created successfully');
     }
+    
     
     
    
