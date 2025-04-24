@@ -14,6 +14,7 @@ class Contract extends Model
         'rate',
         'to_destination_id', // Add the to_destination_id field
         'from_destination_id', // Add the from_destination_id field
+        'user_id' 
     ];
 
     // User relationship

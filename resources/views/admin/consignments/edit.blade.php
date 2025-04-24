@@ -104,6 +104,11 @@
                             value="{{ old('consignor_gst', $lrData['consignor_gst'] ?? '') }}"
                             placeholder="Enter GST numbers" readonly required>
                     </div>
+                   
+                    <div class="mb-3 ">
+                     <label class="form-label">💰 ORDER AMOUNT</label>
+                     <input type="number" name="byOrder" class="form-control"  value="{{ $order->byorder }}" placeholder="Enter Amount" id="byoder">
+                  </div>
                   </div>
                   <!-- Consignee Details -->
                   <div class="col-md-6">
@@ -338,9 +343,10 @@
                </select>
             </td>
             <td><input type="text" name="cargo[{{ $index }}][package_description]" class="form-control" value="{{ $cargo['package_description'] }}" required></td>
-            {{-- <td><input type="number" name="cargo[{{ $index }}][weight]" class="form-control" value="{{ $cargo['weight'] }}" required></td> --}}
             <td><input type="number" name="cargo[{{ $index }}][actual_weight]" class="form-control" value="{{ $cargo['actual_weight'] }}" required></td>
-            <td><input type="number" name="cargo[{{ $index }}][charged_weight]" class="form-control" value="{{ $cargo['charged_weight'] }}" required></td>
+            {{-- <td><input type="number" name="cargo[{{ $index }}][charged_weight]" class="form-control" value="{{ $cargo['charged_weight'] }}" required></td> --}}
+            <td><input type="number" name="cargo[{{ $index }}][charged_weight]"   value="{{ $cargo['charged_weight'] }}" class="form-control" oninput="calculateTotalChargedWeight()"></td>
+
             <td>
                <select class="form-select " name="cargo[{{ $index }}][unit]" required>
                   <option value="">Select Unit</option>
@@ -422,7 +428,7 @@
                            <tbody id="freightBody">
                                   <tr>
                                      <td>
-                                       <input type="number" name="freight_amount" value="{{ old('freight_amount', $lrData['freight_amount'] ?? '') }}" class="form-control freight-amount" placeholder="Enter Freight Amount" required>
+                                       <input type="number" name="freight_amount" value="{{ old('freight_amount', $lrData['freight_amount'] ?? '') }}" class="form-control freight-amount" placeholder="Enter Freight Amount" readonly>
                                      </td>
                                      <td>
                                        <input type="number" name="lr_charges"  value="{{ old('lr_charges', $lrData['lr_charges'] ?? '') }}" class="form-control lr-charges" placeholder="Enter LR " required>
@@ -454,6 +460,10 @@
                <div class="row">
                   <!-- Declared Value -->
                   <div class="col-md-6 mt-3">
+                    
+                       
+                        <input type="hidden" id="totalChargedWeight" class="form-control" readonly>
+                    
                      <div class="mb-3">
                         <label class="form-label " style="font-weight: bold;">💰 Total Declared Value
                         (Rs.)</label>
@@ -477,19 +487,26 @@
    </div>
 </div>
 {{-- image view --}}
-<div class="modal fade" id="imageModal" tabindex="-1" aria-hidden="true">
-   <div class="modal-dialog modal-dialog-centered">
-       <div class="modal-content">
-           <div class="modal-header">
-               <h5 class="modal-title">Document Image</h5>
-               <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-           </div>
-           <div class="modal-body text-center">
-               <img id="modalImage" src="" alt="Document" class="img-fluid" />
-           </div>
-       </div>
-   </div>
-</div>
+{{-- add charge weigth --}}
+<script>
+   function calculateTotalChargedWeight() {
+       let total = 0;
+       const inputs = document.querySelectorAll('input[name$="[charged_weight]"]');
+
+       inputs.forEach(input => {
+           total += parseFloat(input.value) || 0;
+       });
+
+       document.getElementById('totalChargedWeight').value = total.toFixed(2);
+   }
+
+   // Page load pe call karo
+   document.addEventListener('DOMContentLoaded', function () {
+       calculateTotalChargedWeight();  // ⚡ Existing values ka total dikhega on load
+   });
+</script>
+
+{{-- add charge weigth --}}
 <script>
    function toggleFreightTable() {
        const tbody = document.getElementById('freightBody');
@@ -562,7 +579,8 @@
            </td>
            <td><input type="text" name="cargo[${cargoIndex}][package_description]" class="form-control"></td>
            <td><input type="number" name="cargo[${cargoIndex}][actual_weight]" class="form-control"></td>
-           <td><input type="number" name="cargo[${cargoIndex}][charged_weight]" class="form-control"></td>
+               <td><input type="number" name="cargo[${cargoIndex}][charged_weight]" class="form-control" oninput="calculateTotalChargedWeight()"></td>
+
            <td>
                <select class="form-select my-select" name="cargo[${cargoIndex}][unit]" required>
                <option value="">Select Unit</option>
@@ -689,6 +707,46 @@
   });
   
     </script>
+    <script>
+      function updateFreightAmount() {
+          const byOrder = parseFloat(document.getElementById('byoder')?.value) || 0;
+          const chargedWeight = parseFloat(document.getElementById('totalChargedWeight')?.value) || 0;
+          const result = byOrder * chargedWeight;
+  
+          const freightInput = document.querySelector('.freight-amount');
+          if (freightInput) {
+              freightInput.value = result.toFixed(2);
+          }
+      }
+  
+      function calculateTotalChargedWeight() {
+          let total = 0;
+          const inputs = document.querySelectorAll('input[name$="[charged_weight]"]');
+  
+          inputs.forEach(input => {
+              total += parseFloat(input.value) || 0;
+          });
+  
+          document.getElementById('totalChargedWeight').value = total.toFixed(2);
+  
+          // Call freight updater here
+          updateFreightAmount(); 
+      }
+  
+      document.addEventListener('DOMContentLoaded', function () {
+          calculateTotalChargedWeight();
+          updateFreightAmount();
+  
+          // Bind event to byOrder input
+          document.getElementById('byoder').addEventListener('input', updateFreightAmount);
+  
+          // Bind charged weight inputs
+          document.querySelectorAll('input[name$="[charged_weight]"]').forEach(input => {
+              input.addEventListener('input', calculateTotalChargedWeight);
+          });
+      });
+  </script>
+  
     
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 @endsection

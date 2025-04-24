@@ -34,11 +34,16 @@ class ConsignmentNoteController extends Controller
     
     public function store(Request $request)
     {
+        // return $request->all();
         // Step 1: Create a new order
         $order = new Order();
     
         // Generate unique order ID
+
+
         $order->order_id = 'ORD-' . time();
+        $order->order_method = 'order';
+        $order->byorder = $request->byOrder;
     
         $cargoArray = [];
     
@@ -141,7 +146,8 @@ class ConsignmentNoteController extends Controller
     public function update(Request $request, $order_id)
     {
         $order = Order::where('order_id', $order_id)->firstOrFail();
-    
+        $order->order_method = 'order';
+        $order->byorder = $request->byOrder;
         $cargoArray = [];
     
         // Loop through cargo entries if available

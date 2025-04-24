@@ -15,13 +15,16 @@
                ⬅ Back to Listing
                </a>
             </div>
+           
             <form method="POST" action="{{ route('admin.contract.store') }}">
                @csrf
+               <input type="hidden" name="user_id" value="{{ $user->id }}">
                <div class="container mt-4">
                   <div id="contract-wrapper">
                      <div class="contract-section border p-3 mb-4">
                         <div class="row mb-3">
                            <div class="col-md-5">
+                            
                               <label>From</label>
                               <select class="form-control" name="from[]" required>
                                  <option value="">Select</option>

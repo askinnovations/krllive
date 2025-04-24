@@ -91,18 +91,13 @@
             </td>
 
             {{-- From --}}
-            <td>
-                @foreach($lrDetails as $lr)
-                     {{ $lr['from_location'] ?? '-' }}<br>
-                @endforeach
-            </td>
-
-            {{-- To --}}
-            <td>
-                @foreach($lrDetails as $lr)
-                     {{ $lr['to_location'] ?? '-' }}<br>
-                @endforeach
-            </td>
+            @php
+            $fromDestination = \App\Models\Destination::find($lr['from_location']);
+            $toDestination = \App\Models\Destination::find($lr['to_location']);
+        @endphp
+        
+        <td>{{ $fromDestination->destination ?? '-' }}</td>
+        <td>{{ $toDestination->destination ?? '-' }}</td>
 
             {{-- Action --}}
             <td>

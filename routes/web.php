@@ -81,6 +81,8 @@ Route::prefix('admin')->group(function () {
         Route::put('/update/{id}', [ContractController::class, 'update'])->name('admin.contract.update');
         Route::get('/delete/{id}', [ContractController::class, 'destroy'])->name('admin.contract.delete');
     });
+    Route::post('/get-rate', [ContractController::class, 'getRate']);
+
 
     // VehicleTypeController
     Route::prefix('vehicletype')->group(function () {
@@ -200,8 +202,7 @@ Route::prefix('admin')->group(function () {
 
     Route::get('/stock-transfer/index', [StockTransferController::class, 'index'])->name('admin.stock.index');
     // Route::post('/get-contract-rate', [ContractController::class, 'getRate'])->name('get.contract.rate');
-    Route::post('/get-rate', [ContractController::class, 'getRate']);
-
+   
 
     
 });
