@@ -14,7 +14,7 @@ class Order extends Model
     public $incrementing = false; 
     protected $keyType = 'string'; 
     protected $fillable = [
-        'order_id', 'description', 'order_date', 'status', 'order_type', 'cargo_description_type',
+        'order_id', 'description', 'order_date', 'status', 'user_id','from_destination_id','to_destination_id','order_type', 'cargo_description_type',
         'customer_id', 'customer_gst', 'customer_address',
         'consignor_id', 'consignor_gst', 'consignor_loading',
         'consignee_id', 'consignee_gst', 'consignee_unloading',
@@ -46,6 +46,21 @@ class Order extends Model
     public function customer()
     {
     return $this->belongsTo(User::class, 'customer_id');
+    }
+
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
+
+    public function fromDestination()
+    {
+        return $this->belongsTo(Destination::class, 'from_destination_id');
+    }
+
+    public function toDestination()
+    {
+        return $this->belongsTo(Destination::class, 'to_destination_id');
     }
     
     public function vehicle()

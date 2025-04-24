@@ -24,7 +24,7 @@ class LoginController extends Controller
         // Custom credentials check
         if (Auth::attempt(['mobile_number' => $credentials['mobile_number'], 'password' => $credentials['password']])) {
             $request->session()->regenerate();
-            return redirect()->route('front.index');
+            return redirect()->route('user.dashboard'); // 👈 Correct route name
         }
 
         return back()->withErrors([

@@ -15,8 +15,6 @@ class DestinationController extends Controller
     }
     public function store(Request $request)
     {  
-        
-      
         $validatedData = $request->validate([
             'destination' => 'required|string|max:255',
             
