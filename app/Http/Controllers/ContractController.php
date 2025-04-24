@@ -40,7 +40,36 @@ class ContractController extends Controller
     
         return view('admin.contract.view', compact('user', 'vehicles', 'destinations','contracts'));
     }
+
+    public function getRate(Request $request)
+    {
+        try {
+            // Get values from the request
+            $customer_id = $request->customer_id; // Customer ID
+            $vehicle_type = $request->vehicle_type;
+            $from_location = $request->from_location;
+            $to_location = $request->to_location;
     
+            // Fetch rate from the Contract model based on vehicle type, from location, and to location
+            $rate = Contract::where('type_id', $vehicle_type)
+                            ->where('from_destination_id', $from_location)
+                            ->where('to_destination_id', $to_location)
+                            ->where('user_id', $customer_id)
+                            ->value('rate');
+                           
+            // Return rate if found
+            if ($rate) {
+                return response()->json(['rate' => $rate, 'customer_id' => $customer_id]);
+            } else {
+                return response()->json(['rate' => null, 'message' => 'No rate found for this selection.'], 404);
+            }
+        } catch (\Exception $e) {
+            // Return error message if any exception occurs
+            return response()->json(['error' => $e->getMessage()], 500);
+        }
+    }
+    
+
     public function store(Request $request)
     {
         // return($request->all());

@@ -1,6 +1,18 @@
 @extends('admin.layouts.app')
 @section('title', 'Order | KRL')
 @section('content')
+
+<style>
+   /* Make Select2 look like Bootstrap input */
+   .select2-container .select2-selection--single {
+   height: 38px !important; /* match Bootstrap .form-control height */
+   padding: 6px 12px;
+   }
+   .select2-container--default .select2-selection--single .select2-selection__arrow {
+   height: 38px !important;
+   right: 6px;
+   }
+</style>
 <!-- Order Booking Add Page -->
 <div class="row order-booking-form">
 <div class="col-12">
@@ -40,11 +52,12 @@
                   <input type="date" name="order_date" class="form-control" required>
                </div>
             </div>
+            <!-- Select2 CSS -->
             <!-- Status -->
             <div class="col-md-3">
                <div class="mb-3">
                   <label class="form-label">📊 Status</label>
-                  <select name="status" class="form-select" required>
+                  <select name="status" class="form-select my-select" required >
                      <option value="">Select Status</option>
                      <option value="Pending">Pending</option>
                      <option value="Processing">Processing</option>
@@ -55,52 +68,51 @@
             </div>
             <!-- CUSTOMER NAME DROPDOWN -->
             <div class="col-md-3">
-               <div class="mb-3">
+              <div class="mb-3">
                   <label class="form-label">👤 Freight A/c</label>
                   <select name="customer_id" id="customer_id" class="form-select" onchange="setCustomerDetails()" required>
-                     <option value="">Select Customer</option>
-                     @foreach($users as $user)
-                     @php
-                     $addresses = json_decode($user->address, true);
-                     $formattedAddress = '';
-                     if (!empty($addresses) && is_array($addresses)) {
-                     $first = $addresses[0]; // first address only
-                     $formattedAddress = trim(
-                     ($first['full_address'] ?? '') . ', ' .
-                     ($first['city'] ?? '') . ', ' .
-                     ($first['pincode'] ?? '')
-                     );
-                     }
-                     @endphp
-                     <option 
-                        value="{{ $user->id }}"
-                        data-gst="{{ $user->gst_number }}"
-                        data-address="{{ $formattedAddress }}">
-                        {{ $user->name }}
-                     </option>
-                     @endforeach
+                      <option value="">Select Customer</option>
+          
+                      @foreach($users as $user)
+                          @php
+                              $addresses = json_decode($user->address, true);
+                          @endphp
+          
+                          @if(!empty($addresses) && is_array($addresses))
+                              @foreach($addresses as $address)
+                                  <option value="{{ $user->id }}"
+                                      data-gst="{{ $address['gstin'] ?? '' }}"  
+                                      data-address="{{ $address['billing_address'] ?? '' }}"> 
+                                      {{ $user->name }} - {{ $address['city'] ?? '' }}
+                                  </option>
+                              @endforeach
+                          @endif
+                      @endforeach
                   </select>
-               </div>
-            </div>
-            <!-- GST NUMBER (Auto-filled) -->
-            <div class="col-md-3">
-               <div class="mb-3">
+              </div>
+          </div>
+          
+          <!-- GST NUMBER (Auto-filled) -->
+          <div class="col-md-3">
+              <div class="mb-3">
                   <label class="form-label">🧾 GST NUMBER</label>
                   <input type="text" name="gst_number" id="gst_number" class="form-control" readonly required>
-               </div>
-            </div>
-            <!-- CUSTOMER ADDRESS (Auto-filled) -->
-            <div class="col-md-3">
-               <div class="mb-3">
+              </div>
+          </div>
+          
+          <!-- CUSTOMER ADDRESS (Auto-filled) -->
+          <div class="col-md-3">
+              <div class="mb-3">
                   <label class="form-label">📍 CUSTOMER ADDRESS</label>
                   <input type="text" name="customer_address" id="customer_address" class="form-control" readonly required>
-               </div>
-            </div>
+              </div>
+          </div>
+          
             <!-- ORDER TYPE -->
             <div class="col-md-3">
                <div class="mb-3">
                   <label class="form-label">📊 Order Type</label>
-                  <select name="order_type" class="form-select" required>
+                  <select name="order_type" class="form-select  my-select " required>
                      <option value="">Select Order</option>
                      <option value="import"> Import</option>
                      <option value="import-restoff">Import Restoff</option>
@@ -112,47 +124,41 @@
             </div>
             {{-- oder contract --}}
             <div class="col-md-3">
-              <div class="mb-3">
+               <div class="mb-3">
                   <label class="form-label">📑 ORDER METHOD</label><br>
-          
                   <div class="form-check form-check-inline">
-                      <input class="form-check-input" type="radio" name="order_method" id="byOrder" value="order" onclick="toggleOrderMethod()">
-                      <label class="form-check-label" for="byOrder">By Order</label>
+                     <input class="form-check-input" type="radio" name="order_method" id="byOrder" value="order" onclick="toggleOrderMethod()">
+                     <label class="form-check-label" for="byOrder">By Order</label>
                   </div>
-          
                   <div class="form-check form-check-inline">
-                      <input class="form-check-input" type="radio" name="order_method" id="byContract" value="contract" onclick="toggleOrderMethod()">
-                      <label class="form-check-label" for="byContract">By Contract</label>
+                     <input class="form-check-input" type="radio" name="order_method" id="byContract" value="contract" onclick="toggleOrderMethod()">
+                     <label class="form-check-label" for="byContract">By Contract</label>
                   </div>
-              </div>
-          
-              <!-- Input field for By Order -->
-              <div class="mb-3 d-none" id="orderAmountDiv">
+               </div>
+               <!-- Input field for By Order -->
+               <div class="mb-3 d-none" id="orderAmountDiv">
                   <label class="form-label">💰 ORDER AMOUNT</label>
                   <input type="number" name="byOrder" class="form-control" placeholder="Enter Amount">
-              </div>
-          
-              <!-- Input field for By Contract -->
-              <div class="mb-3 d-none" id="contractNumberDiv">
+               </div>
+               <!-- Input field for By Contract -->
+               <div class="mb-3 d-none" id="contractNumberDiv">
                   <label class="form-label">📄 CONTRACT NUMBER</label>
-                  <input type="text" name="byContract" class="form-control" placeholder="Enter Contract ">
-              </div>
-              
-          </div>
-          <div class="col-md-3">
-            <div class="mb-3">
-               <label class="form-label">📍 PICKUP ADDRESS</label>
-               <input type="text" name="pickup_addresss" id="pickup_addresss" class="form-control"  placeholder="Pickup Addresss" required>
+                  <input type="text" name="byContract" id="rate_input" class="form-control" placeholder="Enter Contract " readonly>
+               </div>
             </div>
-         </div>
-         <!-- DEliver adddress   -->
-         <div class="col-md-3">
-            <div class="mb-3">
-               <label class="form-label">📍DELEIEIVER ADDRESS</label>
-               <input type="text" name="deleiver_addresss" id="deleiver_addresss" class="form-control"  placeholder="Deleiver Addresss" required>
+            <div class="col-md-3">
+               <div class="mb-3">
+                  <label class="form-label">📍 PICKUP ADDRESS</label>
+                  <input type="text" name="pickup_addresss" id="pickup_addresss" class="form-control"  placeholder="Pickup Addresss" required>
+               </div>
             </div>
-         </div>
-         
+            <!-- DEliver adddress   -->
+            <div class="col-md-3">
+               <div class="mb-3">
+                  <label class="form-label">📍DELEIEIVER ADDRESS</label>
+                  <input type="text" name="deleiver_addresss" id="deleiver_addresss" class="form-control"  placeholder="Deleiver Addresss" required>
+               </div>
+            </div>
          </div>
          <!-- Button to Add LR - Consignment -->
          <div class="row">
@@ -182,33 +188,9 @@
 <script>
    var vehicles = @json($vehicles);
    
-   // Function जो vehicles array से options generate करेगा
-   function generateVehicleOptions() {
-  const vehicleOptions = [
-    "3MT / LCV",
-    "5MT",
-    "7.5MT",
-    "9MT",
-    "12MT",
-    "20MT / Multiaxle",
-    "25MT",
-    "19MT / 32FT Container",
-    "30MT",
-    "35MT",
-    "20FT Trailer - 20FT Container",
-    "40FT Container"
-  ];
-
-  let options = '<option value="">Select Vehicle</option>';
-  options += vehicleOptions.map(option => `<option value="${option}">${option}</option>`).join('');
-  return options;
-}
-
-
    function generateVehicle_typeOptions() {
        let options = '<option value="">Select Vehicle</option>';
        vehicles.forEach(function(vehicle) {
-           // यहाँ आप अपनी आवश्यकता के अनुसार vehicle का display नाम बना सकते हैं
            options += `<option value="${vehicle.id}">${vehicle.vehicle_no}</option>`;
        });
        return options;
@@ -241,42 +223,45 @@
                  <div class="col-md-6">
                  
                    
-
+   
                    <h5>📦 Consignor (Sender)</h5>
-                  <select name="lr[${counter}][consignor_id]" id="consignor_id_${counter}" class="form-select" onchange="setConsignorDetails(${counter})" required>
-   <option value="">Select Consignor Name</option>
-   @foreach($users as $user)
-      @php
-          $addresses = json_decode($user->address, true);
-          $formattedAddress = '';
-          if (!empty($addresses) && is_array($addresses)) {
-              $first = $addresses[0];
-              $formattedAddress = trim(
-                  ($first['full_address'] ?? '') . ', ' .
-                  ($first['city'] ?? '') . ', ' .
-                  ($first['pincode'] ?? '')
-              );
-          }
-      @endphp
-      <option 
-          value="{{ $user->id }}"
-          data-gst-consignor="{{ $user->gst_number }}"
-          data-address-consignor="{{ $formattedAddress }}">
-          {{ $user->name }}
-      </option>
-   @endforeach
-   </select>
-   
-   <div class="mb-3">
-   <label class="form-label">Consignor Loading Address</label>
-   <textarea name="lr[${counter}][consignor_loading]" id="consignor_loading_${counter}" class="form-control" rows="2" placeholder="Enter loading address" required></textarea>
-   </div>
-   
-   <div class="mb-3">
-   <label class="form-label">Consignor GST</label>
-   <input type="text" name="lr[${counter}][consignor_gst]" id="consignor_gst_${counter}" class="form-control" placeholder="Enter GST number" required>
-   </div>
-   
+               <select name="lr[${counter}][consignor_id]" id="consignor_id_${counter}" class="form-select" onchange="setConsignorDetails(${counter})" required>
+    <option value="">Select Consignor Name</option>
+    @foreach($users as $user)
+        @php
+            $addresses = json_decode($user->address, true);
+        @endphp
+        @if(!empty($addresses) && is_array($addresses))
+            @foreach($addresses as $address)
+                @php
+                    $formattedAddress = trim(
+                        ($address['billing_address'] ?? '') . ', ' .
+                        ($address['city'] ?? '') . ', ' .
+                        ($address['consignment_address'] ?? '')
+                    );
+                @endphp
+                <option 
+                    value="{{ $user->id }}"
+                    data-gst="{{ $address['gstin'] ?? '' }}"
+                    data-address="{{ $formattedAddress }}"
+                >
+                    {{ $user->name }} - {{ $address['city'] ?? '' }}
+                </option>
+            @endforeach
+        @endif
+    @endforeach
+</select>
+
+<div class="mb-3">
+    <label class="form-label">Consignor Loading Address</label>
+    <textarea name="lr[${counter}][consignor_loading]" id="consignor_loading_${counter}" class="form-control" rows="2" placeholder="Enter loading address" required></textarea>
+</div>
+
+<div class="mb-3">
+    <label class="form-label">Consignor GST</label>
+    <input type="text" name="lr[${counter}][consignor_gst]" id="consignor_gst_${counter}" class="form-control" placeholder="Enter GST number" required>
+</div>
+
                  </div>
                  
                  <!-- Consignee Details -->
@@ -286,29 +271,33 @@
                      <input type="date" name="lr[${counter}][lr_date]" class="form-control" placeholder="Enter lr date" required>
                    </div>
                    <h5>📦 Consignee (Receiver)</h5>
-                  <select name="lr[${counter}][consignee_id]" id="consignee_id_${counter}" class="form-select" onchange="setConsigneeDetails(${counter})" required>
-   <option value="">Select Consignee Name</option>
-   @foreach($users as $user)
-      @php
-          $addresses = json_decode($user->address, true);
-          $formattedAddress = '';
-          if (!empty($addresses) && is_array($addresses)) {
-              $first = $addresses[0];
-              $formattedAddress = trim(
-                  ($first['full_address'] ?? '') . ', ' .
-                  ($first['city'] ?? '') . ', ' .
-                  ($first['pincode'] ?? '')
-              );
-          }
-      @endphp
-      <option 
-          value="{{ $user->id }}"
-          data-gst-consignee="{{ $user->gst_number }}"
-          data-address-consignee="{{ $formattedAddress }}">
-          {{ $user->name }}
-      </option>
-   @endforeach
-   </select>
+                <select name="lr[${counter}][consignee_id]" id="consignee_id_${counter}" class="form-select" onchange="setConsigneeDetails(${counter})" required>
+    <option value="">Select Consignee Name</option>
+    @foreach($users as $user)
+        @php
+            $addresses = json_decode($user->address, true);
+        @endphp
+        @if(!empty($addresses) && is_array($addresses))
+            @foreach($addresses as $address)
+                @php
+                    $formattedAddress = trim(
+                        ($address['billing_address'] ?? '') . ', ' .
+                        ($address['city'] ?? '') . ', ' .
+                        ($address['consignment_address'] ?? '')
+                    );
+                @endphp
+                <option 
+                    value="{{ $user->id }}"
+                    data-gst-consignee="{{ $address['gstin'] ?? '' }}"
+                    data-address-consignee="{{ $formattedAddress }}"
+                >
+                    {{ $user->name }} - {{ $address['city'] ?? '' }}
+                </option>
+            @endforeach
+        @endif
+    @endforeach
+</select>
+
    
    <div class="mb-3">
    <label class="form-label">Consignee Unloading Address</label>
@@ -329,23 +318,26 @@
                  <div class="col-md-4">
                    <div class="mb-3">
                      <label class="form-label">🚚 Vehicle Number</label>
-                    <select name="lr[${counter}][vehicle_no]" class="form-select" required>
+                    <select name="lr[${counter}][vehicle_no]" class="form-select search-select" required>
                                        ${generateVehicle_typeOptions()}
                       </select>
                    </div>
                  </div>
                  
-                 <!-- Vehicle Type (Vehicle ID from vehicles table) -->
-                 <div class="col-md-4">
-                   <div class="mb-3">
-                     <label class="form-label">🚛 Vehicle Type</label>
-                    <select name="lr[${counter}][vehicle_type]" class="form-select" required>
-                      ${generateVehicleOptions()}
-                    </select>
-
-                   </div>
-                 </div>
                  
+                 <!-- Vehicle Type (Vehicle ID from vehicles table) -->
+                <div class="col-md-4">
+                    <div class="mb-3">
+                        <label class="form-label">🚛 Vehicle Type</label>
+                        <select name="lr[${counter}][vehicle_type]" id="vehicle_type"  class="form-select " required>
+                            <option value="">Select Vehicle Type</option>
+                            @foreach ($vehiclesType as $type)
+                                <option value="{{ $type->id }}">{{ $type->vehicletype }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+                </div>
+
                  <!-- Vehicle Ownership -->
                  <div class="col-md-4">
                    <label class="form-label">🛻 Vehicle Ownership</label>
@@ -367,11 +359,11 @@
                  <div class="col-md-4">
                    <div class="mb-3">
                      <label class="form-label">🚢 Delivery Mode</label>
-                     <select name="lr[${counter}][delivery_mode]" class="form-select" required>
-                       <option value="">Select Mode</option>
-                       <option value="door_delivery">Door Delivery</option>
-                       <option value="godwon_deliver">Dodwon  Deliver</option>
-                     </select>
+                     <select name="lr[${counter}][delivery_mode]" class="form-select " required>
+                        <option value="">Select Mode</option>
+                        <option value="door_delivery">Door Delivery</option>
+                        <option value="godwon_deliver">Godown Delivery</option>
+                      </select>
                    </div>
                  </div>
                  
@@ -379,12 +371,13 @@
                  <div class="col-md-4">
                    <div class="mb-3">
                      <label class="form-label">📍 From (Origin)</label>
-                     <select name="lr[${counter}][from_location]" class="form-select" required>
-                       <option value="">Select Origin</option>
-                       <option value="Mumbai">Mumbai</option>
-                       <option value="Delhi">Delhi</option>
-                       <option value="Chennai">Chennai</option>
-                     </select>
+                     
+                     <select name="lr[${counter}][from_location]" class="form-select"  id="from_location" required>
+                        <option value="">Select Destination</option>
+                        @foreach ($destination as $loc)
+                            <option value="{{ $loc->id }}">{{ $loc->destination }}</option>
+                        @endforeach
+                    </select>
                    </div>
                  </div>
                  
@@ -392,18 +385,18 @@
                  <div class="col-md-4">
                    <div class="mb-3">
                      <label class="form-label">📍 To (Destination)</label>
-                     <select name="lr[${counter}][to_location]" class="form-select" required>
+                     <select name="lr[${counter}][to_location]" class="form-select" id="to_location" required>
                        <option value="">Select Destination</option>
-                       <option value="Kolkata">Kolkata</option>
-                       <option value="Hyderabad">Hyderabad</option>
-                       <option value="Pune">Pune</option>
+                      @foreach ($destination as $loc)
+                            <option value="{{ $loc->id }}">{{ $loc->destination }}</option>
+                        @endforeach
                      </select>
                    </div>
                  </div>
                </div>
              <div class="mb-3 d-flex align-items-center gap-3 flex-wrap">
     <label class="form-label mb-0">🛡️ Insurance?</label>
-
+   
     <div class="form-check form-check-inline">
         <input class="form-check-input"
                type="radio"
@@ -413,7 +406,7 @@
                onchange="toggleInsuranceInput(${counter})">
         <label class="form-check-label" for="insuranceYes${counter}">Yes</label>
     </div>
-
+   
     <div class="form-check form-check-inline">
         <input class="form-check-input"
                type="radio"
@@ -424,7 +417,7 @@
                checked>
         <label class="form-check-label" for="insuranceNo${counter}">No</label>
     </div>
-
+   
     <!-- Insurance input field -->
     <input type="text"
            class="form-control d-none"
@@ -432,8 +425,8 @@
            id="insuranceInput${counter}"
            placeholder="Enter Insurance Number"
            style="max-width: 450px;">
-</div>
-
+     </div>
+   
                 <!-- Cargo Description Section -->
                 <div class="row mt-4">
                      <div class="col-12">
@@ -502,7 +495,7 @@
                                               <td>
                                                   <input type="number" name="lr[${counter}][cargo][0][declared_value]" class="form-control declared-value" placeholder="0" oninput="calculateTotalDeclaredValue(${counter})">
                                                </td>
-
+   
                                               <td>
                                                 
                                                   <button class="btn btn-danger btn-sm" onclick="removeRow(this)">🗑</button>
@@ -540,79 +533,79 @@
                   <label class="form-check-label" for="freightToBeBilled-${counter}">To Be Billed</label>
                 </div>
               </div>
-                   <div class="table-responsive">
-                  <table class="table table-bordered align-middle text-center freight-table" id="freight-table-${counter}">
-                     
-                       <thead>
-                         <tr>
-                           <th>Freight</th>
-                           <th>LR Charges</th>
-                           <th>Hamali</th>
-                           <th>Other Charges</th>
-                           <th>GST</th>
-                           <th>Total Freight</th>
-                           <th>Less Advance</th>
-                           <th>Balance Freight</th>
-                         </tr>
-                       </thead>
-                       <tbody id="freightBody-${counter}">
-                         <tr>
-                           <td>
-                             <input type="number" name="lr[${counter}][freight_amount]" class="form-control" placeholder="Enter Freight Amount" required>
-                           </td>
-                           <td>
-                             <input type="number" name="lr[${counter}][lr_charges]" class="form-control" placeholder="Enter LR Charges" required>
-                           </td>
-                           <td>
-                             <input type="number" name="lr[${counter}][hamali]" class="form-control" placeholder="Enter Hamali Charges" required>
-                           </td>
-                           <td>
-                             <input type="number" name="lr[${counter}][other_charges]" class="form-control" placeholder="Enter Other Charges" required>
-                           </td>
-                           <td>
-                             <input type="number" name="lr[${counter}][gst_amount]" class="form-control" placeholder="Enter GST Amount" required>
-                           </td>
-                           <td>
-                             <input type="number" name="lr[${counter}][total_freight]" class="form-control" placeholder="Total Freight" required>
-                           </td>
-                           <td>
-                             <input type="number" name="lr[${counter}][less_advance]" class="form-control" placeholder="Less Advance Amount" required>
-                           </td>
-                           <td>
-                             <input type="number" name="lr[${counter}][balance_freight]" class="form-control" placeholder="Balance Freight Amount" required>
-                           </td>
-                         </tr>
-                       </tbody>
-                     </table>
-                   </div>
-                 </div>
-               </div>
-               
-               <!-- Declared Value -->
-               <div class="row mt-3">
-                 <div class="col-md-6">
-                   
-                   <div class="mb-3">
-                        <label class="form-label fw-bold">💰 Total Declared Value (Rs.)</label>
-                  <input type="number" class="form-control"  id="totalDeclaredValue-${counter}" name="lr[${counter}][total_declared_value]" placeholder="0" ...>
-
-                    </div>
-                 </div>
-               </div>
-               
-               <!-- Remove / Add More LR Buttons -->
-               <div class="d-flex justify-content-end gap-2 mt-3">
-                 <button type="button" class="btn btn-outline-warning btn-sm removeLRBtn" data-id="lrItem${counter}">
-                   <i class="fas fa-trash-alt"></i> Remove
-                 </button>
-                 <button type="button" class="btn btn-sm addMoreLRBtn" data-id="lrItem${counter}" style="background-color: #ca2639; color: #fff;">
-                   <i class="fas fa-plus-circle"></i> Add More LR - Consignment
-                 </button>
-               </div>
-             </div>
-           </div>
-         </div>
-       `;
+                  
+   <div class="table-responsive">
+   <table class="table table-bordered align-middle text-center freight-table" id="freight-table-${counter}">
+    <thead>
+      <tr>
+        <th>Freight</th>
+        <th>LR Charges </th>
+        <th>Hamali </th>
+        <th>Other Charges </th>
+        <th>GST (%)</th>
+        <th>Total Freight</th>
+        <th>Less Advance</th>
+        <th>Balance Freight</th>
+      </tr>
+    </thead>
+    <tbody id="freightBody-${counter}">
+      <tr>
+        <td>
+          <input type="number" name="lr[${counter}][freight_amount]" class="form-control freight-amount" placeholder="Enter Freight Amount" required>
+        </td>
+        <td>
+          <input type="number" name="lr[${counter}][lr_charges]" class="form-control lr-charges" placeholder="Enter LR " required>
+        </td>
+        <td>
+          <input type="number" name="lr[${counter}][hamali]" class="form-control hamali" placeholder="Enter Hamali " required>
+        </td>
+        <td>
+          <input type="number" name="lr[${counter}][other_charges]" class="form-control other-charges" placeholder="Enter Other " required>
+        </td>
+        <td>
+          <input type="number" name="lr[${counter}][gst_amount]" class="form-control gst" placeholder="Enter GST %" required>
+        </td>
+        <td>
+          <input type="number" name="lr[${counter}][total_freight]" class="form-control total-freight" placeholder="Total Freight" readonly>
+        </td>
+        <td>
+          <input type="number" name="lr[${counter}][less_advance]" class="form-control less-advance" placeholder="Less Advance Amount" required>
+        </td>
+        <td>
+          <input type="number" name="lr[${counter}][balance_freight]" class="form-control balance-freight" placeholder="Balance Freight" readonly>
+        </td>
+      </tr>
+    </tbody>
+   </table>
+   </div>
+          </div>
+        </div>
+        
+        <!-- Declared Value -->
+        <div class="row mt-3">
+          <div class="col-md-6">
+            
+            <div class="mb-3">
+                <label class="form-label fw-bold">💰 Total Declared Value (Rs.)</label>
+          <input type="number" class="form-control"  id="totalDeclaredValue-${counter}" name="lr[${counter}][total_declared_value]" placeholder="0" ...>
+   
+            </div>
+          </div>
+        </div>
+        
+        <!-- Remove / Add More LR Buttons -->
+        <div class="d-flex justify-content-end gap-2 mt-3">
+          <button type="button" class="btn btn-outline-warning btn-sm removeLRBtn" data-id="lrItem${counter}">
+            <i class="fas fa-trash-alt"></i> Remove
+          </button>
+          <button type="button" class="btn btn-sm addMoreLRBtn" data-id="lrItem${counter}" style="background-color: #ca2639; color: #fff;">
+            <i class="fas fa-plus-circle"></i> Add More LR - Consignment
+          </button>
+        </div>
+      </div>
+    </div>
+   </div>
+   `;
        return newAccordionItem;
      }
    
@@ -622,13 +615,21 @@
        const newAccordionItem = createLRAccordionItem(lrCounter);
        lrAccordion.appendChild(newAccordionItem);
    
-       // Attach Event Listeners for Remove and Add More buttons
+      
        newAccordionItem.querySelector(".removeLRBtn").addEventListener("click", function () {
          removeLR(this.getAttribute("data-id"));
        });
        newAccordionItem.querySelector(".addMoreLRBtn").addEventListener("click", addNewLR);
+       $(newAccordionItem).find('.search-select').select2({
+        allowClear: true,
+        width: '100%',
+        minimumInputLength: 1
+    });
+
+
      }
    
+
      function removeLR(removeId) {
        const element = document.getElementById(removeId);
        if (element) {
@@ -639,158 +640,271 @@
          lrSection.style.display = "none";
        }
      }
+    
+    
    
      addLRBtn.addEventListener("click", addNewLR);
      bindDeclaredValueEvents(lrIndex);
      calculateTotalDeclaredValue(lrIndex);
      handleFreightType(counter);
    });
+  
 </script>
-<script>
-  function addRow(lrIndex) {
-    const tableBody = document.getElementById(`cargoTableBody-${lrIndex}`);
-    const rowCount = tableBody.rows.length;
-    const newRow = tableBody.rows[0].cloneNode(true);
+{{-- oder method --}}
 
-    // Clear and update name/index of inputs
-    [...newRow.querySelectorAll('input, select')].forEach((input) => {
-      if (input.name) {
-        // Update name attribute with new index
-        input.name = input.name.replace(/lr\[\d+]\[cargo]\[\d+]/, `lr[${lrIndex}][cargo][${rowCount}]`);
-        input.value = '';
+{{-- <script>
+ document.getElementById('customer_id').addEventListener('change', function(e) {
+    const customer_id = e.target.value;
+    const customer_text = e.target.options[e.target.selectedIndex].text;
 
-        // Attach event for live total
-        if (input.name.includes('declared_value')) {
-          input.classList.add('declared-value');
-          input.setAttribute('oninput', `calculateTotalDeclaredValue(${lrIndex})`);
-        }
-      }
-    });
+    alert(`Customer ID: ${customer_id}\nCustomer: ${customer_text}`);
+});
 
-    tableBody.appendChild(newRow);
-    calculateTotalDeclaredValue(lrIndex);
-  }
+</script> --}}
 
-  function removeRow(button) {
-    const row = button.closest('tr');
-    const tbody = row.closest('tbody');
-    const lrIndex = tbody.dataset.lrIndex;
+ 
+  <script>
+  // Event listener for customer selection
+  document.getElementById('customer_id').addEventListener('change', function(e) {
+      const customer_id = e.target.value;
+      const customer_text = e.target.options[e.target.selectedIndex].text;
 
-    if (tbody.rows.length > 1) {
-      row.remove();
-      calculateTotalDeclaredValue(lrIndex);
-    }
-  }
-
-  function calculateTotalDeclaredValue(lrIndex) {
-    let total = 0;
-    const tableBody = document.getElementById(`cargoTableBody-${lrIndex}`);
-    const inputs = tableBody.querySelectorAll(`input[name^="lr[${lrIndex}][cargo]"][name$="[declared_value]"]`);
-
-    inputs.forEach(input => {
-      total += parseFloat(input.value) || 0;
-    });
-
-    document.getElementById(`totalDeclaredValue-${lrIndex}`).value = total;
-  }
-
-  // Auto setup on page load for declared value rows
-  document.addEventListener('DOMContentLoaded', function () {
-    document.querySelectorAll('[id^="cargoTableBody-"]').forEach(tbody => {
-      const lrIndex = tbody.dataset.lrIndex;
-      const inputs = tbody.querySelectorAll('input[name$="[declared_value]"]');
-
-      inputs.forEach(input => {
-        input.classList.add('declared-value');
-        input.setAttribute('oninput', `calculateTotalDeclaredValue(${lrIndex})`);
-      });
-
-      calculateTotalDeclaredValue(lrIndex);
-    });
+      // Display the selected customer details in alert
+      alert(`Customer ID: ${customer_id}\nCustomer: ${customer_text}`);
   });
-</script>
 
-<script>
-   function setCustomerDetails() {
-       const selected = document.getElementById('customer_id');
-       const gst = selected.options[selected.selectedIndex].getAttribute('data-gst');
-       const address = selected.options[selected.selectedIndex].getAttribute('data-address');
-   
-       document.getElementById('gst_number').value = gst || '';
-       document.getElementById('customer_address').value = address || '';
-   }
-</script>
-<script>
-   function setConsignorDetails(counter) {
-       const selected = document.getElementById(`consignor_id_${counter}`);
-       const gst = selected.options[selected.selectedIndex].getAttribute('data-gst-consignor');
-       const address = selected.options[selected.selectedIndex].getAttribute('data-address-consignor');
-   
-       document.getElementById(`consignor_gst_${counter}`).value = gst || '';
-       document.getElementById(`consignor_loading_${counter}`).value = address || '';
-   }
-</script>
-<script>
-   function setConsigneeDetails(counter) {
-       const selected = document.getElementById(`consignee_id_${counter}`);
-       const gst = selected.options[selected.selectedIndex].getAttribute('data-gst-consignee');
-       const address = selected.options[selected.selectedIndex].getAttribute('data-address-consignee');
-   
-       document.getElementById(`consignee_gst_${counter}`).value = gst || '';
-       document.getElementById(`consignee_unloading_${counter}`).value = address || '';
-   }
-</script>
-<script>
-  function toggleOrderMethod() {
-      const orderRadio = document.getElementById('byOrder');
-      const contractRadio = document.getElementById('byContract');
-      const orderAmountDiv = document.getElementById('orderAmountDiv');
-      const contractNumberDiv = document.getElementById('contractNumberDiv');
+  // Event listener for the other selects (vehicle_type, from_location, to_location)
+  document.addEventListener('change', function(e) {
+      if (
+          e.target.matches('select[name^="lr"][name$="[vehicle_type]"], select[name^="lr"][name$="[to_location]"], select[name^="lr"][name$="[from_location]"]')
+      ) {
+          // Get the selected values for vehicle_type, from_location, to_location
+          const vehicle_type = document.querySelector('select[name$="[vehicle_type]"]').value;
+          const from_location = document.querySelector('select[name$="[from_location]"]').value;
+          const to_location = document.querySelector('select[name$="[to_location]"]').value;
+          const customer_id = document.getElementById('customer_id').value;
 
-      if (orderRadio && orderRadio.checked) {
-          orderAmountDiv.classList.remove('d-none');
-          orderAmountDiv.querySelector('input').setAttribute('required', 'required');
+          // Combine all values to show in alert
+          const alertMessage = `Customer ID: ${customer_id}\nCustomer: ${document.getElementById('customer_id').options[document.getElementById('customer_id').selectedIndex].text}\nVehicle Type: ${vehicle_type}\nFrom Location: ${from_location}\nTo Location: ${to_location}`;
+          alert(alertMessage);
 
-          contractNumberDiv.classList.add('d-none');
-          contractNumberDiv.querySelector('input').removeAttribute('required');
-      } else if (contractRadio && contractRadio.checked) {
-          contractNumberDiv.classList.remove('d-none');
-          contractNumberDiv.querySelector('input').setAttribute('required', 'required');
-
-          orderAmountDiv.classList.add('d-none');
-          orderAmountDiv.querySelector('input').removeAttribute('required');
+          // Send data to server via AJAX (fetch)
+          fetch('/admin/get-rate', {
+              method: 'POST',
+              headers: {
+                  'Content-Type': 'application/json',
+                  'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+              },
+              body: JSON.stringify({
+                  customer_id: customer_id,  // Add customer_id here
+                  vehicle_type: vehicle_type,
+                  from_location: from_location,
+                  to_location: to_location
+              })
+          })
+          .then(res => res.json())
+          .then(data => {
+              // If rate is available, populate it into the input field
+              if (data.rate) {
+                  document.getElementById('rate_input').value = data.rate; // Use the ID of the input field
+              } else {
+                  document.getElementById('rate_input').value = ''; // Clear the field if no rate found
+                  alert('No rate found for this selection.'); // Show message if rate is not found
+              }
+          })
+          .catch(err => {
+              // If error occurs, show it in alert
+              alert('Error: ' + err.message);
+          });
       }
-  }
+  });
 
-  // Call once on page load in case preselected value exists
-  document.addEventListener('DOMContentLoaded', toggleOrderMethod);
+
 </script>
 
+  
 
 <script>
-  // This will be called when a radio button is clicked
-  function toggleFreightTable(counter) {
-      const tbody = document.getElementById(`freightBody-${counter}`);
-      const freightPaidRadio = document.getElementById(`freightPaid-${counter}`);
-      const freightToPayRadio = document.getElementById(`freightToPay-${counter}`);
-      const freightToBeBilledRadio = document.getElementById(`freightToBeBilled-${counter}`);
+   document.addEventListener('input', function(e) {
+    const row = e.target.closest('tr');
+    if (!row) return;
+   
+    // Get all input values
+    const freight = parseFloat(row.querySelector('.freight-amount')?.value) || 0;
+    const lrCharges = parseFloat(row.querySelector('.lr-charges')?.value) || 0;
+    const hamali = parseFloat(row.querySelector('.hamali')?.value) || 0;
+    const otherCharges = parseFloat(row.querySelector('.other-charges')?.value) || 0;
+    const gstPercent = parseFloat(row.querySelector('.gst')?.value) || 0;
+    const lessAdvance = parseFloat(row.querySelector('.less-advance')?.value) || 0;
+   
+    // Total before GST
+    const subtotal = freight + lrCharges + hamali + otherCharges;
+   
+    // GST amount
+    const gstAmount = subtotal * gstPercent / 100;
+   
+    // Total Freight = subtotal + gst
+    const totalFreight = subtotal + gstAmount;
+   
+    // Balance Freight = total - less advance
+    const balance = totalFreight - lessAdvance;
+   
+    // Update values
+    if (row.querySelector('.total-freight')) {
+      row.querySelector('.total-freight').value = totalFreight.toFixed(2);
+    }
+   
+    if (row.querySelector('.balance-freight')) {
+      row.querySelector('.balance-freight').value = balance.toFixed(2);
+    }
+   });
+   
+    
+</script>
+<script>
+   function addRow(lrIndex) {
+     const tableBody = document.getElementById(`cargoTableBody-${lrIndex}`);
+     const rowCount = tableBody.rows.length;
+     const newRow = tableBody.rows[0].cloneNode(true);
+   
+     // Clear and update name/index of inputs
+     [...newRow.querySelectorAll('input, select')].forEach((input) => {
+       if (input.name) {
+         // Update name attribute with new index
+         input.name = input.name.replace(/lr\[\d+]\[cargo]\[\d+]/, `lr[${lrIndex}][cargo][${rowCount}]`);
+         input.value = '';
+   
+         // Attach event for live total
+         if (input.name.includes('declared_value')) {
+           input.classList.add('declared-value');
+           input.setAttribute('oninput', `calculateTotalDeclaredValue(${lrIndex})`);
+         }
+       }
+     });
+   
+     tableBody.appendChild(newRow);
+     calculateTotalDeclaredValue(lrIndex);
+   }
+   
+   function removeRow(button) {
+     const row = button.closest('tr');
+     const tbody = row.closest('tbody');
+     const lrIndex = tbody.dataset.lrIndex;
+   
+     if (tbody.rows.length > 1) {
+       row.remove();
+       calculateTotalDeclaredValue(lrIndex);
+     }
+   }
+   
+   function calculateTotalDeclaredValue(lrIndex) {
+     let total = 0;
+     const tableBody = document.getElementById(`cargoTableBody-${lrIndex}`);
+     const inputs = tableBody.querySelectorAll(`input[name^="lr[${lrIndex}][cargo]"][name$="[declared_value]"]`);
+   
+     inputs.forEach(input => {
+       total += parseFloat(input.value) || 0;
+     });
+   
+     document.getElementById(`totalDeclaredValue-${lrIndex}`).value = total;
+   }
+   
+   // Auto setup on page load for declared value rows
+   document.addEventListener('DOMContentLoaded', function () {
+     document.querySelectorAll('[id^="cargoTableBody-"]').forEach(tbody => {
+       const lrIndex = tbody.dataset.lrIndex;
+       const inputs = tbody.querySelectorAll('input[name$="[declared_value]"]');
+   
+       inputs.forEach(input => {
+         input.classList.add('declared-value');
+         input.setAttribute('oninput', `calculateTotalDeclaredValue(${lrIndex})`);
+       });
+   
+       calculateTotalDeclaredValue(lrIndex);
+     });
+   });
+</script>
+<script>
+  function setCustomerDetails() {
+      const selected = document.getElementById('customer_id');
+      const gst = selected.options[selected.selectedIndex].getAttribute('data-gst');
+      const address = selected.options[selected.selectedIndex].getAttribute('data-address');
 
-      // Debugging: Check which radio is selected
-      console.log('Selected Value:', freightPaidRadio.checked, freightToPayRadio.checked, freightToBeBilledRadio.checked);
+      document.getElementById('gst_number').value = gst || '';  // Set GST number
+      document.getElementById('customer_address').value = address || '';  // Set customer address
+  }
+</script>
+<script>
+  function setConsignorDetails(counter) {
+      const select = document.getElementById(`consignor_id_${counter}`);
+      const selectedOption = select.options[select.selectedIndex];
 
-      // Toggle table visibility based on the selected freight type
-      if (freightToBeBilledRadio.checked) {
-          tbody.style.display = 'none';  // Hide table body when 'To Be Billed' is selected
-          const inputs = tbody.querySelectorAll('input');
-          inputs.forEach(input => input.removeAttribute('required'));  // Remove required attribute
-      } else {
-          tbody.style.display = 'table-row-group'; // Show table body for other types
-          const inputs = tbody.querySelectorAll('input');
-          inputs.forEach(input => input.setAttribute('required', 'required'));  // Set required attribute
-      }
+      const gst = selectedOption.getAttribute('data-gst') || '';
+      const address = selectedOption.getAttribute('data-address') || '';
+
+      document.getElementById(`consignor_gst_${counter}`).value = gst;
+      document.getElementById(`consignor_loading_${counter}`).value = address;
+  }
+</script>
+<script>
+  function setConsigneeDetails(counter) {
+      const selected = document.getElementById(`consignee_id_${counter}`);
+      const gst = selected.options[selected.selectedIndex].getAttribute('data-gst-consignee');
+      const address = selected.options[selected.selectedIndex].getAttribute('data-address-consignee');
+
+      document.getElementById(`consignee_gst_${counter}`).value = gst || '';
+      document.getElementById(`consignee_unloading_${counter}`).value = address || '';
   }
 </script>
 
+<script>
+   function toggleOrderMethod() {
+       const orderRadio = document.getElementById('byOrder');
+       const contractRadio = document.getElementById('byContract');
+       const orderAmountDiv = document.getElementById('orderAmountDiv');
+       const contractNumberDiv = document.getElementById('contractNumberDiv');
+   
+       if (orderRadio && orderRadio.checked) {
+           orderAmountDiv.classList.remove('d-none');
+           orderAmountDiv.querySelector('input').setAttribute('required', 'required');
+   
+           contractNumberDiv.classList.add('d-none');
+           contractNumberDiv.querySelector('input').removeAttribute('required');
+       } else if (contractRadio && contractRadio.checked) {
+           contractNumberDiv.classList.remove('d-none');
+           contractNumberDiv.querySelector('input').setAttribute('required', 'required');
+   
+           orderAmountDiv.classList.add('d-none');
+           orderAmountDiv.querySelector('input').removeAttribute('required');
+       }
+   }
+   
+   // Call once on page load in case preselected value exists
+   document.addEventListener('DOMContentLoaded', toggleOrderMethod);
+</script>
+<script>
+   // This will be called when a radio button is clicked
+   function toggleFreightTable(counter) {
+       const tbody = document.getElementById(`freightBody-${counter}`);
+       const freightPaidRadio = document.getElementById(`freightPaid-${counter}`);
+       const freightToPayRadio = document.getElementById(`freightToPay-${counter}`);
+       const freightToBeBilledRadio = document.getElementById(`freightToBeBilled-${counter}`);
+   
+       // Debugging: Check which radio is selected
+       console.log('Selected Value:', freightPaidRadio.checked, freightToPayRadio.checked, freightToBeBilledRadio.checked);
+   
+       // Toggle table visibility based on the selected freight type
+       if (freightToBeBilledRadio.checked) {
+           tbody.style.display = 'none';  // Hide table body when 'To Be Billed' is selected
+           const inputs = tbody.querySelectorAll('input');
+           inputs.forEach(input => input.removeAttribute('required'));  // Remove required attribute
+       } else {
+           tbody.style.display = 'table-row-group'; // Show table body for other types
+           const inputs = tbody.querySelectorAll('input');
+           inputs.forEach(input => input.setAttribute('required', 'required'));  // Set required attribute
+       }
+   }
+</script>
 <script>
    $(document).ready(function () {
     $('input[name="order_method"]').on('change', function () {
@@ -802,18 +916,29 @@
             $('#orderAmountDiv').hide();
         }
     });
-
+   
     // Trigger change on page load if radio already selected
     $('input[name="order_method"]:checked').trigger('change');
-});
+   });
 </script>
- 
+<script>
+   function toggleInsuranceInput(counter) {
+       const yesRadio = document.getElementById(`insuranceYes${counter}`);
+       const insuranceInput = document.getElementById(`insuranceInput${counter}`);
+   
+       if (yesRadio.checked) {
+           insuranceInput.classList.remove('d-none');
+       } else {
+           insuranceInput.classList.add('d-none');
+       }
+   }
+</script>
 
 
 
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <!-- DataTables CSS -->
 <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
 <!-- DataTables JS -->
 <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+
 @endsection

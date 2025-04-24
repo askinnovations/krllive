@@ -7,8 +7,19 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta content="KRL" name="description" />
     <meta content="ASK Innovations" name="ASK Innovations" />
+  
     <meta name="csrf-token" content="{{ csrf_token() }}">
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
 
+    <!-- jQuery (must be before Select2) -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<!-- Select2 CSS -->
+<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+
+<!-- Select2 JS -->
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+      
+ 
     <!-- App favicon -->
     <link rel="shortcut icon" href="{{ asset('backend/images/logo.png') }}">
 
@@ -174,8 +185,11 @@
     <script src="{{ asset('backend/js/pages/datatables.init.js') }}"></script>
 
     <script src="{{ asset('backend/js/app.js') }}"></script>
-      
-        
+
+
+    
+
+       
 </body>
 
 </html>
