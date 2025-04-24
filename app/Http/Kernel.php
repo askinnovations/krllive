@@ -47,6 +47,7 @@ class Kernel extends HttpKernel
         'auth' => \App\Http\Middleware\Authenticate::class,
         'auth.admin' => \App\Http\Middleware\AuthenticateAdmin::class, // ✅ Ensure this exists
         'adminlocalize' => \App\Http\Middleware\AdminLocalize::class, // ✅ Add this line
+        'auth.user' => \App\Http\Middleware\AuthenticateUser::class,
 
        ];
        

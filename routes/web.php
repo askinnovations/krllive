@@ -1,16 +1,54 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\Frontend\HomeController;
+use App\Http\Controllers\Frontend\DashboardController;
+use App\Http\Controllers\Frontend\Auth\RegisterController as FrontendRegisterController;
+use App\Http\Controllers\Frontend\Auth\LoginController as FrontendLoginController;
+
+
 use App\Http\Controllers\{
-    EmployeeController, PayrollController, Auth\LoginController, AdminDashboardController,DestinationController,
-    UserController, TyreController, WarehouseController, OrderController,PackageTypeController,
+    EmployeeController, PayrollController, Auth\LoginController, AdminDashboardController, DestinationController,
+    UserController, TyreController, WarehouseController, OrderController, PackageTypeController,
     ConsignmentNoteController, FreightBillController, StockTransferController, DriverController,
-    AttendanceController, MaintenanceController, VehicleController,TaskManagmentController,ContractController,SettingsController,VehicleTypeController
+    AttendanceController, MaintenanceController, VehicleController, TaskManagmentController, ContractController,
+    SettingsController, VehicleTypeController
 };
 
-Route::get('/', function () {
-    return view('welcome');
+// 🌐 Frontend Routes Group (user side)
+Route::prefix('user')->name('user.')->group(function () {
+
+    // 👤 Register
+    Route::get('/register', [FrontendRegisterController::class, 'showRegisterForm'])->name('register');
+    Route::post('/register', [FrontendRegisterController::class, 'register']);
+
+    // 🔐 Login
+    Route::get('/login', [FrontendLoginController::class, 'showLoginForm'])->name('login');
+    Route::post('/login', [FrontendLoginController::class, 'login']);
+
+    // 🚪 Logout
+    Route::post('/logout', [FrontendLoginController::class, 'logout'])->name('logout');
+
+    // 📊 Protected Routes (Login Required)
+    Route::middleware(['auth'])->group(function () {
+        Route::get('/dashboard', [DashboardController::class, 'dashboard'])->name('dashboard');
+        Route::get('/profile', [DashboardController::class, 'profile'])->name('profile');
+        Route::post('/update', [DashboardController::class, 'updateProfile'])->name('update');
+        Route::get('/order-details/{order_id}', [DashboardController::class, 'OrderDetails'])->name('order-details');
+
+    });
 });
+
+// ✅ Frontend Pages
+Route::get('/', [HomeController::class, 'index'])->name('front.index');
+Route::get('/about', [HomeController::class, 'about'])->name('front.about');
+Route::get('/contact', [HomeController::class, 'contact'])->name('front.contact');
+Route::get('/terms', [HomeController::class, 'terms'])->name('front.terms');
+Route::get('/privacy', [HomeController::class, 'privacy'])->name('front.privacy');
+Route::post('/save-order', [HomeController::class, 'saveOrder'])->name('order.save');
+// 📄 User Profile
+
+
 
 // Authentication Routes
 Route::prefix('admin')->group(function () {

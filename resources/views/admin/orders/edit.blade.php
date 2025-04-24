@@ -151,13 +151,16 @@
       </div>
          <!-- lr  -->
          @php
-         // agar $order->lr null ho ya decode na ho paye to empty array mile
-         $lrData = is_array($order->lr)
-             ? $order->lr
-             : (json_decode($order->lr ?? '[]', true) ?? []);
-     @endphp
-     
-     @foreach($lrData as $index => $lr)
+
+    // agar $order->lr null ho ya decode na ho paye to empty array mile
+    $lrData = is_array($order->lr)
+        ? $order->lr
+        : (json_decode($order->lr ?? '[]', true) ?? []);
+@endphp
+
+@foreach($lrData as $index => $lr)
+
+
 
          <div class="row mt-4" >
             <h4 style="margin-bottom: 2%;">🚚 Update LR - Consignment Details</h4>
@@ -652,8 +655,10 @@
    
    // Run on page load (edit mode)
    document.addEventListener('DOMContentLoaded', function () {
-       
-       const totalLrCount ={{ count($lrdata) }};
+
+   
+       const totalLrCount = {{ count($lrData) }};
+
        for (let i = 0; i < totalLrCount; i++) {
            const select = document.getElementById(`consignor_id_${i}`);
            if (select && select.value !== '') {
@@ -661,10 +666,9 @@
            }
        }
    });
+
    
-   
-   
-       
+
 </script>
 <script>
   function setConsigneeDetails(index) {
