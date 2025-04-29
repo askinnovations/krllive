@@ -375,7 +375,7 @@
                                     <input type="number" name="other_charges" class="form-control other-charges" placeholder="Enter Other " required>
                                  </td>
                                  <td>
-                                    <input type="number" name="gst_amount" class="form-control gst" placeholder="Enter GST %" required>
+                                    <input type="number" name="gst_amount" class="form-control gst-amount" placeholder=" GST Amount" readonly>
                                  </td>
                                  <td>
                                     <input type="number" name="total_freight" class="form-control total-freight" placeholder="Total Freight" readonly>
@@ -590,41 +590,48 @@
 </script>
 <script>
    document.addEventListener('input', function(e) {
-    const row = e.target.closest('tr');
-    if (!row) return;
+       const row = e.target.closest('tr');
+       if (!row) return;
    
-    // Get all input values
-    const freight = parseFloat(row.querySelector('.freight-amount')?.value) || 0;
-    const lrCharges = parseFloat(row.querySelector('.lr-charges')?.value) || 0;
-    const hamali = parseFloat(row.querySelector('.hamali')?.value) || 0;
-    const otherCharges = parseFloat(row.querySelector('.other-charges')?.value) || 0;
-    const gstPercent = parseFloat(row.querySelector('.gst')?.value) || 0;
-    const lessAdvance = parseFloat(row.querySelector('.less-advance')?.value) || 0;
+       // Get all input values
+       const freight = parseFloat(row.querySelector('.freight-amount')?.value) || 0;
+       const lrCharges = parseFloat(row.querySelector('.lr-charges')?.value) || 0;
+       const hamali = parseFloat(row.querySelector('.hamali')?.value) || 0;
+       const otherCharges = parseFloat(row.querySelector('.other-charges')?.value) || 0;
+       const gstPercent = 12; // Fixed GST percentage (12%)
+       const lessAdvance = parseFloat(row.querySelector('.less-advance')?.value) || 0;
    
-    // Total before GST
-    const subtotal = freight + lrCharges + hamali + otherCharges;
+       // Total before GST
+       const subtotal = freight + lrCharges + hamali + otherCharges;
    
-    // GST amount
-    const gstAmount = subtotal * gstPercent / 100;
+       // GST amount calculation
+       const gstAmount = subtotal * gstPercent / 100; // 12% GST
    
-    // Total Freight = subtotal + gst
-    const totalFreight = subtotal + gstAmount;
+       // Update GST amount input field with the calculated value
+       const gstAmountInput = row.querySelector('.gst-amount');
+       if (gstAmountInput) {
+           gstAmountInput.value = gstAmount.toFixed(2); // Show calculated GST amount (e.g., 120)
+       }
    
-    // Balance Freight = total - less advance
-    const balance = totalFreight - lessAdvance;
+       // Total Freight = subtotal + gst
+       const totalFreight = subtotal + gstAmount;
    
-    // Update values
-    if (row.querySelector('.total-freight')) {
-      row.querySelector('.total-freight').value = totalFreight.toFixed(2);
-    }
+       // Balance Freight = total - less advance
+       const balance = totalFreight - lessAdvance;
    
-    if (row.querySelector('.balance-freight')) {
-      row.querySelector('.balance-freight').value = balance.toFixed(2);
-    }
+       // Update values
+       if (row.querySelector('.total-freight')) {
+           row.querySelector('.total-freight').value = totalFreight.toFixed(2);
+       }
+   
+       if (row.querySelector('.balance-freight')) {
+           row.querySelector('.balance-freight').value = balance.toFixed(2);
+       }
    });
+   </script>
    
-    
-</script>
+   
+   
 <script>
    function updateFreightAmount() {
        const byOrder = parseFloat(document.getElementById('byoder')?.value) || 0;
@@ -637,12 +644,36 @@
        }
    }
    
-   // Listen to changes on both inputs
-   document.getElementById('byoder').addEventListener('input', updateFreightAmount);
-   document.getElementById('totalChargedWeight').addEventListener('input', updateFreightAmount);
+   // Fire input event manually after fake filler or auto-fill
+   function triggerInputEvents() {
+       const byOrderInput = document.getElementById('byoder');
+       const chargedWeightInput = document.getElementById('totalChargedWeight');
    
-   // Run once on load
-   document.addEventListener('DOMContentLoaded', updateFreightAmount);
+       if (byOrderInput) {
+           byOrderInput.dispatchEvent(new Event('input', { bubbles: true }));
+       }
+       if (chargedWeightInput) {
+           chargedWeightInput.dispatchEvent(new Event('input', { bubbles: true }));
+       }
+   }
+   
+   // Attach event listeners safely after DOM is loaded
+   document.addEventListener('DOMContentLoaded', function() {
+       const byOrderInput = document.getElementById('byoder');
+       const chargedWeightInput = document.getElementById('totalChargedWeight');
+   
+       if (byOrderInput) {
+           byOrderInput.addEventListener('input', updateFreightAmount);
+       }
+       if (chargedWeightInput) {
+           chargedWeightInput.addEventListener('input', updateFreightAmount);
+       }
+   
+       // Trigger input events after slight delay for fake filler compatibility
+       setTimeout(triggerInputEvents, 500); // 500ms wait for fake filler to fill data
+   });
    </script>
+   
+   
    
 @endsection

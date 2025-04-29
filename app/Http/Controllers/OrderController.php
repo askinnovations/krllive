@@ -183,6 +183,30 @@ class OrderController extends Controller
     return redirect()->route('admin.orders.index')
         ->with('success', 'Order stored with nested LR and cargo arrays successfully!');
     }
+    public function getRate(Request $request)
+    {
+        // Validate incoming request
+      
+        // Find the contract matching these fields
+       
+
+            $rate = Contract::where('user_id', $request->customer_id)
+    ->where('type_id', $request->vehicle_type)
+    ->where('from_destination_id', $request->from_location)
+    ->where('to_destination_id', $request->to_location)
+    ->value('rate');
+
+        if ($rate) {
+            return response()->json([
+                'rate' => $rate, 
+            ]);
+        } else {
+            return response()->json([
+                'rate' => null,
+            ]);
+        }
+    }
+
 
     
 
