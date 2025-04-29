@@ -1,0 +1,828 @@
+@extends('admin.layouts.app')
+@section('title', 'Order | KRL')
+@section('content')
+
+<style>
+   /* Make Select2 look like Bootstrap input */
+   .select2-container .select2-selection--single {
+       height: 38px !important;
+       padding: 6px 12px;
+   }
+   .select2-container--default .select2-selection--single .select2-selection__arrow {
+       height: 38px !important;
+       right: 6px;
+   }
+</style>
+
+<!-- Order Booking Add Page -->
+<div class="row order-booking-form">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <div>
+                    <h4>🛒 Order Details Add</h4>
+                    <p class="mb-0">Enter the required details for the order.</p>
+                </div>
+                <a href="{{ route('admin.orders.create') }}" class="btn" id="backToListBtn" style="background-color: #ca2639; color: white; border: none;">
+                    ⬅ Back to Listing
+                </a>
+            </div>
+            <form method="POST" action="{{ route('admin.orders.store') }}" enctype="multipart/form-data">
+                @csrf
+                <div class="card">
+                    <div class="card-header">
+                        <h4>Order Details</h4>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <!-- Description -->
+                            <div class="col-md-3">
+                                <div class="mb-3">
+                                    <label class="form-label">📝 Consignment Details</label>
+                                    <textarea name="description" class="form-control" rows="2" placeholder="Enter order description" required></textarea>
+                                    @error('description')
+                                        <small class="text-danger">{{ $message }}</small>
+                                    @enderror
+                                </div>
+                            </div>
+                            <!-- Order Date -->
+                            <div class="col-md-3">
+                                <div class="mb-3">
+                                    <label class="form-label">📅 Consignment Pickup Date</label>
+                                    <input type="date" name="order_date" class="form-control" required>
+                                </div>
+                            </div>
+                            <!-- Status -->
+                            <div class="col-md-3">
+                                <div class="mb-3">
+                                    <label class="form-label">📊 Status</label>
+                                    <select name="status" class="form-select my-select" required>
+                                        <option value="">Select Status</option>
+                                        <option value="Pending">Pending</option>
+                                        <option value="Processing">Processing</option>
+                                        <option value="Completed">Completed</option>
+                                        <option value="Cancelled">Cancelled</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <!-- Customer Name Dropdown -->
+                            <div class="col-md-3">
+                                <div class="mb-3">
+                                    <label class="form-label">👤 Freight A/c</label>
+                                    <select name="customer_id" id="customer_id" class="form-select" onchange="setCustomerDetails()" required>
+                                        <option value="">Select Customer</option>
+                                        @foreach($users as $user)
+                                            @php
+                                                $addresses = json_decode($user->address, true);
+                                            @endphp
+                                            @if(!empty($addresses) && is_array($addresses))
+                                                @foreach($addresses as $address)
+                                                    <option value="{{ $user->id }}"
+                                                            data-gst="{{ $address['gstin'] ?? '' }}"
+                                                            data-address="{{ $address['billing_address'] ?? '' }}">
+                                                        {{ $user->name }} - {{ $address['city'] ?? '' }}
+                                                    </option>
+                                                @endforeach
+                                            @endif
+                                        @endforeach
+                                    </select>
+                                </div>
+                            </div>
+                            <!-- GST Number (Auto-filled) -->
+                            <div class="col-md-3">
+                                <div class="mb-3">
+                                    <label class="form-label">🧾 GST NUMBER</label>
+                                    <input type="text" name="gst_number" id="gst_number" class="form-control" readonly required>
+                                </div>
+                            </div>
+                            <!-- Customer Address (Auto-filled) -->
+                            <div class="col-md-3">
+                                <div class="mb-3">
+                                    <label class="form-label">📍 CUSTOMER ADDRESS</label>
+                                    <input type="text" name="customer_address" id="customer_address" class="form-control" readonly required>
+                                </div>
+                            </div>
+                            <!-- Order Type -->
+                            <div class="col-md-3">
+                                <div class="mb-3">
+                                    <label class="form-label">📊 Order Type</label>
+                                    <select name="order_type" class="form-select my-select" required>
+                                        <option value="">Select Order</option>
+                                        <option value="import">Import</option>
+                                        <option value="import-restoff">Import Restoff</option>
+                                        <option value="export">Export</option>
+                                        <option value="export-restoff">Export Restoff</option>
+                                        <option value="domestic">Domestic</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <!-- Order Method -->
+                            <div class="col-md-3">
+                                <div class="mb-3">
+                                    <label class="form-label">📑 ORDER METHOD</label><br>
+                                    <div class="form-check form-check-inline">
+                                        <input class="form-check-input" type="radio" name="order_method" id="byOrder" value="order" onclick="toggleOrderMethod()" checked>
+                                        <label class="form-check-label" for="byOrder">By Order</label>
+                                    </div>
+                                    <div class="form-check form-check-inline">
+                                        <input class="form-check-input" type="radio" name="order_method" id="byContract" value="contract" onclick="toggleOrderMethod()">
+                                        <label class="form-check-label" for="byContract">By Contract</label>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- Pickup Address -->
+                            <div class="col-md-3">
+                                <div class="mb-3">
+                                    <label class="form-label">📍 PICKUP ADDRESS</label>
+                                    <input type="text" name="pickup_addresss" id="pickup_addresss" class="form-control" placeholder="Pickup Address" required>
+                                </div>
+                            </div>
+                            <!-- Delivery Address -->
+                            <div class="col-md-3">
+                                <div class="mb-3">
+                                    <label class="form-label">📍 DELIVERY ADDRESS</label>
+                                    <input type="text" name="deleiver_addresss" id="deleiver_addresss" class="form-control" placeholder="Delivery Address" required>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Button to Add LR - Consignment -->
+                        <div class="row">
+                            <div class="col-12 text-center">
+                                <button type="button" class="btn" id="addLRBtn" style="background-color: #ca2639; color: white; border: none;">
+                                    <i class="fas fa-plus"></i> Add LR - Consignment
+                                </button>
+                            </div>
+                        </div>
+                        <!-- LR Consignment Section (Initially Hidden) -->
+                        <div class="mt-4" id="lrSection" style="display: none;">
+                            <h4 style="margin-bottom: 2%;">🚚 Add LR - Consignment Details</h4>
+                            <div class="accordion" id="lrAccordion"></div>
+                        </div>
+                        <!-- Submit Button -->
+                        <div class="row mt-4 mb-4">
+                            <div class="col-12 text-center">
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="fas fa-save"></i> Save Order & LR Details
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- DataTables CSS -->
+<link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
+<!-- DataTables JS -->
+<script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+<!-- Select2 JS -->
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+
+<script>
+    var vehicles = @json($vehicles);
+
+    function generateVehicle_typeOptions() {
+        let options = '<option value="">Select Vehicle</option>';
+        vehicles.forEach(function(vehicle) {
+            options += `<option value="${vehicle.id}">${vehicle.vehicle_no}</option>`;
+        });
+        return options;
+    }
+
+    document.addEventListener("DOMContentLoaded", function () {
+        let lrCounter = 0;
+        const addLRBtn = document.getElementById("addLRBtn");
+        const lrAccordion = document.getElementById("lrAccordion");
+        const lrSection = document.getElementById("lrSection");
+
+        function createLRAccordionItem(counter) {
+            const newAccordionItem = document.createElement("div");
+            newAccordionItem.classList.add("accordion-item");
+            newAccordionItem.setAttribute("id", `lrItem${counter}`);
+            newAccordionItem.innerHTML = `
+                <h2 class="accordion-header" id="heading${counter}">
+                    <button class="accordion-button btn-light" type="button" data-bs-toggle="collapse"
+                        data-bs-target="#collapse${counter}" aria-expanded="true" aria-controls="collapse${counter}">
+                        LR - Consignment #${counter}
+                    </button>
+                </h2>
+                <div id="collapse${counter}" class="accordion-collapse collapse show" aria-labelledby="heading${counter}"
+                    data-bs-parent="#lrAccordion">
+                    <div class="accordion-body">
+                        <div class="card-body">
+                            <div class="row">
+                                <!-- Consignor Details -->
+                                <div class="col-md-6">
+                                    <h5>📦 Consignor (Sender)</h5>
+                                    <select name="lr[${counter}][consignor_id]" id="consignor_id_${counter}" class="form-select" onchange="setConsignorDetails(${counter})" required>
+                                        <option value="">Select Consignor Name</option>
+                                        @foreach($users as $user)
+                                            @php
+                                                $addresses = json_decode($user->address, true);
+                                            @endphp
+                                            @if(!empty($addresses) && is_array($addresses))
+                                                @foreach($addresses as $address)
+                                                    @php
+                                                        $formattedAddress = trim(
+                                                            ($address['billing_address'] ?? '') . ', ' .
+                                                            ($address['city'] ?? '') . ', ' .
+                                                            ($address['consignment_address'] ?? '')
+                                                        );
+                                                    @endphp
+                                                    <option 
+                                                        value="{{ $user->id }}"
+                                                        data-gst="{{ $address['gstin'] ?? '' }}"
+                                                        data-address="{{ $formattedAddress }}"
+                                                    >
+                                                        {{ $user->name }} - {{ $address['city'] ?? '' }}
+                                                    </option>
+                                                @endforeach
+                                            @endif
+                                        @endforeach
+                                    </select>
+                                    <div class="mb-3">
+                                        <label class="form-label">Consignor Loading Address</label>
+                                        <textarea name="lr[${counter}][consignor_loading]" id="consignor_loading_${counter}" class="form-control" rows="2" placeholder="Enter loading address" required></textarea>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="form-label">Consignor GST</label>
+                                        <input type="text" name="lr[${counter}][consignor_gst]" id="consignor_gst_${counter}" class="form-control" placeholder="Enter GST number" required>
+                                    </div>
+                                </div>
+                                <!-- Consignee Details -->
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label class="form-label">Lr date</label>
+                                        <input type="date" name="lr[${counter}][lr_date]" class="form-control" placeholder="Enter lr date" required>
+                                    </div>
+                                    <h5>📦 Consignee (Receiver)</h5>
+                                    <select name="lr[${counter}][consignee_id]" id="consignee_id_${counter}" class="form-select" onchange="setConsigneeDetails(${counter})" required>
+                                        <option value="">Select Consignee Name</option>
+                                        @foreach($users as $user)
+                                            @php
+                                                $addresses = json_decode($user->address, true);
+                                            @endphp
+                                            @if(!empty($addresses) && is_array($addresses))
+                                                @foreach($addresses as $address)
+                                                    @php
+                                                        $formattedAddress = trim(
+                                                            ($address['billing_address'] ?? '') . ', ' .
+                                                            ($address['city'] ?? '') . ', ' .
+                                                            ($address['consignment_address'] ?? '')
+                                                        );
+                                                    @endphp
+                                                    <option 
+                                                        value="{{ $user->id }}"
+                                                        data-gst-consignee="{{ $address['gstin'] ?? '' }}"
+                                                        data-address-consignee="{{ $formattedAddress }}"
+                                                    >
+                                                        {{ $user->name }} - {{ $address['city'] ?? '' }}
+                                                    </option>
+                                                @endforeach
+                                            @endif
+                                        @endforeach
+                                    </select>
+                                    <div class="mb-3">
+                                        <label class="form-label">Consignee Unloading Address</label>
+                                        <textarea name="lr[${counter}][consignee_unloading]" id="consignee_unloading_${counter}" class="form-control" rows="2" placeholder="Enter unloading address" required></textarea>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="form-label">Consignee GST</label>
+                                        <input type="text" name="lr[${counter}][consignee_gst]" id="consignee_gst_${counter}" class="form-control" placeholder="Enter GST number" required>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <!-- Vehicle Number -->
+                                <div class="col-md-4">
+                                    <div class="mb-3">
+                                        <label class="form-label">🚚 Vehicle Number</label>
+                                        <select name="lr[${counter}][vehicle_no]" class="form-select search-select" required>
+                                            ${generateVehicle_typeOptions()}
+                                        </select>
+                                    </div>
+                                </div>
+                                <!-- Vehicle Type -->
+                                <div class="col-md-4">
+                                    <div class="mb-3">
+                                        <label class="form-label">🚛 Vehicle Type</label>
+                                        <select name="lr[${counter}][vehicle_type]" id="vehicle_type_${counter}" class="form-select" required>
+                                            <option value="">Select Vehicle Type</option>
+                                            @foreach ($vehiclesType as $type)
+                                                <option value="{{ $type->id }}">{{ $type->vehicletype }}</option>
+                                            @endforeach
+                                        </select>
+                                    </div>
+                                </div>
+                                <!-- Vehicle Ownership -->
+                                <div class="col-md-4">
+                                    <label class="form-label">🛻 Vehicle Ownership</label>
+                                    <div class="d-flex gap-3">
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="radio" name="lr[${counter}][vehicle_ownership]" value="Own" checked required>
+                                            <label class="form-check-label">Own</label>
+                                        </div>
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="radio" name="lr[${counter}][vehicle_ownership]" value="Other" required>
+                                            <label class="form-check-label">Other</label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <!-- Delivery Mode -->
+                                <div class="col-md-4">
+                                    <div class="mb-3">
+                                        <label class="form-label">🚢 Delivery Mode</label>
+                                        <select name="lr[${counter}][delivery_mode]" class="form-select" required>
+                                            <option value="">Select Mode</option>
+                                            <option value="door_delivery">Door Delivery</option>
+                                            <option value="godwon_deliver">Godown Delivery</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <!-- From Location -->
+                                <div class="col-md-4">
+                                    <div class="mb-3">
+                                        <label class="form-label">📍 From (Origin)</label>
+                                        <select name="lr[${counter}][from_location]" id="from_location_${counter}" class="form-select" required>
+                                            <option value="">Select Destination</option>
+                                            @foreach ($destination as $loc)
+                                                <option value="{{ $loc->id }}">{{ $loc->destination }}</option>
+                                            @endforeach
+                                        </select>
+                                    </div>
+                                </div>
+                                <!-- To Location -->
+                                <div class="col-md-4">
+                                    <div class="mb-3">
+                                        <label class="form-label">📍 To (Destination)</label>
+                                        <select name="lr[${counter}][to_location]" id="to_location_${counter}" class="form-select" required>
+                                            <option value="">Select Destination</option>
+                                            @foreach ($destination as $loc)
+                                                <option value="{{ $loc->id }}">{{ $loc->destination }}</option>
+                                            @endforeach
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- Insurance Section -->
+                            <div class="mb-3 d-flex align-items-center gap-3 flex-wrap">
+                                <label class="form-label mb-0">🛡️ Insurance?</label>
+                                <div class="form-check form-check-inline">
+                                    <input class="form-check-input"
+                                           type="radio"
+                                           name="lr[${counter}][insurance_status]"
+                                           value="yes"
+                                           id="insuranceYes${counter}"
+                                           onchange="toggleInsuranceInput(${counter})">
+                                    <label class="form-check-label" for="insuranceYes${counter}">Yes</label>
+                                </div>
+                                <div class="form-check form-check-inline">
+                                    <input class="form-check-input"
+                                           type="radio"
+                                           name="lr[${counter}][insurance_status]"
+                                           value="no"
+                                           id="insuranceNo${counter}"
+                                           onchange="toggleInsuranceInput(${counter})"
+                                           checked>
+                                    <label class="form-check-label" for="insuranceNo${counter}">No</label>
+                                </div>
+                                <input type="text"
+                                       class="form-control d-none"
+                                       name="lr[${counter}][insurance_description]"
+                                       id="insuranceInput${counter}"
+                                       placeholder="Enter Insurance Number"
+                                       style="max-width: 450px;">
+                            </div>
+                            <!-- Cargo Description Section -->
+                            <div class="row mt-4">
+                                <div class="col-12">
+                                    <h5 class="mb-3 pb-3">📦 Cargo Description</h5>
+                                    <!-- Documentation Selection -->
+                                    <div class="mb-3 d-flex gap-3">
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="radio" name="lr[${counter}][cargo_description_type]" id="singleDoc${counter}" value="single" checked required>
+                                            <label class="form-check-label" for="singleDoc${counter}">Single Document</label>
+                                        </div>
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="radio" name="lr[${counter}][cargo_description_type]" id="multipleDoc${counter}" value="multiple" required>
+                                            <label class="form-check-label" for="multipleDoc${counter}">Multiple Documents</label>
+                                        </div>
+                                    </div>
+                                    <!-- Cargo Details Table -->
+                                    <div class="table-responsive">
+                                        <table class="table table-bordered align-middle text-center">
+                                            <thead>
+                                                <tr>
+                                                    <th>No. of Packages</th>
+                                                    <th>Packaging Type</th>
+                                                    <th>Description</th>
+                                                    <th>Actual Weight (kg)</th>
+                                                    <th>Charged Weight (kg)</th>
+                                                    <th>Unit</th>
+                                                    <th>Document No.</th>
+                                                    <th>Document Name</th>
+                                                    <th>Document Date</th>
+                                                    <th>Document Upload</th>
+                                                    <th>Eway Bill</th>
+                                                    <th>Valid Upto</th>
+                                                    <th>Declared Value</th>
+                                                    <th>Action</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody id="cargoTableBody-${counter}" data-lr-index="${counter}">
+                                                <tr>
+                                                    <td><input type="number" class="form-control" name="lr[${counter}][cargo][0][packages_no]" placeholder="0" required></td>
+                                                    <td>
+                                                        <select class="form-select" name="lr[${counter}][cargo][0][package_type]" required>
+                                                            <option>Pallets</option>
+                                                            <option>Cartons</option>
+                                                            <option>Bags</option>
+                                                        </select>
+                                                    </td>
+                                                    <td><input type="text" class="form-control" name="lr[${counter}][cargo][0][package_description]" placeholder="Enter description" required></td>
+                                                    <td><input type="number" class="form-control" name="lr[${counter}][cargo][0][actual_weight]" placeholder="0" required></td>
+                                                    <td><input type="number" class="form-control charged_weight" name="lr[${counter}][cargo][0][charged_weight]" placeholder="0" required oninput="calculateTotalChargedWeight(${counter})"></td>
+                                                    <td>
+                                                        <select class="form-select" name="lr[${counter}][cargo][0][unit]" required>
+                                                            <option value="">Select Unit</option>
+                                                            <option value="kg">Kg</option>
+                                                            <option value="ton">Ton</option>
+                                                        </select>
+                                                    </td>
+                                                    <td><input type="text" class="form-control" name="lr[${counter}][cargo][0][document_no]" placeholder="Doc No." required></td>
+                                                    <td><input type="text" class="form-control" name="lr[${counter}][cargo][0][document_name]" placeholder="Doc Name" required></td>
+                                                    <td><input type="date" class="form-control" name="lr[${counter}][cargo][0][document_date]" required></td>
+                                                    <td><input type="file" class="form-control" name="lr[${counter}][cargo][0][document_file]"></td>
+                                                    <td><input type="text" class="form-control" name="lr[${counter}][cargo][0][eway_bill]" placeholder="Eway Bill No." required></td>
+                                                    <td><input type="date" class="form-control" name="lr[${counter}][cargo][0][valid_upto]" required></td>
+                                                    <td>
+                                                        <input type="number" name="lr[${counter}][cargo][0][declared_value]" class="form-control declared-value" placeholder="0" oninput="calculateTotalDeclaredValue(${counter})">
+                                                    </td>
+                                                    <td>
+                                                        <button class="btn btn-danger btn-sm" onclick="removeRow(this)">🗑</button>
+                                                    </td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                    <!-- Add Row Button -->
+                                    <div class="text-end mt-2">
+                                        <button type="button" class="btn btn-sm" style="background: #ca2639; color: white;" onclick="addRow(${counter})">
+                                            <span style="filter: invert(1);">➕</span> Add Row
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- Freight Details Section -->
+                            <div class="row mt-4">
+                                <div class="col-12">
+                                    <h5 class="pb-3">🚚 Freight Details</h5>
+                                    <div class="mb-3 d-flex gap-3">
+                                        <div class="form-check form-check-inline">
+                                            <input class="form-check-input freight-type" type="radio" name="lr[${counter}][freightType]" id="freightPaid-${counter}" value="paid" checked onchange="toggleFreightTable(${counter})">
+                                            <label class="form-check-label" for="freightPaid-${counter}">Paid</label>
+                                        </div>
+                                        <div class="form-check form-check-inline">
+                                            <input class="form-check-input freight-type" type="radio" name="lr[${counter}][freightType]" id="freightToPay-${counter}" value="to_pay" onchange="toggleFreightTable(${counter})">
+                                            <label class="form-check-label" for="freightToPay-${counter}">To Pay</label>
+                                        </div>
+                                        <div class="form-check form-check-inline">
+                                            <input class="form-check-input freight-type" type="radio" name="lr[${counter}][freightType]" id="freightToBeBilled-${counter}" value="to_be_billed" onchange="toggleFreightTable(${counter})">
+                                            <label class="form-check-label" for="freightToBeBilled-${counter}">To Be Billed</label>
+                                        </div>
+                                    </div>
+                                    <div class="table-responsive">
+                                        <table class="table table-bordered align-middle text-center freight-table" id="freight-table-${counter}">
+                                            <thead>
+                                                <tr>
+                                                    <th>Rate</th>
+                                                    <th>Freight Amount</th>
+                                                    <th>LR Charges</th>
+                                                    <th>Hamali</th>
+                                                    <th>Other Charges</th>
+                                                    <th>GST (%)</th>
+                                                    <th>Total Freight</th>
+                                                    <th>Less Advance</th>
+                                                    <th>Balance Freight</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody id="freightBody-${counter}">
+                                                <tr>
+                                                    <td>
+                                                        <input type="number" id="rate_input_${counter}" name="lr[${counter}][rate]" class="form-control rate-input" placeholder="Enter Rate" oninput="updateFreightAmount(${counter})" required>
+                                                    </td>
+                                                    <td>
+                                                        <input type="number" id="freight_amount_${counter}" name="lr[${counter}][freight_amount]" class="form-control freight-amount" placeholder="Freight Amount" readonly>
+                                                    </td>
+                                                    <td>
+                                                        <input type="number" name="lr[${counter}][lr_charges]" class="form-control lr-charges" placeholder="Enter LR Charges" required oninput="calculateFreight(${counter})">
+                                                    </td>
+                                                    <td>
+                                                        <input type="number" name="lr[${counter}][hamali]" class="form-control hamali" placeholder="Enter Hamali" required oninput="calculateFreight(${counter})">
+                                                    </td>
+                                                    <td>
+                                                        <input type="number" name="lr[${counter}][other_charges]" class="form-control other-charges" placeholder="Enter Other Charges" required oninput="calculateFreight(${counter})">
+                                                    </td>
+                                                    <td>
+                                                        <input type="number" name="lr[${counter}][gst_amount]" class="form-control gst" placeholder="GST Amount" readonly>
+                                                    </td>
+                                                    <td>
+                                                        <input type="number" name="lr[${counter}][total_freight]" class="form-control total-freight" placeholder="Total Freight" readonly>
+                                                    </td>
+                                                    <td>
+                                                        <input type="number" name="lr[${counter}][less_advance]" class="form-control less-advance" placeholder="Less Advance Amount" required oninput="calculateFreight(${counter})">
+                                                    </td>
+                                                    <td>
+                                                        <input type="number" name="lr[${counter}][balance_freight]" class="form-control balance-freight" placeholder="Balance Freight" readonly>
+                                                    </td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- Total Declared Value and Charged Weight -->
+                            <div class="row mt-3">
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label class="form-label fw-bold">💰 Total Declared Value (Rs.)</label>
+                                        <input type="number" class="form-control" id="totalDeclaredValue-${counter}" name="lr[${counter}][total_declared_value]" placeholder="0" readonly>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label class="form-label fw-bold">⚖️ Total Charged Weight (kg)</label>
+                                        <input type="number" class="form-control" id="totalChargedWeight-${counter}" name="lr[${counter}][total_charged_weight]" placeholder="0" readonly>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- Remove / Add More LR Buttons -->
+                            <div class="d-flex justify-content-end gap-2 mt-3">
+                                <button type="button" class="btn btn-outline-warning btn-sm removeLRBtn" data-id="lrItem${counter}">
+                                    <i class="fas fa-trash-alt"></i> Remove
+                                </button>
+                                <button type="button" class="btn btn-sm addMoreLRBtn" data-id="lrItem${counter}" style="background-color: #ca2639; color: #fff;">
+                                    <i class="fas fa-plus-circle"></i> Add More LR - Consignment
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+            return newAccordionItem;
+        }
+
+        function addNewLR() {
+            lrCounter++;
+            lrSection.style.display = "block"; // Show LR Section
+            const newAccordionItem = createLRAccordionItem(lrCounter);
+            lrAccordion.appendChild(newAccordionItem);
+
+            // Initialize Select2 for vehicle number
+            $(newAccordionItem).find('.search-select').select2({
+                allowClear: true,
+                width: '100%',
+                minimumInputLength: 1
+            });
+
+            // Bind event listeners
+            newAccordionItem.querySelector(".removeLRBtn").addEventListener("click", function () {
+                removeLR(this.getAttribute("data-id"));
+            });
+            newAccordionItem.querySelector(".addMoreLRBtn").addEventListener("click", addNewLR);
+
+            // Apply order method settings to new LR
+            toggleOrderMethodForLR(lrCounter);
+
+            // Bind change events for vehicle_type, from_location, to_location
+            bindLocationChangeEvents(lrCounter);
+        }
+
+        function removeLR(removeId) {
+            const element = document.getElementById(removeId);
+            if (element) {
+                element.remove();
+            }
+            if (lrAccordion.children.length === 0) {
+                lrSection.style.display = "none";
+            }
+        }
+
+        addLRBtn.addEventListener("click", addNewLR);
+    });
+
+    // Toggle Insurance Input
+    function toggleInsuranceInput(counter) {
+        const insuranceYes = document.getElementById(`insuranceYes${counter}`);
+        const insuranceInput = document.getElementById(`insuranceInput${counter}`);
+        insuranceInput.classList.toggle('d-none', !insuranceYes.checked);
+        insuranceInput.toggleAttribute('required', insuranceYes.checked);
+    }
+
+    // Toggle Order Method
+    function toggleOrderMethod() {
+        const isOrder = document.getElementById('byOrder').checked;
+        document.querySelectorAll('.rate-input').forEach(input => {
+            const counter = input.id.split('_')[2];
+            input.readOnly = !isOrder;
+            input.placeholder = isOrder ? 'Enter Rate' : 'Contract Rate (Auto)';
+            if (!isOrder) {
+                fetchContractRate(counter); // Fetch rate for each LR if contract
+            } else {
+                input.value = ''; // Clear rate for manual input
+                updateFreightAmount(counter);
+            }
+        });
+    }
+
+    function toggleOrderMethodForLR(counter) {
+        const isOrder = document.getElementById('byOrder').checked;
+        const rateInput = document.getElementById(`rate_input_${counter}`);
+        rateInput.readOnly = !isOrder;
+        rateInput.placeholder = isOrder ? 'Enter Rate' : 'Contract Rate (Auto)';
+        if (!isOrder) {
+            fetchContractRate(counter);
+        } else {
+            rateInput.value = '';
+            updateFreightAmount(counter);
+        }
+    }
+
+    // Fetch Contract Rate via AJAX
+    function fetchContractRate(counter) {
+        const customer_id = document.getElementById('customer_id').value;
+        const vehicle_type = document.getElementById(`vehicle_type_${counter}`).value;
+        const from_location = document.getElementById(`from_location_${counter}`).value;
+        const to_location = document.getElementById(`to_location_${counter}`).value;
+
+        if (!customer_id || !vehicle_type || !from_location || !to_location) {
+            document.getElementById(`rate_input_${counter}`).value = 0;
+            updateFreightAmount(counter);
+            return;
+        }
+
+        fetch('/admin/get-rate', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+            },
+            body: JSON.stringify({
+                customer_id: customer_id,
+                vehicle_type: vehicle_type,
+                from_location: from_location,
+                to_location: to_location
+            })
+        })
+        .then(res => res.json())
+        .then(data => {
+            const rateInput = document.getElementById(`rate_input_${counter}`);
+            rateInput.value = data.rate || 0;
+            updateFreightAmount(counter);
+        })
+        .catch(err => {
+            console.error('Error:', err);
+            document.getElementById(`rate_input_${counter}`).value = 0;
+            updateFreightAmount(counter);
+        });
+    }
+
+    // Bind change events for vehicle_type, from_location, to_location
+    function bindLocationChangeEvents(counter) {
+        ['vehicle_type', 'from_location', 'to_location'].forEach(field => {
+            document.getElementById(`${field}_${counter}`).addEventListener('change', () => {
+                if (document.getElementById('byContract').checked) {
+                    fetchContractRate(counter);
+                }
+            });
+        });
+    }
+
+    // Update Freight Amount
+    function updateFreightAmount(counter) {
+        const rate = parseFloat(document.getElementById(`rate_input_${counter}`).value) || 0;
+        const chargedWeight = parseFloat(document.getElementById(`totalChargedWeight-${counter}`).value) || 0;
+        const freightAmount = rate * chargedWeight;
+        document.getElementById(`freight_amount_${counter}`).value = freightAmount.toFixed(2);
+        calculateFreight(counter);
+    }
+
+    // Calculate Freight Details
+    function calculateFreight counter) {
+        const freight = parseFloat(document.getElementById(`freight_amount_${counter}`).value) || 0;
+        const lrCharges = parseFloat(document.querySelector(`#freightBody-${counter} .lr-charges`).value) || 0;
+        const hamali = parseFloat(document.querySelector(`#freightBody-${counter} .hamali`).value) || 0;
+        const otherCharges = parseFloat(document.querySelector(`#freightBody-${counter} .other-charges`).value) || 0;
+        const lessAdvance = parseFloat(document.querySelector(`#freightBody-${counter} .less-advance`).value) || 0;
+
+        const subtotal = freight + lrCharges + hamali + otherCharges;
+        const gstPercent = 12;
+        const gstAmount = subtotal * gstPercent / 100;
+        const totalFreight = subtotal + gstAmount;
+        const balance = totalFreight - lessAdvance;
+
+        document.querySelector(`#freightBody-${counter} .gst`).value = gstAmount.toFixed(2);
+        document.querySelector(`#freightBody-${counter} .total-freight`).value = totalFreight.toFixed(2);
+        document.querySelector(`#freightBody-${counter} .balance-freight`).value = balance.toFixed(2);
+    }
+
+    // Toggle Freight Table
+    function toggleFreightTable(counter) {
+        const tbody = document.getElementById(`freightBody-${counter}`);
+        const freightToBeBilled = document.getElementById(`freightToBeBilled-${counter}`).checked;
+        tbody.style.display = freightToBeBilled ? 'none' : 'table-row-group';
+        tbody.querySelectorAll('input').forEach(input => {
+            input.toggleAttribute('required', !freightToBeBilled);
+        });
+    }
+
+    // Add Row to Cargo Table
+    function addRow(lrIndex) {
+        const tableBody = document.getElementById(`cargoTableBody-${lrIndex}`);
+        const rowCount = tableBody.rows.length;
+        const newRow = tableBody.rows[0].cloneNode(true);
+
+        newRow.querySelectorAll('input, select').forEach(input => {
+            if (input.name) {
+                input.name = input.name.replace(/lr\[\d+]\[cargo]\[\d+]/, `lr[${lrIndex}][cargo][${rowCount}]`);
+                input.value = '';
+                if (input.name.includes('declared_value')) {
+                    input.classList.add('declared-value');
+                    input.setAttribute('oninput', `calculateTotalDeclaredValue(${lrIndex})`);
+                }
+                if (input.name.includes('charged_weight')) {
+                    input.classList.add('charged-weight');
+                    input.setAttribute('oninput', `calculateTotalChargedWeight(${lrIndex})`);
+                }
+            }
+        });
+
+        tableBody.appendChild(newRow);
+        calculateTotalDeclaredValue(lrIndex);
+        calculateTotalChargedWeight(lrIndex);
+    }
+
+    // Remove Row from Cargo Table
+    function removeRow(button) {
+        const row = button.closest('tr');
+        const tbody = row.closest('tbody');
+        const lrIndex = tbody.dataset.lrIndex;
+
+        if (tbody.rows.length > 1) {
+            row.remove();
+            calculateTotalDeclaredValue(lrIndex);
+            calculateTotalChargedWeight(lrIndex);
+        }
+    }
+
+    // Calculate Total Declared Value
+    function calculateTotalDeclaredValue(lrIndex) {
+        let total = 0;
+        const inputs = document.querySelectorAll(`#cargoTableBody-${lrIndex} input[name$="[declared_value]"]`);
+        inputs.forEach(input => {
+            total += parseFloat(input.value) || 0;
+        });
+        document.getElementById(`totalDeclaredValue-${lrIndex}`).value = total.toFixed(2);
+    }
+
+    // Calculate Total Charged Weight
+    function calculateTotalChargedWeight(lrIndex) {
+        let total = 0;
+        const inputs = document.querySelectorAll(`#cargoTableBody-${lrIndex} input[name$="[charged_weight]"]`);
+        inputs.forEach(input => {
+            total += parseFloat(input.value) || 0;
+        });
+        document.getElementById(`totalChargedWeight-${lrIndex}`).value = total.toFixed(2);
+        updateFreightAmount(lrIndex);
+    }
+
+    // Set Customer Details
+    function setCustomerDetails() {
+        const select = document.getElementById('customer_id');
+        const selectedOption = select.options[select.selectedIndex];
+        document.getElementById('gst_number').value = selectedOption.getAttribute('data-gst') || '';
+        document.getElementById('customer_address').value = selectedOption.getAttribute('data-address') || '';
+    }
+
+    // Set Consignor Details
+    function setConsignorDetails(counter) {
+        const select = document.getElementById(`consignor_id_${counter}`);
+        const selectedOption = select.options[select.selectedIndex];
+        document.getElementById(`consignor_gst_${counter}`).value = selectedOption.getAttribute('data-gst') || '';
+        document.getElementById(`consignor_loading_${counter}`).value = selectedOption.getAttribute('data-address') || '';
+    }
+
+    // Set Consignee Details
+    function setConsigneeDetails(counter) {
+        const select = document.getElementById(`consignee_id_${counter}`);
+        const selectedOption = select.options[select.selectedIndex];
+        document.getElementById(`consignee_gst_${counter}`).value = selectedOption.getAttribute('data-gst-consignee') || '';
+        document.getElementById(`consignee_unloading_${counter}`).value = selectedOption.getAttribute('data-address-consignee') || '';
+    }
+</script>
+
+@endsection

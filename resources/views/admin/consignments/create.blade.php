@@ -94,6 +94,10 @@
                         <label class="form-label">Consignor GST</label>
                         <input type="text" name="consignor_gst" id="consignor_gst" class="form-control" placeholder="Enter GST numbers" required>
                      </div>
+                     <div class="mb-3 ">
+                        <label class="form-label">💰 ORDER AMOUNT</label>
+                        <input type="number" name="byOrder" class="form-control" placeholder="Enter Amount" id="byoder">
+                     </div>
                   </div>
                   <!-- Consignee Details -->
                   <div class="col-md-6">
@@ -147,7 +151,7 @@
                         <label class="form-label">Consignee GST</label>
                         <input name="consignee_gst" id="consignee_gst" type="text" class="form-control" placeholder="Enter GST number" required>
                     </div>
-                    
+                   
                   </div>
                </div>
                <div class="row">
@@ -305,7 +309,7 @@
                                  <td><input name="cargo[0][document_no]" type="text" class="form-control" placeholder="Doc No." required></td>
                                  <td><input name="cargo[0][document_name]" type="text" class="form-control" placeholder="Doc Name" required></td>
                                  <td><input name="cargo[0][document_date]" type="date" class="form-control" required></td>
-                                 <td><input name="cargo[0][document_file]" type="file" class="form-control" required></td>
+                                 <td><input name="cargo[0][document_file]" type="file" class="form-control"></td>
                                  <td><input name="cargo[0][eway_bill]" type="text" class="form-control" placeholder="Eway Bill No." required></td>
                                  <td><input name="cargo[0][valid_upto]" type="date" class="form-control" required></td>
                                  <td><input name="cargo[0][declared_value]" type="number" class="form-control" placeholder="0" required></td>
@@ -359,7 +363,7 @@
                            <tbody id="freightBody">
                               <tr>
                                  <td>
-                                    <input type="number" name="freight_amount" class="form-control freight-amount" placeholder="Enter Freight Amount" required>
+                                    <input type="number" name="freight_amount" class="form-control freight-amount" placeholder="Enter Freight Amount" readonly>
                                  </td>
                                  <td>
                                     <input type="number" name="lr_charges" class="form-control lr-charges" placeholder="Enter LR " required>
@@ -371,7 +375,7 @@
                                     <input type="number" name="other_charges" class="form-control other-charges" placeholder="Enter Other " required>
                                  </td>
                                  <td>
-                                    <input type="number" name="gst_amount" class="form-control gst" placeholder="Enter GST %" required>
+                                    <input type="number" name="gst_amount" class="form-control gst-amount" placeholder=" GST Amount" readonly>
                                  </td>
                                  <td>
                                     <input type="number" name="total_freight" class="form-control total-freight" placeholder="Total Freight" readonly>
@@ -391,6 +395,10 @@
                <div class="row">
                   <!-- Declared Value -->
                   <div class="col-md-6 mt-3">
+                     
+                        
+                        <input type="hidden" id="totalChargedWeight" class="form-control" readonly>
+                   
                      <div class="mb-3">
                         <label class="form-label " style="font-weight: bold;">💰Total Declared Value
                         (Rs.)</label>
@@ -413,6 +421,7 @@
       </div>
    </div>
 </div>
+
 <script>
    function toggleFreightTable() {
        const tbody = document.getElementById('freightBody');
@@ -471,8 +480,8 @@
    });
 </script>
 <script>
-   function calculateTotal() {
-       const declaredValues = document.querySelectorAll('.declared-value');
+   function calculateTotalDeclaredValue() {
+       const declaredValues = document.querySelectorAll('input[name$="[declared_value]"]');
        let total = 0;
    
        declaredValues.forEach(input => {
@@ -480,6 +489,17 @@
        });
    
        document.getElementById('totalDeclaredValue').value = total;
+   }
+   
+   function calculateTotalChargedWeight() {
+       const chargedWeights = document.querySelectorAll('input[name$="[charged_weight]"]');
+       let total = 0;
+   
+       chargedWeights.forEach(input => {
+           total += parseFloat(input.value) || 0;
+       });
+   
+       document.getElementById('totalChargedWeight').value = total;
    }
    
    function addRow() {
@@ -495,16 +515,20 @@
                input.setAttribute('name', `cargo[${rowCount}][${field}]`);
                input.value = '';
    
-               // Check for declared_value field
+               // Bind input listeners dynamically
                if (field === 'declared_value') {
-                   input.classList.add('declared-value');
-                   input.addEventListener('input', calculateTotal);
+                   input.addEventListener('input', calculateTotalDeclaredValue);
+               }
+   
+               if (field === 'charged_weight') {
+                   input.addEventListener('input', calculateTotalChargedWeight);
                }
            }
        });
    
        table.appendChild(newRow);
-       calculateTotal(); // Recalculate after adding
+       calculateTotalDeclaredValue();
+       calculateTotalChargedWeight();
    }
    
    function removeRow(button) {
@@ -512,7 +536,6 @@
        if (table.rows.length > 1) {
            button.closest('tr').remove();
    
-           // Reindex rows
            Array.from(table.rows).forEach((row, index) => {
                const inputs = row.querySelectorAll('input, select');
                inputs.forEach(input => {
@@ -524,21 +547,25 @@
                });
            });
    
-           calculateTotal(); // Recalculate after removing
+           calculateTotalDeclaredValue();
+           calculateTotalChargedWeight();
        }
    }
    
-   // Bind first declared value field on page load
    document.addEventListener('DOMContentLoaded', function () {
-       const input = document.querySelector('input[name="cargo[0][declared_value]"]');
-       if (input) {
-           input.classList.add('declared-value');
-           input.addEventListener('input', calculateTotal);
-       }
+       document.querySelectorAll('input[name$="[declared_value]"]').forEach(input => {
+           input.addEventListener('input', calculateTotalDeclaredValue);
+       });
    
-       calculateTotal();
+       document.querySelectorAll('input[name$="[charged_weight]"]').forEach(input => {
+           input.addEventListener('input', calculateTotalChargedWeight);
+       });
+   
+       calculateTotalDeclaredValue();
+       calculateTotalChargedWeight();
    });
-</script>
+   </script>
+   
 <script>
    function setConsignorDetails() {
        const selected = document.getElementById('consignor_id');
@@ -563,40 +590,90 @@
 </script>
 <script>
    document.addEventListener('input', function(e) {
-    const row = e.target.closest('tr');
-    if (!row) return;
+       const row = e.target.closest('tr');
+       if (!row) return;
    
-    // Get all input values
-    const freight = parseFloat(row.querySelector('.freight-amount')?.value) || 0;
-    const lrCharges = parseFloat(row.querySelector('.lr-charges')?.value) || 0;
-    const hamali = parseFloat(row.querySelector('.hamali')?.value) || 0;
-    const otherCharges = parseFloat(row.querySelector('.other-charges')?.value) || 0;
-    const gstPercent = parseFloat(row.querySelector('.gst')?.value) || 0;
-    const lessAdvance = parseFloat(row.querySelector('.less-advance')?.value) || 0;
+       // Get all input values
+       const freight = parseFloat(row.querySelector('.freight-amount')?.value) || 0;
+       const lrCharges = parseFloat(row.querySelector('.lr-charges')?.value) || 0;
+       const hamali = parseFloat(row.querySelector('.hamali')?.value) || 0;
+       const otherCharges = parseFloat(row.querySelector('.other-charges')?.value) || 0;
+       const gstPercent = 12; // Fixed GST percentage (12%)
+       const lessAdvance = parseFloat(row.querySelector('.less-advance')?.value) || 0;
    
-    // Total before GST
-    const subtotal = freight + lrCharges + hamali + otherCharges;
+       // Total before GST
+       const subtotal = freight + lrCharges + hamali + otherCharges;
    
-    // GST amount
-    const gstAmount = subtotal * gstPercent / 100;
+       // GST amount calculation
+       const gstAmount = subtotal * gstPercent / 100; // 12% GST
    
-    // Total Freight = subtotal + gst
-    const totalFreight = subtotal + gstAmount;
+       // Update GST amount input field with the calculated value
+       const gstAmountInput = row.querySelector('.gst-amount');
+       if (gstAmountInput) {
+           gstAmountInput.value = gstAmount.toFixed(2); // Show calculated GST amount (e.g., 120)
+       }
    
-    // Balance Freight = total - less advance
-    const balance = totalFreight - lessAdvance;
+       // Total Freight = subtotal + gst
+       const totalFreight = subtotal + gstAmount;
    
-    // Update values
-    if (row.querySelector('.total-freight')) {
-      row.querySelector('.total-freight').value = totalFreight.toFixed(2);
-    }
+       // Balance Freight = total - less advance
+       const balance = totalFreight - lessAdvance;
    
-    if (row.querySelector('.balance-freight')) {
-      row.querySelector('.balance-freight').value = balance.toFixed(2);
-    }
+       // Update values
+       if (row.querySelector('.total-freight')) {
+           row.querySelector('.total-freight').value = totalFreight.toFixed(2);
+       }
+   
+       if (row.querySelector('.balance-freight')) {
+           row.querySelector('.balance-freight').value = balance.toFixed(2);
+       }
    });
+   </script>
    
-    
-</script>
-
+   
+   
+<script>
+   function updateFreightAmount() {
+       const byOrder = parseFloat(document.getElementById('byoder')?.value) || 0;
+       const chargedWeight = parseFloat(document.getElementById('totalChargedWeight')?.value) || 0;
+       const result = byOrder * chargedWeight;
+   
+       const freightInput = document.querySelector('.freight-amount');
+       if (freightInput) {
+           freightInput.value = result.toFixed(2);
+       }
+   }
+   
+   // Fire input event manually after fake filler or auto-fill
+   function triggerInputEvents() {
+       const byOrderInput = document.getElementById('byoder');
+       const chargedWeightInput = document.getElementById('totalChargedWeight');
+   
+       if (byOrderInput) {
+           byOrderInput.dispatchEvent(new Event('input', { bubbles: true }));
+       }
+       if (chargedWeightInput) {
+           chargedWeightInput.dispatchEvent(new Event('input', { bubbles: true }));
+       }
+   }
+   
+   // Attach event listeners safely after DOM is loaded
+   document.addEventListener('DOMContentLoaded', function() {
+       const byOrderInput = document.getElementById('byoder');
+       const chargedWeightInput = document.getElementById('totalChargedWeight');
+   
+       if (byOrderInput) {
+           byOrderInput.addEventListener('input', updateFreightAmount);
+       }
+       if (chargedWeightInput) {
+           chargedWeightInput.addEventListener('input', updateFreightAmount);
+       }
+   
+       // Trigger input events after slight delay for fake filler compatibility
+       setTimeout(triggerInputEvents, 500); // 500ms wait for fake filler to fill data
+   });
+   </script>
+   
+   
+   
 @endsection

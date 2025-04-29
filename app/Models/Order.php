@@ -24,7 +24,7 @@ class Order extends Model
         'total_freight', 'less_advance', 'balance_freight', 'declared_value',
         'packages_no', 'package_type', 'package_description', 'weight',
         'actual_weight', 'charged_weight', 'document_no', 'document_name',
-        'document_date', 'eway_bill', 'valid_upto'
+        'document_date', 'eway_bill', 'valid_upto','order_method','byoder'
     ];
     
     protected $casts = [

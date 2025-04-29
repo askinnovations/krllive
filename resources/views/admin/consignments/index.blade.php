@@ -66,7 +66,8 @@
                         @php
                             $lrDetails = is_array($order->lr) ? $order->lr : json_decode($order->lr, true);
                         @endphp
-                        @foreach($lrDetails as $lr)
+                    @if(!empty($lrDetails) && count($lrDetails) > 0)
+                    @foreach($lrDetails as $lr)
                             <tr class="lr-row" data-id="{{ $order->id }}">
                             <td>
                             <input type="checkbox" class="lr-checkbox" value="{{ $lr['lr_number'] }}">
@@ -109,7 +110,9 @@
                             </td>
                             </tr>
                         @endforeach
+                        @endif
                     @endforeach
+                   
                 </tbody>
 
                 </table>
