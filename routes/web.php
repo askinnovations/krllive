@@ -228,12 +228,9 @@ Route::prefix('admin')->group(function () {
         Route::get('/', [FreightBillController::class, 'index'])->name('admin.freight-bill.index');
         Route::get('/create', [FreightBillController::class, 'create'])->name('admin.freight-bill.create');
         Route::post('/store', [FreightBillController::class, 'store'])->name('admin.freight-bill.store');
-        // Route::get('/view/{order_id}', [FreightBillController::class, 'show'])->name('admin.freight-bill.view');
-        Route::post('/view', [FreightBillController::class, 'show'])->name('admin.freight-bill.view');
-
-        Route::get('/edit/{order_id}', [FreightBillController::class, 'edit'])->name('admin.freight-bill.edit');
-        Route::post('/update/{order_id}', [FreightBillController::class, 'update'])->name('admin.freight-bill.update');
-        Route::delete('/delete/{order_id}', [FreightBillController::class, 'destroy'])->name('admin.freight-bill.delete');
+        Route::put('/update/{id}', [FreightBillController::class, 'update'])->name('admin.freight-bill.update');
+        Route::delete('/delete/{id}', [FreightBillController::class, 'destroy'])->name('admin.freight-bill.delete');
+        
     });
 
     Route::get('/stock-transfer/index', [StockTransferController::class, 'index'])->name('admin.stock.index');
