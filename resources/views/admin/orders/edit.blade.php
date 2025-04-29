@@ -1,6 +1,8 @@
 @extends('admin.layouts.app')
 @section('title', 'Order | KRL')
 @section('content')
+
+
 <form method="POST" action="{{ route('admin.orders.update', $order->order_id) }}">
    @csrf
    <div class="card">
@@ -84,13 +86,13 @@
             <div class="col-md-3">
                <div class="mb-3">
                   <label class="form-label">📍 PICKUP ADDRESS</label>
-                  <input type="text" name="pickup_address" id="pickup_address" value="{{ old('pickup_address', $order->pickup_addresss ?? '') }}" class="form-control" placeholder="Pickup Address" required>
+                  <input type="text" name="pickup_address" id="pickup_address" value="{{ old('pickup_address', $order->pickup_address ?? '') }}" class="form-control" placeholder="Pickup Address" required>
                </div>
             </div>
             <div class="col-md-3">
                <div class="mb-3">
                   <label class="form-label">📍 DELIVER ADDRESS</label>
-                  <input type="text" name="deliver_address" id="deliver_address" class="form-control" value="{{ old('deliver_address', $order->deleiver_addresss ?? '') }}" placeholder="Deliver Address" required>
+                  <input type="text" name="deliver_address" id="deliver_address" class="form-control" value="{{ old('deliver_address', $order->deliver_address ?? '') }}" placeholder="Deliver Address" required>
                </div>
             </div>
             @php
@@ -110,12 +112,13 @@
                      <label class="form-check-label" for="byContract">By Contract</label>
                   </div>
                </div>
-               <div class="mb-3 d-none" id="orderAmountDiv">
+               <div class="mb-3 {{ $method == 'order' ? '' : 'd-none' }}" id="orderAmountDiv">
                   <label class="form-label">💰 ORDER AMOUNT</label>
-                  <input type="number" name="byOrder" class="form-control" placeholder="Enter Amount" value="{{ $orderAmount }}" oninput="showOrderAmountAlert(this.value)">
+                  <input type="number" name="byOrder" class="form-control" placeholder="Enter Amount" value="{{ $orderAmount }}" oninput="showOrderAmountAlert(this.value)" {{ $method == 'order' ? 'required' : '' }}>
                </div>
-               <div class="mb-3 d-none" id="contractNumberDiv">
-                  <input type="number" name="byContract" class="form-control" value="{{ $contractNumber }}" id="rate_input" placeholder="Enter Amount" oninput="showContractAmountAlert(this.value)">
+               <div class="mb-3 {{ $method == 'contract' ? '' : 'd-none' }}" id="contractNumberDiv">
+                  
+                  <input type="hidden" >
                </div>
             </div>
          </div>
@@ -241,7 +244,7 @@
                      <select name="lr[{{ $index }}][delivery_mode]" class="form-select" required>
                         <option value="">Select Mode</option>
                         <option value="door_delivery" {{ old("lr.$index.delivery_mode", $lr['delivery_mode'] ?? '') == 'door_delivery' ? 'selected' : '' }}>Door Delivery</option>
-                        <option value="godwon_deliver" {{ old("lr.$index.delivery_mode", $lr['delivery_mode'] ?? '') == 'godwon_deliver' ? 'selected' : '' }}>Godown Delivery</option>
+                        <option value="godown_delivery" {{ old("lr.$index.delivery_mode", $lr['delivery_mode'] ?? '') == 'godown_delivery' ? 'selected' : '' }}>Godown Delivery</option>
                      </select>
                   </div>
                </div>
@@ -273,19 +276,51 @@
                      </select>
                   </div>
                </div>
+               <div class="mb-3">
+                  <label class="form-label">💰 Order Rate</label>
+                  <input type="number" name="lr[{{ $index }}][order_rate]" class="form-control" id="rate_input{{ $index }}" placeholder="Enter Amount" readonly>
+                  </div>
             </div>
+            {{-- @dd($lr['insurance_status']); --}}
+           
+
+            <!-- Insurance -->
             <div class="mb-3 d-flex align-items-center gap-3 flex-wrap">
                <label class="form-label mb-0">🛡️ Insurance?</label>
+
+               <!-- YES Option -->
                <div class="form-check form-check-inline">
-                  <input class="form-check-input" type="radio" name="lr[{{ $index }}][insurance_status]" value="yes" id="insuranceYes_{{ $index }}" onchange="toggleInsuranceInput({{ $index }})" {{ old("lr.$index.insurance_status", $lr['insurance_status'] ?? '') == 'yes' ? 'checked' : '' }}>
+                  <input class="form-check-input" type="radio"
+                        name="lr[{{ $index }}][insurance_status]"
+                        value="yes"
+                        id="insuranceYes_{{ $index }}"
+                        onchange="toggleInsuranceInput({{ $index }})"
+                        {{ old("lr.$index.insurance_status", $lr['insurance_status'] ?? '') == 'yes' ? 'checked' : '' }}>
                   <label class="form-check-label" for="insuranceYes_{{ $index }}">Yes</label>
                </div>
+
+               <!-- NO Option -->
                <div class="form-check form-check-inline">
-                  <input class="form-check-input" type="radio" name="lr[{{ $index }}][insurance_status]" value="no" id="insuranceNo_{{ $index }}" onchange="toggleInsuranceInput({{ $index }})" {{ old("lr.$index.insurance_status", $lr['insurance_status'] ?? 'no') == 'no' ? 'checked' : '' }}>
+                  <input class="form-check-input" type="radio"
+                        name="lr[{{ $index }}][insurance_status]"
+                        value="no"
+                        id="insuranceNo_{{ $index }}"
+                        onchange="toggleInsuranceInput({{ $index }})"
+                        {{ old("lr.$index.insurance_status", $lr['insurance_status'] ?? 'no') == 'no' ? 'checked' : '' }}>
                   <label class="form-check-label" for="insuranceNo_{{ $index }}">No</label>
                </div>
-               <input type="text" class="form-control {{ old("lr.$index.insurance_status", $lr['insurance_status'] ?? 'no') != 'yes' ? 'd-none' : '' }}" name="lr[{{ $index }}][insurance_description]" id="insuranceInput_{{ $index }}" placeholder="Enter Insurance Number" style="max-width: 450px;" value="{{ old("lr.$index.insurance_description", $lr['insurance_description'] ?? '') }}">
+
+               <!-- Insurance Number Input -->
+               <input type="text"
+                     class="form-control insurance-input {{ old("lr.$index.insurance_status", $lr['insurance_status'] ?? 'no') != 'yes' ? 'd-none' : '' }}"
+                     name="lr[{{ $index }}][insurance_description]"
+                     id="insuranceInput_{{ $index }}"
+                     placeholder="Enter Insurance Number"
+                     style="max-width: 450px;"
+                     value="{{ old("lr.$index.insurance_description", $lr['insurance_description'] ?? '') }}">
             </div>
+
+            <!-- Insurance -->
             <div class="row mt-4">
                @php
                $cargoData = isset($lr['cargo']) && is_array($lr['cargo']) ? collect($lr['cargo'])->filter(fn($item) => isset($item['packages_no']) && $item['packages_no'] !== null)->values() : collect();
@@ -353,32 +388,34 @@
                         </tbody>
                      </table>
                      <div class="text-end mt-2">
-                        <button type="button" class="btn btn-sm btn-primary" onclick="addRow({{ $index }})">
+                        <button type="button" class="btn btn-sm btn-primary" onclick="addCargoRowOld({{ $index }})">
                            ➕ Add Row
                         </button>
                      </div>
                   </div>
                </div>
                <div class="row mt-4">
-                  <div class="col-12">
-                     <h5 class="pb-3">🚚 Freight Details</h5>
-                     @php $freightType = old("lr.$index.freightType", $lr['freightType'] ?? 'paid'); @endphp
-                     <div class="mb-3 d-flex gap-3">
-                        <div class="form-check form-check-inline">
+
+                 <!--  Freight Details -->
+                 <div class="col-12">
+                  <h5 class="pb-3">🚚 Freight Details</h5>
+                  @php $freightType = old("lr.$index.freightType", $lr['freightType'] ?? 'paid'); @endphp
+                  <div class="mb-3 d-flex gap-3">
+                     <div class="form-check form-check-inline">
                            <input class="form-check-input freight-type" type="radio" name="lr[{{ $index }}][freightType]" id="freightPaid_{{ $index }}" value="paid" onchange="toggleFreightTable({{ $index }})" {{ $freightType === 'paid' ? 'checked' : '' }}>
                            <label class="form-check-label" for="freightPaid_{{ $index }}">Paid</label>
-                        </div>
-                        <div class="form-check form-check-inline">
+                     </div>
+                     <div class="form-check form-check-inline">
                            <input class="form-check-input freight-type" type="radio" name="lr[{{ $index }}][freightType]" id="freightToPay_{{ $index }}" value="to_pay" onchange="toggleFreightTable({{ $index }})" {{ $freightType === 'to_pay' ? 'checked' : '' }}>
                            <label class="form-check-label" for="freightToPay_{{ $index }}">To Pay</label>
-                        </div>
-                        <div class="form-check form-check-inline">
+                     </div>
+                     <div class="form-check form-check-inline">
                            <input class="form-check-input freight-type" type="radio" name="lr[{{ $index }}][freightType]" id="freightToBeBilled_{{ $index }}" value="to_be_billed" onchange="toggleFreightTable({{ $index }})" {{ $freightType === 'to_be_billed' ? 'checked' : '' }}>
                            <label class="form-check-label" for="freightToBeBilled_{{ $index }}">To Be Billed</label>
-                        </div>
                      </div>
-                     <div class="table-responsive">
-                        <table class="table table-bordered align-middle text-center" id="freight-table-{{ $index }}">
+                  </div>
+                  <div class="table-responsive">
+                     <table class="table table-bordered align-middle text-center" id="freight-table-{{ $index }}">
                            <thead>
                               <tr>
                                  <th>Freight</th>
@@ -403,9 +440,11 @@
                                  <td><input name="lr[{{ $index }}][balance_freight]" type="number" class="form-control balance-freight" value="{{ $lr['balance_freight'] ?? '' }}" placeholder="Balance Freight Amount" required readonly></td>
                               </tr>
                            </tbody>
-                        </table>
-                     </div>
+                     </table>
                   </div>
+            </div>
+            <!--  Freight Details -->
+
                </div>
                <div class="row mt-3">
                   <div class="col-md-6">
@@ -417,7 +456,6 @@
                   </div>
                </div>
             </div>
-         </div>
          @endforeach
          <div id="lrContainer"></div>
          <div class="d-flex justify-content-end gap-2 mt-3">
@@ -437,435 +475,357 @@
 </form>
 
 <script>
-   
-   let lrCounter = {{ count($lrData) }};
-   let cargoCounters = {};
-   let currentOrderAmount = 0;
-   let currentContractAmount = 0;
+let lrCounter = {{ count($lrData) }};
+let cargoCounters = {};
+let currentOrderAmount = 0;
+let currentContractAmount = 0;
+window.lrRates = {}; // Store rates for each LR
 
-   // Initialize on page load
-   document.addEventListener('DOMContentLoaded', function () {
-      // Initialize existing LR calculations
-      document.querySelectorAll('[id^="cargoTableBody-"]').forEach(tbody => {
-         const index = tbody.id.split('-')[1];
-         cargoCounters[index] = document.querySelectorAll(`#cargoTableBody-${index} tr`).length;
-         initializeCargoTable(index);
-      });
+// Initialize on page load
+document.addEventListener('DOMContentLoaded', function () {
+    // Initialize existing LR calculations
+    document.querySelectorAll('[id^="cargoTableBody-"]').forEach(tbody => {
+        const index = tbody.id.split('-')[1];
+        cargoCounters[index] = document.querySelectorAll(`#cargoTableBody-${index} tr`).length;
+        initializeCargoTable(index);
+    });
 
-      // Set initial customer details
-      const customerSelect = document.getElementById('customer_id');
-      if (customerSelect?.value) setCustomerDetails();
+    // Set initial customer details
+    const customerSelect = document.getElementById('customer_id');
+    if (customerSelect?.value) setCustomerDetails();
 
-      // Set initial consignor/consignee details and freight tables
-      for (let i = 0; i < lrCounter; i++) {
-         if (document.getElementById(`consignor_id_${i}`)?.value) setConsignorDetails(i);
-         if (document.getElementById(`consignee_id_${i}`)?.value) setConsigneeDetails(i);
-         toggleFreightTable(i);
-      }
+    // Set initial consignor/consignee details, freight tables, and insurance
+    for (let i = 0; i < lrCounter; i++) {
+        if (document.getElementById(`consignor_id_${i}`)?.value) setConsignorDetails(i);
+        if (document.getElementById(`consignee_id_${i}`)?.value) setConsigneeDetails(i);
+        toggleFreightTable(i);
+        toggleInsuranceInput(i); // Initialize insurance visibility
+    }
 
-      // Initialize order method
-      toggleOrderMethod();
+    // Initialize order method
+    toggleOrderMethod();
 
-      // Set initial order/contract amount
-      currentOrderAmount = parseFloat(document.querySelector('input[name="byOrder"]')?.value) || 0;
-      currentContractAmount = parseFloat(document.querySelector('input[name="byContract"]')?.value) || 0;
+    // Set initial order/contract amount
+    currentOrderAmount = parseFloat(document.querySelector('input[name="byOrder"]')?.value) || 0;
+    currentContractAmount = document.querySelector('input[name="byContract"]')?.value || '';
 
-      // Update all freight amounts
-      updateAllFinalResults();
-   });
+    // Update all freight amounts
+    updateAllFinalResults();
+});
 
-   // Customer details
-   function setCustomerDetails() {
-      const select = document.getElementById('customer_id');
-      const gst = select.options[select.selectedIndex]?.dataset.gst || '';
-      const address = select.options[select.selectedIndex]?.dataset.address || '';
-      document.getElementById('gst_number').value = gst;
-      document.getElementById('customer_address').value = address;
-   }
+// Customer details
+function setCustomerDetails() {
+    const select = document.getElementById('customer_id');
+    const gst = select.options[select.selectedIndex]?.dataset.gst || '';
+    const address = select.options[select.selectedIndex]?.dataset.address || '';
+    document.getElementById('gst_number').value = gst;
+    document.getElementById('customer_address').value = address;
+    // Update rates for contract method if selected
+    const orderMethod = document.querySelector('input[name="order_method"]:checked')?.value;
+    if (orderMethod === 'contract') {
+        for (let i = 0; i < lrCounter; i++) {
+            fetchRateForLR(i);
+        }
+    }
+}
 
-   // Consignor details
-   function setConsignorDetails(index) {
-      const select = document.getElementById(`consignor_id_${index}`);
-      const gst = select.options[select.selectedIndex]?.dataset.gstConsignor || '';
-      const address = select.options[select.selectedIndex]?.dataset.addressConsignor || '';
-      document.getElementById(`consignor_gst_${index}`).value = gst;
-      document.getElementById(`consignor_loading_${index}`).value = address;
-   }
+// Consignor details
+function setConsignorDetails(index) {
+    const select = document.getElementById(`consignor_id_${index}`);
+    const gst = select.options[select.selectedIndex]?.dataset.gstConsignor || '';
+    const address = select.options[select.selectedIndex]?.dataset.addressConsignor || '';
+    document.getElementById(`consignor_gst_${index}`).value = gst;
+    document.getElementById(`consignor_loading_${index}`).value = address;
+}
 
-   // Consignee details
-   function setConsigneeDetails(index) {
-      const select = document.getElementById(`consignee_id_${index}`);
-      const gst = select.options[select.selectedIndex]?.dataset.gstConsignee || '';
-      const address = select.options[select.selectedIndex]?.dataset.addressConsignee || '';
-      document.getElementById(`consignee_gst_${index}`).value = gst;
-      document.getElementById(`consignee_unloading_${index}`).value = address;
-   }
+// Consignee details
+function setConsigneeDetails(index) {
+    const select = document.getElementById(`consignee_id_${index}`);
+    const gst = select.options[select.selectedIndex]?.dataset.gstConsignee || '';
+    const address = select.options[select.selectedIndex]?.dataset.addressConsignee || '';
+    document.getElementById(`consignee_gst_${index}`).value = gst;
+    document.getElementById(`consignee_unloading_${index}`).value = address;
+}
 
-   // Vehicle details (stub)
-   function fillVehicleDetails(index) {
-      // Implement if needed
-   }
+// Vehicle details (stub, as implementation not provided)
+function fillVehicleDetails(index) {
+    // Implement if needed
+}
 
-   // Order method toggle
-   function toggleOrderMethod() {
-      const orderRadio = document.getElementById('byOrder');
-      const contractRadio = document.getElementById('byContract');
-      const orderAmountDiv = document.getElementById('orderAmountDiv');
-      const contractNumberDiv = document.getElementById('contractNumberDiv');
+// Order method toggle
+function toggleOrderMethod() {
+    const orderRadio = document.getElementById('byOrder');
+    const contractRadio = document.getElementById('byContract');
+    const orderAmountDiv = document.getElementById('orderAmountDiv');
+    const contractNumberDiv = document.getElementById('contractNumberDiv');
 
-      if (orderRadio.checked) {
-         orderAmountDiv.classList.remove('d-none');
-         orderAmountDiv.querySelector('input').setAttribute('required', 'required');
-         contractNumberDiv.classList.add('d-none');
-         contractNumberDiv.querySelector('input').removeAttribute('required');
-         currentOrderAmount = parseFloat(document.querySelector('input[name="byOrder"]')?.value) || 0;
-         currentContractAmount = 0;
-      } else {
-         contractNumberDiv.classList.remove('d-none');
-         contractNumberDiv.querySelector('input').setAttribute('required', 'required');
-         orderAmountDiv.classList.add('d-none');
-         orderAmountDiv.querySelector('input').removeAttribute('required');
-         currentContractAmount = parseFloat(document.querySelector('input[name="byContract"]')?.value) || 0;
-         currentOrderAmount = 0;
-      }
-      updateAllFinalResults();
-   }
+    if (orderRadio.checked) {
+        orderAmountDiv.classList.remove('d-none');
+        orderAmountDiv.querySelector('input').setAttribute('required', 'required');
+        contractNumberDiv.classList.add('d-none');
+        contractNumberDiv.querySelector('input').removeAttribute('required');
+        currentOrderAmount = parseFloat(document.querySelector('input[name="byOrder"]')?.value) || 0;
+        currentContractAmount = '';
+        // Update rates for order method
+        for (let i = 0; i < lrCounter; i++) {
+            window.lrRates[i] = currentOrderAmount;
+            document.getElementById(`rate_input${i}`).value = currentOrderAmount.toFixed(2);
+            updateFinalResult(i);
+        }
+    } else {
+        contractNumberDiv.classList.remove('d-none');
+        contractNumberDiv.querySelector('input').setAttribute('required', 'required');
+        orderAmountDiv.classList.add('d-none');
+        orderAmountDiv.querySelector('input').removeAttribute('required');
+        currentContractAmount = document.querySelector('input[name="byContract"]')?.value || '';
+        currentOrderAmount = 0;
+        // Fetch rates for contract method
+        for (let i = 0; i < lrCounter; i++) {
+            fetchRateForLR(i);
+        }
+    }
+}
 
-   // Freight calculations
-   document.addEventListener('input', function (e) {
-      const row = e.target.closest('tr');
-      if (!row || !row.closest('.lr-section')) return;
+// Fetch rate for a specific LR via AJAX
+// Initialize window.lrRates with old order_rate on page load
+window.lrRates = window.lrRates || {};
+document.addEventListener('DOMContentLoaded', () => {
+    // Assuming index is available from Blade loop
+    const index = '{{ $index }}'; // Replace with actual index from Blade
+    const oldRate = parseFloat('{{ $lr["order_rate"] ?? 0 }}') || 0;
+    window.lrRates[index] = oldRate;
+    // Ensure rate_input is set to old value (already handled by Blade, but just in case)
+    document.getElementById(`rate_input${index}`).value = oldRate.toFixed(2);
+    updateFinalResult(index); // Call to update calculations with old rate
+});
 
-      const index = row.closest('.lr-section').dataset.lrIndex;
-      const freight = parseFloat(row.querySelector('.freight-amount')?.value) || 0;
-      const lrCharges = parseFloat(row.querySelector('.lr-charges')?.value) || 0;
-      const hamali = parseFloat(row.querySelector('.hamali')?.value) || 0;
-      const otherCharges = parseFloat(row.querySelector('.other-charges')?.value) || 0;
-      const lessAdvance = parseFloat(row.querySelector('.less-advance')?.value) || 0;
+function fetchRateForLR(index) {
+    const vehicle_type = document.querySelector(`select[name="lr[${index}][vehicle_type]"]`)?.value || '';
+    const from_location = document.querySelector(`select[name="lr[${index}][from_location]"]`)?.value || '';
+    const to_location = document.querySelector(`select[name="lr[${index}][to_location]"]`)?.value || '';
+    const customer_id = document.getElementById('customer_id')?.value || '';
 
-      const subtotal = freight + lrCharges + hamali + otherCharges;
-      const gstPercent = 12;
-      const gstAmount = subtotal * gstPercent / 100;
-      const totalFreight = subtotal + gstAmount;
-      const balance = totalFreight - lessAdvance;
+    // If any field is missing, retain the old rate instead of setting to 0
+    if (!vehicle_type || !from_location || !to_location || !customer_id) {
+        // Keep window.lrRates[index] and rate_input unchanged
+        updateFinalResult(index); // Update calculations with existing rate
+        return;
+    }
 
-      row.querySelector('.gst').value = gstAmount.toFixed(2);
-      row.querySelector('.total-freight').value = totalFreight.toFixed(2);
-      row.querySelector('.balance-freight').value = balance.toFixed(2);
-   });
+    // Fetch new rate only if all fields are valid
+    fetch('/admin/get-rate', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+        },
+        body: JSON.stringify({
+            customer_id: customer_id,
+            vehicle_type: vehicle_type,
+            from_location: from_location,
+            to_location: to_location
+        })
+    })
+    .then(res => res.json())
+    .then(data => {
+        const rateInput = document.getElementById(`rate_input${index}`);
+        window.lrRates[index] = parseFloat(data.rate) || 0;
+        rateInput.value = window.lrRates[index].toFixed(2);
+        updateFinalResult(index);
+    })
+    .catch(err => {
+        console.error('Error:', err);
+        // On error, retain old rate instead of setting to 0
+        updateFinalResult(index);
+    });
+}
+// Freight calculations
+document.addEventListener('input', function (e) {
+    const row = e.target.closest('tr');
+    if (!row || !row.closest('.lr-section')) return;
 
-   // Freight table visibility
-   function toggleFreightTable(index) {
-      const tbody = document.getElementById(`freightBody-${index}`);
-      const toBeBilled = document.getElementById(`freightToBeBilled_${index}`);
+    const index = row.closest('.lr-section').dataset.lrIndex;
+    const freight = parseFloat(row.querySelector('.freight-amount')?.value) || 0;
+    const lrCharges = parseFloat(row.querySelector('.lr-charges')?.value) || 0;
+    const hamali = parseFloat(row.querySelector('.hamali')?.value) || 0;
+    const otherCharges = parseFloat(row.querySelector('.other-charges')?.value) || 0;
+    const lessAdvance = parseFloat(row.querySelector('.less-advance')?.value) || 0;
 
-      if (!tbody || !toBeBilled) return;
+    const subtotal = freight + lrCharges + hamali + otherCharges;
+    const gstPercent = 12;
+    const gstAmount = subtotal * gstPercent / 100;
+    const totalFreight = subtotal + gstAmount;
+    const balance = totalFreight - lessAdvance;
 
-      if (toBeBilled.checked) {
-         tbody.style.display = 'none';
-         tbody.querySelectorAll('input').forEach(input => input.removeAttribute('required'));
-      } else {
-         tbody.style.display = '';
-         tbody.querySelectorAll('input').forEach(input => input.setAttribute('required', 'required'));
-      }
-   }
+    row.querySelector('.gst').value = gstAmount.toFixed(2);
+    row.querySelector('.total-freight').value = totalFreight.toFixed(2);
+    row.querySelector('.balance-freight').value = balance.toFixed(2);
+});
 
-   // Order and contract amount handling
-   function showOrderAmountAlert(value) {
-      currentOrderAmount = parseFloat(value) || 0;
-      currentContractAmount = 0;
-      updateAllFinalResults();
-   }
+// Freight table visibility
+function toggleFreightTable(index) {
+    const tbody = document.getElementById(`freightBody-${index}`);
+    const toBeBilled = document.getElementById(`freightToBeBilled_${index}`);
 
-   function showContractAmountAlert(value) {
-      currentContractAmount = parseFloat(value) || 0;
-      currentOrderAmount = 0;
-      updateAllFinalResults();
-   }
+    if (!tbody || !toBeBilled) return;
 
-   // Update final freight result
-   function updateFinalResult(index) {
-      const totalChargedWeight = parseFloat(document.getElementById(`totalChargedWeight-${index}`)?.value) || 0;
-      const finalResultInput = document.getElementById(`finalResult-${index}`);
-      if (!finalResultInput) return;
+    if (toBeBilled.checked) {
+        tbody.style.display = 'none';
+        tbody.querySelectorAll('input').forEach(input => input.removeAttribute('required'));
+    } else {
+        tbody.style.display = '';
+        tbody.querySelectorAll('input').forEach(input => input.setAttribute('required', 'required'));
+    }
+}
 
-      const rate = currentOrderAmount || currentContractAmount;
-      finalResultInput.value = (totalChargedWeight * rate).toFixed(2);
+// Order and contract amount handling
+function showOrderAmountAlert(value) {
+    currentOrderAmount = parseFloat(value) || 0;
+    currentContractAmount = '';
+    for (let i = 0; i < lrCounter; i++) {
+        window.lrRates[i] = currentOrderAmount;
+        document.getElementById(`rate_input${i}`).value = currentOrderAmount.toFixed(2);
+        updateFinalResult(i);
+    }
+}
 
-      // Trigger freight calculations
-      const row = finalResultInput.closest('tr');
-      const event = new Event('input');
-      row.querySelector('.freight-amount').dispatchEvent(event);
-   }
+// Update final freight result
+function updateFinalResult(index) {
+    const totalChargedWeight = parseFloat(document.getElementById(`totalChargedWeight-${index}`)?.value) || 0;
+    const finalResultInput = document.getElementById(`finalResult-${index}`);
+    if (!finalResultInput) return;
 
-   function updateAllFinalResults() {
-      document.querySelectorAll('[id^="totalChargedWeight-"]').forEach(input => {
-         const index = input.id.split('-')[1];
-         updateFinalResult(index);
-      });
-   }
+    const rate = window.lrRates[index] || 0;
+    finalResultInput.value = (totalChargedWeight * rate).toFixed(2);
 
-   // Cargo calculations
-   function calculateTotal(index, className, totalId) {
-      let total = 0;
-      document.querySelectorAll(`#cargoTableBody-${index} .${className}`).forEach(input => {
-         total += parseFloat(input.value) || 0;
-      });
-      const totalInput = document.getElementById(totalId);
-      if (totalInput) {
-         totalInput.value = total.toFixed(2);
-         if (totalId.includes('totalChargedWeight')) updateFinalResult(index);
-      }
-   }
+    // Trigger freight calculations
+    const row = finalResultInput.closest('tr');
+    const event = new Event('input');
+    row.querySelector('.freight-amount').dispatchEvent(event);
+}
 
-   // Initialize cargo table
-   function initializeCargoTable(index) {
-      const tbody = document.getElementById(`cargoTableBody-${index}`);
-      if (!tbody) return;
+function updateAllFinalResults() {
+    for (let i = 0; i < lrCounter; i++) {
+        updateFinalResult(i);
+    }
+}
 
-      // Remove existing listeners to prevent duplicates
-      tbody.querySelectorAll('.declared-value').forEach(input => {
-         input.removeEventListener('input', calculateDeclaredValue);
-         input.addEventListener('input', calculateDeclaredValue);
-      });
-      tbody.querySelectorAll('.charged-weight').forEach(input => {
-         input.removeEventListener('input', calculateChargedWeight);
-         input.addEventListener('input', calculateChargedWeight);
-      });
+// Cargo calculations
+function calculateTotal(index, className, totalId) {
+    let total = 0;
+    document.querySelectorAll(`#cargoTableBody-${index} .${className}`).forEach(input => {
+        total += parseFloat(input.value) || 0;
+    });
+    const totalInput = document.getElementById(totalId);
+    if (totalInput) {
+        totalInput.value = total.toFixed(2);
+        if (totalId.includes('totalChargedWeight')) updateFinalResult(index);
+    }
+}
 
-      function calculateDeclaredValue() {
-         calculateTotal(index, 'declared-value', `totalDeclaredValue-${index}`);
-      }
+// Initialize cargo table
+function initializeCargoTable(index) {
+    const tbody = document.getElementById(`cargoTableBody-${index}`);
+    if (!tbody) return;
 
-      function calculateChargedWeight() {
-         calculateTotal(index, 'charged-weight', `totalChargedWeight-${index}`);
-      }
+    // Remove existing listeners to prevent duplicates
+    tbody.querySelectorAll('.declared-value').forEach(input => {
+        input.removeEventListener('input', calculateDeclaredValue);
+        input.addEventListener('input', calculateDeclaredValue);
+    });
+    tbody.querySelectorAll('.charged-weight').forEach(input => {
+        input.removeEventListener('input', calculateChargedWeight);
+        input.addEventListener('input', calculateChargedWeight);
+    });
 
-      // Initial calculation for existing rows
-      calculateTotal(index, 'declared-value', `totalDeclaredValue-${index}`);
-      calculateTotal(index, 'charged-weight', `totalChargedWeight-${index}`);
-   }
+    function calculateDeclaredValue() {
+        calculateTotal(index, 'declared-value', `totalDeclaredValue-${index}`);
+    }
 
-   // Add cargo row
-   function addRow(index) {
-      if (!(index in cargoCounters)) cargoCounters[index] = 0;
-      const tbody = document.getElementById(`cargoTableBody-${index}`);
-      const cargoIndex = cargoCounters[index]++;
+    function calculateChargedWeight() {
+        calculateTotal(index, 'charged-weight', `totalChargedWeight-${index}`);
+    }
 
-      const row = document.createElement('tr');
-      row.innerHTML = `
-         <td><input type="number" name="lr[${index}][cargo][${cargoIndex}][packages_no]" class="form-control" required></td>
-         <td>
-            <select name="lr[${index}][cargo][${cargoIndex}][package_type]" class="form-select" required>
-               <option value="Pallets">Pallets</option>
-               <option value="Cartons">Cartons</option>
-               <option value="Bags">Bags</option>
-            </select>
-         </td>
-         <td><input type="text" name="lr[${index}][cargo][${cargoIndex}][package_description]" class="form-control" required></td>
-         <td><input type="number" name="lr[${index}][cargo][${cargoIndex}][actual_weight]" class="form-control" required></td>
-         <td><input type="number" name="lr[${index}][cargo][${cargoIndex}][charged_weight]" class="form-control charged-weight" required oninput="calculateTotal(${index}, 'charged-weight', 'totalChargedWeight-${index}')"></td>
-         <td>
-            <select name="lr[${index}][cargo][${cargoIndex}][unit]" class="form-select" required>
-               <option value="">Select Unit</option>
-               <option value="kg">Kg</option>
-               <option value="ton">Ton</option>
-            </select>
-         </td>
-         <td><input type="text" name="lr[${index}][cargo][${cargoIndex}][document_no]" class="form-control" required></td>
-         <td><input type="text" name="lr[${index}][cargo][${cargoIndex}][document_name]" class="form-control" required></td>
-         <td><input type="date" name="lr[${index}][cargo][${cargoIndex}][document_date]" class="form-control" required></td>
-         <td><input type="file" name="lr[${index}][cargo][${cargoIndex}][document_file]" class="form-control"></td>
-         <td><input type="text" name="lr[${index}][cargo][${cargoIndex}][eway_bill]" class="form-control" required></td>
-         <td><input type="date" name="lr[${index}][cargo][${cargoIndex}][valid_upto]" class="form-control" required></td>
-         <td><input type="number" name="lr[${index}][cargo][${cargoIndex}][declared_value]" class="form-control declared-value" required oninput="calculateTotal(${index}, 'declared-value', 'totalDeclaredValue-${index}')"></td>
-         <td><button type="button" class="btn btn-danger btn-sm" onclick="removeRow(this, ${index})">🗑</button></td>
-      `;
+    // Initial calculation for existing rows
+    calculateTotal(index, 'declared-value', `totalDeclaredValue-${index}`);
+    calculateTotal(index, 'charged-weight', `totalChargedWeight-${index}`);
+}
 
-      tbody.appendChild(row);
-      initializeCargoTable(index);
-   }
+// Add cargo row
+function addCargoRowOld(index) {
+if (!(index in cargoCounters)) cargoCounters[index] = 0;
+const tbody = document.getElementById(`cargoTableBody-${index}`);
+const cargoIndex = cargoCounters[index]++;
 
-   // Remove cargo row
-   function removeRow(button, index) {
-      button.closest('tr').remove();
-      calculateTotal(index, 'declared-value', `totalDeclaredValue-${index}`);
-      calculateTotal(index, 'charged-weight', `totalChargedWeight-${index}`);
-   }
+const row = document.createElement('tr');
+row.innerHTML = `
+<td><input type="number" name="lr[${index}][cargo][${cargoIndex}][packages_no]" class="form-control" required></td>
+<td>
+<select name="lr[${index}][cargo][${cargoIndex}][package_type]" class="form-select" required>
+<option value="Pallets">Pallets</option>
+<option value="Cartons">Cartons</option>
+<option value="Bags">Bags</option>
+</select>
+</td>
+<td><input type="text" name="lr[${index}][cargo][${cargoIndex}][package_description]" class="form-control" required></td>
+<td><input type="number" name="lr[${index}][cargo][${cargoIndex}][actual_weight]" class="form-control" required></td>
+<td><input type="number" name="lr[${index}][cargo][${cargoIndex}][charged_weight]" class="form-control charged-weight" required oninput="calculateTotal(${index}, 'charged-weight', 'totalChargedWeight-${index}')"></td>
+<td>
+<select name="lr[${index}][cargo][${cargoIndex}][unit]" class="form-select" required>
+<option value="">Select Unit</option>
+<option value="kg">Kg</option>
+<option value="ton">Ton</option>
+</select>
+</td>
+<td><input type="text" name="lr[${index}][cargo][${cargoIndex}][document_no]" class="form-control" required></td>
+<td><input type="text" name="lr[${index}][cargo][${cargoIndex}][document_name]" class="form-control" required></td>
+<td><input type="date" name="lr[${index}][cargo][${cargoIndex}][document_date]" class="form-control" required></td>
+<td><input type="file" name="lr[${index}][cargo][${cargoIndex}][document_file]" class="form-control"></td>
+<td><input type="text" name="lr[${index}][cargo][${cargoIndex}][eway_bill]" class="form-control" required></td>
+<td><input type="date" name="lr[${index}][cargo][${cargoIndex}][valid_upto]" class="form-control" required></td>
+<td><input type="number" name="lr[${index}][cargo][${cargoIndex}][declared_value]" class="form-control declared-value" required oninput="calculateTotal(${index}, 'declared-value', 'totalDeclaredValue-${index}')"></td>
+<td><button type="button" class="btn btn-danger btn-sm" onclick="removeRow(this, ${index})">🗑</button></td>
+`;
 
-   // Insurance toggle
-   function toggleInsuranceInput(index) {
-      const yesRadio = document.getElementById(`insuranceYes_${index}`);
-      const input = document.getElementById(`insuranceInput_${index}`);
-      input.classList.toggle('d-none', !yesRadio.checked);
-      if (!yesRadio.checked) input.value = '';
-   }
-  
-   // </script>
-{{-- image view --}}
+tbody.appendChild(row);
+initializeCargoTable(index);
+}
 
-  {{-- <script>
-                // Function to update the Total Amount input field
-                function updateTotalAmount() {
-                    var orderAmount = document.getElementById('order').value;
-                    var contractNumber = document.getElementById('contract').value;
-                    
-                    // Get the total amount input field
-                    var totalAmountInput = document.getElementById('totalAmountInput');
-                    
-                    // Priority: If both values exist, show the Contract Number's value.
-                    if (contractNumber > 0) {
-                        totalAmountInput.value = contractNumber;  // Display Contract Number if available
-                    } else if (orderAmount > 0) {
-                        totalAmountInput.value = orderAmount;  // Display Order Amount if available
-                    } else {
-                        totalAmountInput.value = "";  // Empty if neither value is greater than 0
-                    }
-                }
-                
-                // Event listeners for the 'input' event (triggered when the value changes)
-                document.getElementById('order').addEventListener('input', updateTotalAmount);
-                document.getElementById('contract').addEventListener('input', updateTotalAmount);
-                
-                // Run on page load to set the initial value based on the existing input values (Create/Edit Page)
-                window.onload = function() {
-                    updateTotalAmount();  // Set the initial total amount value based on existing fields
-                };
-            </script>
- --}}
+// Remove cargo row
+function removeRow(button, index) {
+    button.closest('tr').remove();
+    calculateTotal(index, 'declared-value', `totalDeclaredValue-${index}`);
+    calculateTotal(index, 'charged-weight', `totalChargedWeight-${index}`);
+}
 
 
-<!-- Script to Set Values -->
 
-   
-   
+// Handle vehicle_type, from_location, to_location changes for contract method
+document.addEventListener('change', function (e) {
+    if (e.target.matches('select[name^="lr"][name$="[vehicle_type]"], select[name^="lr"][name$="[from_location]"], select[name^="lr"][name$="[to_location]"]')) {
+        const nameAttr = e.target.name;
+        const match = nameAttr.match(/lr\[(\d+)\]/);
+        if (!match) return;
+        const counter = match[1];
 
-<!-- JavaScript to Add & Remove LR Consignments -->
+        const orderMethod = document.querySelector('input[name="order_method"]:checked')?.value;
+        if (orderMethod === 'contract') {
+            fetchRateForLR(counter);
+        }
+    }
+});
 
-<script>
-   const yesRadio = document.getElementById('createInsuranceYes');
-   const noRadio = document.getElementById('createInsuranceNo');
-   const insuranceInput = document.getElementById('insuranceInput');
-   
-   function toggleInsuranceField() {
-       if (yesRadio.checked) {
-           insuranceInput.classList.remove('d-none');
-       } else {
-           insuranceInput.classList.add('d-none');
-           insuranceInput.value = '';
-       }
-   }
-   
-   // Run on load
-   window.addEventListener('DOMContentLoaded', toggleInsuranceField);
-   
-   // Run on change
-   yesRadio.addEventListener('change', toggleInsuranceField);
-   noRadio.addEventListener('change', toggleInsuranceField);
+// Initialize insurance visibility on load
+for (let i = 0; i < lrCounter; i++) {
+    toggleInsuranceInput(i);
+}
 </script>
-<!-- JS -->
-{{-- <script>
-   function calculateTotal(index, className, totalId) {
-       let total = 0;
-       document.querySelectorAll(`#cargoTableBody-${index} .${className}`).forEach(input => {
-           total += parseFloat(input.value) || 0;
-       });
-       document.getElementById(totalId).value = total.toFixed(2);
-   }
-   
-   function addRow(index) {
-       const tbody = document.getElementById(`cargoTableBody-${index}`);
-       const row = document.createElement('tr');
-       
-       row.innerHTML = `
-           <td><input type="number" name="lr[${index}][cargo][][packages_no]" class="form-control"></td>
-           <td>
-               <select name="lr[${index}][cargo][][package_type]" class="form-select">
-                   <option value="Pallets">Pallets</option>
-                   <option value="Cartons">Cartons</option>
-                   <option value="Bags">Bags</option>
-               </select>
-           </td>
-           <td><input type="text" name="lr[${index}][cargo][][package_description]" class="form-control"></td>
-           <td><input type="number" name="lr[${index}][cargo][][actual_weight]" class="form-control"></td>
-           <td><input type="number" name="lr[${index}][cargo][][charged_weight]" 
-                     class="form-control charged-weight" 
-                     required 
-                     oninput="calculateTotal(${index}, 'charged-weight', 'totalChargedWeight-${index}')"></td>
-           <td>
-               <select name="lr[${index}][cargo][][unit]" class="form-select" required>
-                   <option value="">Select Unit</option>
-                   <option value="kg">Kg</option>
-                   <option value="ton">Ton</option>
-               </select>
-           </td>
-         <td><input type="text" name="lr[${index}][cargo][][document_no]" class="form-control"></td>
-           <td><input type="text" name="lr[${index}][cargo][][document_name]" class="form-control"></td>
-           <td><input type="date" name="lr[${index}][cargo][][document_date]" class="form-control"></td>
-           <td><input type="file" name="lr[${index}][cargo][][document_file]" class="form-control"></td>
-           <td><input type="text" name="lr[${index}][cargo][][eway_bill]" class="form-control"></td>
-           <td><input type="date" name="lr[${index}][cargo][][valid_upto]" class="form-control"></td>
-   
-           <td>
-               <input type="number" 
-                     name="lr[${index}][cargo][][declared_value]" 
-                     class="form-control declared-value" 
-                     required 
-                     oninput="calculateTotal(${index}, 'declared-value', 'totalDeclaredValue-${index}')">
-           </td>
-           <td><button type="button" class="btn btn-danger btn-sm" onclick="removeRow(this, ${index})">🗑</button></td>
-       `;
-       
-       tbody.appendChild(row);
-       // Update both totals after adding row
-       calculateTotal(index, 'declared-value', `totalDeclaredValue-${index}`);
-       calculateTotal(index, 'charged-weight', `totalChargedWeight-${index}`);
-   }
-   
-   function removeRow(button, index) {
-       button.closest('tr').remove();
-       // Update both totals after removing row
-       calculateTotal(index, 'declared-value', `totalDeclaredValue-${index}`);
-       calculateTotal(index, 'charged-weight', `totalChargedWeight-${index}`);
-   }
-   
-   // Initialize on page load
-   document.addEventListener('DOMContentLoaded', function () {
-       document.querySelectorAll('[id^="cargoTableBody-"]').forEach(tbody => {
-           const index = tbody.id.split('-')[1];
-           
-           // Initialize declared value inputs
-           tbody.querySelectorAll('.declared-value').forEach(input => {
-               input.addEventListener('input', () => 
-                   calculateTotal(index, 'declared-value', `totalDeclaredValue-${index}`)
-               );
-           });
-           
-           // Initialize charged weight inputs
-           tbody.querySelectorAll('.charged-weight').forEach(input => {
-               input.addEventListener('input', () => 
-                   calculateTotal(index, 'charged-weight', `totalChargedWeight-${index}`)
-               );
-           });
-           
-           // Calculate initial totals
-           calculateTotal(index, 'declared-value', `totalDeclaredValue-${index}`);
-           calculateTotal(index, 'charged-weight', `totalChargedWeight-${index}`);
-       });
-   });
-</script> --}}
-{{-- <script>
-   function setConsigneeDetails(index) {
-       const select = document.getElementById(`consignee_id_${index}`);
-       const gst = select.options[select.selectedIndex].dataset.gstConsignee || '';
-       const address = select.options[select.selectedIndex].dataset.addressConsignee || '';
-       document.getElementById(`consignee_gst_${index}`).value = gst;
-       document.getElementById(`consignee_unloading_${index}`).value = address;
-   }
-</script> --}}
-I'll split the JavaScript code into two separate script tags: one for the main LR row management functions and another for the consignor/consignee details handling. I'll also ensure the code works properly by maintaining all functionality.
 
-```html
+
+
+
+<
+{{-- add lr code-----------------------------addlr code------------------------------------------------ --}}
 <script>
 let lrIndex = {{ count($lrData) }}; // Start from existing count
 
@@ -941,17 +901,28 @@ function addLrRow() {
                 <label class="form-label">Consignee GST</label>
                 <input type="text" name="lr[${lrIndex}][consignee_gst]" id="consignee_gst_${lrIndex}" class="form-control" placeholder="Enter GST number" required>
             </div>
+            <div class="mb-3 " >
+                <label class="form-label">💰 Order Rate</label>
+                <input type="number" name="lr[${lrIndex}][order_rate]" class="form-control"  id="rate_input${lrIndex}" placeholder="Enter Amount" readonly
+               >
+             </div>
         </div>
         <!-- Vehicle & Delivery Info -->
         <div class="row">
             <div class="col-md-4 mb-3">
                 <label class="form-label">🚚 Vehicle Number</label>
                 <select name="lr[${lrIndex}][vehicle_no]" class="form-select" required>
+                   <option >Select Vehicle NO.</option>
+                           @foreach ($vehicles as $vehicle)
+                           <option value="{{ $vehicle->vehicle_no }}">
+                              {{ $vehicle->vehicle_no }}
+                           </option>
+                         @endforeach              
                 </select>
             </div>
             <div class="col-md-4 mb-3">
                 <label class="form-label">🚛 Vehicle Type</label>
-                <select name="lr[${lrIndex}][vehicle_type]" class="form-select" required>
+                <select name="lr[${lrIndex}][vehicle_type]" id="vehicle_type${lrIndex}" class="form-select" required>
                     <option value="">Select Vehicle Type</option>
                     @foreach ($vehiclesType as $type)
                         <option value="{{ $type->id }}">{{ $type->vehicletype }}</option>
@@ -983,7 +954,7 @@ function addLrRow() {
             </div>
             <div class="col-md-4 mb-3">
                 <label class="form-label">📍 From (Origin)</label>
-                <select name="lr[${lrIndex}][from_location]" class="form-select" required>
+                <select name="lr[${lrIndex}][from_location]" id="from_location${lrIndex}" class="form-select" required>
                     <option value="">Select Origin</option>
                     @foreach ($destination as $loc)
                         <option value="{{ $loc->id }}">{{ $loc->destination }}</option>
@@ -992,7 +963,7 @@ function addLrRow() {
             </div>
             <div class="col-md-4 mb-3">
                 <label class="form-label">📍 To (Destination)</label>
-                <select name="lr[${lrIndex}][to_location]" class="form-select" required>
+                <select name="lr[${lrIndex}][to_location]" id="to_location${lrIndex}" class="form-select" required>
                     <option value="">Select Destination</option>
                     @foreach ($destination as $loc)
                         <option value="{{ $loc->id }}">{{ $loc->destination }}</option>
@@ -1062,7 +1033,7 @@ function addLrRow() {
                                 <th>Action</th>
                             </tr>
                         </thead>
-                        <tbody id="cargoTableBody-0">
+                        <tbody id="cargoTableBody_${lrIndex}">
                             <tr>
                                 <td><input type="number" class="form-control" name="lr[${lrIndex}][cargo][0][packages_no]" placeholder="0" required></td>
                                 <td>
@@ -1108,7 +1079,7 @@ function addLrRow() {
                     </table>
                 </div>
                 <div class="text-end mt-2">
-                    <button type="button" class="btn btn-sm btn-add-cargo-row" data-lr-index="${lrIndex}" style="background: #ca2639; color: white;">
+                    <button type="button" class="btn btn-sm btn-add-cargo-row" onclick="addCargoRowNew(${lrIndex})" style="background: #ca2639; color: white;">
                         <span style="filter: invert(1);">➕</span> Add Row
                     </button>
                 </div>
@@ -1181,14 +1152,15 @@ function addLrRow() {
         <!-- Declared Value -->
         <div class="row mt-3">
             <div class="col-md-6">
-                <label class="form-label"><strong>💰 Total Declared Value (Rs.)</strong></label>
+                <label class="form-label"><strong>💰 Total Chreged Weight (Rs.)</strong></label>
                 <input
                     type="text"
                     class="form-control"
                     id="total_charged_weight_${lrIndex}"
                     placeholder="Total Charged Weight"
                     readonly>
-                <input type="text" id="totalAmountInput" class="form-control" value="{{ $orderAmount }}" readonly>
+                <label class="form-label"><strong>💰 Total Declared Value (Rs.)</strong></label>
+               
                 <input type="number" id="total_declared_value_${lrIndex}" name="lr[${lrIndex}][total_declared_value]" class="form-control" readonly>
             </div>
         </div>
@@ -1215,21 +1187,6 @@ function removeRow(button) {
 }
 </script>
 <script>
-// function setConsignorDetails(index) {
-//     const select = document.querySelector(`select[name="lr[${index}][consignor_id]"]`);
-//     const gst = select.options[select.selectedIndex].dataset.gstConsignor || '';
-//     const address = select.options[select.selectedIndex].dataset.addressConsignor || '';
-//     document.getElementById(`consignor_gst_${index}`).value = gst;
-//     document.getElementById(`consignor_loading_${index}`).value = address;
-// }
-
-// function setConsigneeDetailslr(index) {
-//     const select = document.querySelector(`select[name="lr[${index}][consignee_id]"]`);
-//     const gst = select.options[select.selectedIndex].dataset.gstConsignor || '';
-//     const address = select.options[select.selectedIndex].dataset.addressConsignor || '';
-//     document.getElementById(`consignee_gst_${index}`).value = gst;
-//     document.getElementById(`consignee_unloading_${index}`).value = address;
-// }
 
 function toggleInsuranceInput(lrIndex) {
     const insuranceYes = document.getElementById(`insuranceYes${lrIndex}`);
@@ -1244,41 +1201,16 @@ function toggleInsuranceInput(lrIndex) {
     }
 }
 
-function calculateTotalChargedWeight(index) {
-    const tableBody = document.getElementById(`cargoTableBody-0`);
-    const inputs = tableBody.querySelectorAll(`input[name^="lr[${index}][cargo]"][name$="[charged_weight]"]`);
-    let total = 0;
-    inputs.forEach(input => {
-        const value = parseFloat(input.value) || 0;
-        total += value;
-    });
-    document.getElementById(`total_charged_weight_${index}`).value = total.toFixed(2);
-}
 
-function calculateTotalDeclaredValue(index) {
-    const tableBody = document.getElementById(`cargoTableBody-0`);
-    const inputs = tableBody.querySelectorAll(`input[name^="lr[${index}][cargo]"][name$="[declared_value]"]`);
-    let total = 0;
-    inputs.forEach(input => {
-        const value = parseFloat(input.value) || 0;
-        total += value;
-    });
-    document.getElementById(`total_declared_value_${index}`).value = total.toFixed(2);
-}
 
-function toggleFreightTable(index) {
-    const freightTable = document.getElementById(`freightTable-${index}`);
-    const freightType = document.querySelector(`input[name="lr[${index}][freightType]"]:checked`).value;
-    // Add logic to modify freight table based on freight type if needed
-}
+
 
 function calculateOrderValue(lrIndex) {
     const totalChargedWeight = parseFloat(document.getElementById(`total_charged_weight_${lrIndex}`).value) || 0;
     const totalDeclaredValue = parseFloat(document.getElementById(`total_declared_value_${lrIndex}`).value) || 0;
     const orderAmountInput = document.getElementById('totalAmountInput');
     
-    // Assuming order value is calculated as charged weight * declared value
-    // Modify this calculation as per your specific requirements
+   
     const orderValue = totalChargedWeight * totalDeclaredValue;
     
     if (orderAmountInput) {
@@ -1294,9 +1226,61 @@ document.addEventListener('click', function(e) {
     }
 });
 </script>
-```
+<!-- ADDCARGONEW LR -->
 
-{{-- <script>
+<script>
+   // Function to remove a row
+   function removeRow(lrIndex, rowIndex) {
+   document.getElementById(`cargoRow_${lrIndex}_${rowIndex}`).remove();
+   }
+   
+   // Function to generate and add a new cargo row
+   function addCargoRowNew(lrIndex) {
+   const rowCount = document.querySelectorAll(`#cargoTableBody_${lrIndex} tr`).length;
+   const newRowId = `cargoRow_${lrIndex}_${rowCount}`;
+   const newRow = `
+   <tr id="${newRowId}">
+   <td><input type="number" class="form-control" name="lr[${lrIndex}][cargo][${rowCount}][packages_no]" placeholder="0" required></td>
+   <td>
+   <select class="form-select" name="lr[${lrIndex}][cargo][${rowCount}][package_type]" required>
+   <option>Pallets</option>
+   <option>Cartons</option>
+   <option>Bags</option>
+   </select>
+   </td>
+   <td><input type="text" class="form-control" name="lr[${lrIndex}][cargo][${rowCount}][package_description]" placeholder="Enter description" required></td>
+   <td><input type="number" class="form-control" name="lr[${lrIndex}][cargo][${rowCount}][actual_weight]" placeholder="0" required></td>
+   <td>
+   <input type="number" class="form-control" name="lr[${lrIndex}][cargo][${rowCount}][charged_weight]" placeholder="0" required oninput="calculateTotalChargedWeight(${lrIndex})">
+   </td>
+   <td>
+   <select class="form-select" name="lr[${lrIndex}][cargo][${rowCount}][unit]" required>
+   <option value="">Select Unit</option>
+   <option value="kg">Kg</option>
+   <option value="ton">Ton</option>
+   </select>
+   </td>
+   <td><input type="text" class="form-control" name="lr[${lrIndex}][cargo][${rowCount}][document_no]" placeholder="Doc No." required></td>
+   <td><input type="text" class="form-control" name="lr[${lrIndex}][cargo][${rowCount}][document_name]" placeholder="Doc Name" required></td>
+   <td><input type="date" class="form-control" name="lr[${lrIndex}][cargo][${rowCount}][document_date]" required></td>
+   <td><input type="file" class="form-control" name="lr[${lrIndex}][cargo][${rowCount}][document_file]" required></td>
+   <td><input type="text" class="form-control" name="lr[${lrIndex}][cargo][${rowCount}][eway_bill]" placeholder="Eway Bill No." required></td>
+   <td><input type="date" class="form-control" name="lr[${lrIndex}][cargo][${rowCount}][valid_upto]" required></td>
+   <td>
+   <input type="number" class="form-control declared-value" name="lr[${lrIndex}][cargo][${rowCount}][declared_value]" oninput="calculateTotalDeclaredValue(${lrIndex})" placeholder="0">
+   </td>
+   <td><button class="btn btn-danger btn-sm" onclick="removeRow(${lrIndex}, ${rowCount})">🗑</button></td>
+   </tr>
+   `;
+   document.querySelector(`#cargoTableBody_${lrIndex}`).insertAdjacentHTML('beforeend', newRow);
+   }
+   </script>
+   
+   
+   <!-- ADD CARGONEW LR -->
+   
+
+<script>
    function toggleFreightTable() {
        const tbody = document.getElementById('freightBody');
        const paid = document.getElementById('freightPaid');
@@ -1322,9 +1306,9 @@ document.addEventListener('click', function(e) {
        toggleFreightTable();
    });
     
-</script> --}}
+</script>
 {{-- new lr insourance  --}}
-{{-- <script>
+<script>
     // Function to toggle the visibility of the insurance input field
     function toggleInsuranceInput(lrIndex) {
         const insuranceYes = document.getElementById(`insuranceYes${lrIndex}`);
@@ -1340,14 +1324,14 @@ document.addEventListener('click', function(e) {
         }
     }
 
-    // Ensure the default "No" option hides the input field on page load
+    
     document.addEventListener("DOMContentLoaded", function() {
         const lrIndex = 1; // Replace with dynamic value if needed
         toggleInsuranceInput(lrIndex); // Call function on page load to set the initial state
     });
-</script> --}}
+</script>
 {{-- new lr insourance  --}}
-{{-- <script>
+<script>
    function toggleFreightTable(lrIndex) {
     const toBeBilled = document.getElementById(`freightToBeBilled-${lrIndex}`);
     const tableBody = document.getElementById(`freightTableBody-${lrIndex}`);
@@ -1359,92 +1343,9 @@ document.addEventListener('click', function(e) {
     }
    }
     
-</script> --}}
-{{-- <script>
-   function toggleOrderMethod() {
-     const orderRadio = document.getElementById('byOrder');
-     const contractRadio = document.getElementById('byContract');
-     const orderAmountDiv = document.getElementById('orderAmountDiv');
-     const contractNumberDiv = document.getElementById('contractNumberDiv');
-   
-     if (orderRadio.checked) {
-       orderAmountDiv.classList.remove('d-none');
-       orderAmountDiv.querySelector('input').setAttribute('required', 'required');
-   
-       contractNumberDiv.classList.add('d-none');
-       contractNumberDiv.querySelector('input').removeAttribute('required');
-     } else if (contractRadio.checked) {
-       contractNumberDiv.classList.remove('d-none');
-       contractNumberDiv.querySelector('input').setAttribute('required', 'required');
-   
-       orderAmountDiv.classList.add('d-none');
-       orderAmountDiv.querySelector('input').removeAttribute('required');
-     }
-   }
-   
-   document.addEventListener('DOMContentLoaded', function () {
-     toggleOrderMethod(); // Run once on load
-   });
-</script> --}}
-<script>
-   let cargoCounters = {}; 
-   
-   document.addEventListener('click', function (e) {
-       if (e.target && e.target.classList.contains('btn-add-cargo-row')) {
-           const lrIndex = e.target.getAttribute('data-lr-index');
-           if (!(lrIndex in cargoCounters)) cargoCounters[lrIndex] = 0;
-   
-           const tbody = e.target.closest('.col-12').querySelector('tbody');
-           const cargoIndex = cargoCounters[lrIndex];
-   
-           const newRow = document.createElement('tr');
-           newRow.innerHTML = `
-               <td><input type="number" class="form-control" name="lr[${lrIndex}][cargo][${cargoIndex}][packages]" placeholder="0"></td>
-               <td>
-                   <select class="form-select" name="lr[${lrIndex}][cargo][${cargoIndex}][packaging_type]">
-                       <option>Pallets</option>
-                       <option>Cartons</option>
-                       <option>Bags</option>
-                   </select>
-               </td>
-               <td><input type="text" class="form-control" name="lr[${lrIndex}][cargo][${cargoIndex}][description]" placeholder="Enter description"></td>
-               <td><input type="number" class="form-control" name="lr[${lrIndex}][cargo][${cargoIndex}][actual_weight]" placeholder="0"></td>
-               <td>
-                <input 
-                   type="number" 
-                   class="form-control" 
-                   name="lr[${lrIndex}][cargo][${cargoIndex}][charged_weight]" 
-                   placeholder="0" 
-                   required 
-                   oninput="calculateTotalChargedWeight(${lrIndex})"
-               ></td>
-              <td>
-                   <select class="form-select" name="lr[${lrIndex}][cargo][${cargoIndex}][unit]" required>
-                           <option value="">Select Unit</option>
-                           <option value="kg">Kg</option>
-                           <option value="ton">Ton</option>
-                   </select>
-               </td>
-               <td><input type="text" class="form-control" name="lr[${lrIndex}][cargo][${cargoIndex}][document_no]" placeholder="Doc No."></td>
-               <td><input type="text" class="form-control" name="lr[${lrIndex}][cargo][${cargoIndex}][document_name]" placeholder="Doc Name"></td>
-               <td><input type="date" class="form-control" name="lr[${lrIndex}][cargo][${cargoIndex}][document_date]"></td>
-                <td><input type="file" class="form-control" name="lr[${lrIndex}][cargo][${cargoIndex}][document_file]" required></td>
-               <td><input type="text" class="form-control" name="lr[${lrIndex}][cargo][${cargoIndex}][eway_bill]" placeholder="Eway Bill No."></td>
-               <td><input type="date" class="form-control" name="lr[${lrIndex}][cargo][${cargoIndex}][valid_upto]"></td><td>
-              <input type="number" class="form-control declared-value" 
-               name="lr[${lrIndex}][cargo][${cargoIndex}][declared_value]" 
-               oninput="calculateTotalDeclaredValue(${lrIndex})"
-               placeholder="0"></td>
-               <td>
-                   <button type="button" class="btn btn-danger btn-sm" onclick="this.closest('tr').remove()">🗑</button>
-               </td>
-           `;
-           tbody.appendChild(newRow);
-   
-           cargoCounters[lrIndex]++;
-       }
-   });
 </script>
+
+
 <script>
    let currentOrderAmount = 0; // globally store current order amount
    let currentContractAmount = 0; // globally store current contract amount
@@ -1481,7 +1382,7 @@ document.addEventListener('click', function(e) {
        }
    
        // Display the result in the final result input
-       document.getElementById(`finalResult-${index}`).value = finalAmount;
+       document.getElementById(`finalResult-${lrIndex}`).value = finalAmount;
    }
    
    // Modify the calculation functions as needed for declared value and charged weight
@@ -1547,6 +1448,51 @@ document.addEventListener('click', function(e) {
       });
    }
 </script>
+<!-- Insurance yese no -->
+<script>
+   function toggleInsuranceInput(index) {
+      const isYes = $(`#insuranceYes_${index}`).is(':checked');
+      const input = $(`#insuranceInput_${index}`);
+
+      if (isYes) {
+         input.removeClass('d-none');
+      } else {
+         input.addClass('d-none').val('');
+      }
+   }
+
+   // Optional: initialize on page load
+   $(document).ready(function () {
+      $('[id^="insuranceYes_"]').each(function () {
+         const index = $(this).attr('id').split('_')[1];
+         toggleInsuranceInput(index);
+      });
+   });
+</script>
+<!-- Freight -->
+<script>
+   function toggleFreightTable(index) {
+       const selectedType = $(`input[name="lr[${index}][freightType]"]:checked`).val();
+       const table = $(`#freight-table-${index}`);
+
+       // If "To Be Billed" is selected, hide the entire freight table
+       if (selectedType === 'to_be_billed') {
+           table.closest('.table-responsive').hide(); // Hide the table container
+       } else {
+           table.closest('.table-responsive').show(); // Show the table if Paid or To Pay is selected
+       }
+   }
+
+   // Initialize visibility on page load
+   $(document).ready(function () {
+       $('[id^="freight-table-"]').each(function () {
+           const index = $(this).attr('id').split('-')[2]; // extract index from table ID
+           toggleFreightTable(index); // Set visibility based on the current selected radio button
+       });
+   });
+</script>
+<!-- Freight -->
+<!-- Insurance yes or now -->
 
 
     
