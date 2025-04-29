@@ -440,7 +440,7 @@
                                        <input type="number" name="other_charges"   value="{{ old('other_charges', $lrData['other_charges'] ?? '') }}" class="form-control other-charges" placeholder="Enter Other " required>
                                      </td>
                                      <td>
-                                       <input type="number" name="gst_amount"  value="{{ old('gst_amount', $lrData['gst_amount'] ?? '') }}" class="form-control gst" placeholder="Enter GST %" required>
+                                       <input type="number" name="gst_amount"  value="{{ old('gst_amount', $lrData['gst_amount'] ?? '') }}" class="form-control gst-amount" placeholder=" GST Amount" readonly>
                                      </td>
                                      <td>
                                        <input type="number" name="total_freight"  value="{{ old('total_freight', $lrData['total_freight'] ?? '') }}" class="form-control total-freight" placeholder="Total Freight" readonly>
@@ -662,51 +662,49 @@
        }
    });
 </script>
+
 <script>
-   $(document).ready(function () {
-       $(document).on('click', '.openImageModal', function () {
-           var imageUrl = $(this).data('image');
-           console.log("Image URL:", imageUrl); // Should log to console
-           $('#modalImage').attr('src', imageUrl);
-       });
-   });
-</script>
-<script>
-   document.addEventListener('input', function(e) {
-    const row = e.target.closest('tr');
-    if (!row) return;
-  
-    // Get all input values
-    const freight = parseFloat(row.querySelector('.freight-amount')?.value) || 0;
-    const lrCharges = parseFloat(row.querySelector('.lr-charges')?.value) || 0;
-    const hamali = parseFloat(row.querySelector('.hamali')?.value) || 0;
-    const otherCharges = parseFloat(row.querySelector('.other-charges')?.value) || 0;
-    const gstPercent = parseFloat(row.querySelector('.gst')?.value) || 0;
-    const lessAdvance = parseFloat(row.querySelector('.less-advance')?.value) || 0;
-  
-    // Total before GST
-    const subtotal = freight + lrCharges + hamali + otherCharges;
-  
-    // GST amount
-    const gstAmount = subtotal * gstPercent / 100;
-  
-    // Total Freight = subtotal + gst
-    const totalFreight = subtotal + gstAmount;
-  
-    // Balance Freight = total - less advance
-    const balance = totalFreight - lessAdvance;
-  
-    // Update values
-    if (row.querySelector('.total-freight')) {
-      row.querySelector('.total-freight').value = totalFreight.toFixed(2);
-    }
-  
-    if (row.querySelector('.balance-freight')) {
-      row.querySelector('.balance-freight').value = balance.toFixed(2);
-    }
-  });
-  
+    document.addEventListener('input', function(e) {
+        const row = e.target.closest('tr');
+        if (!row) return;
+    
+        // Get all input values
+        const freight = parseFloat(row.querySelector('.freight-amount')?.value) || 0;
+        const lrCharges = parseFloat(row.querySelector('.lr-charges')?.value) || 0;
+        const hamali = parseFloat(row.querySelector('.hamali')?.value) || 0;
+        const otherCharges = parseFloat(row.querySelector('.other-charges')?.value) || 0;
+        const gstPercent = 12; // Fixed GST percentage (12%)
+        const lessAdvance = parseFloat(row.querySelector('.less-advance')?.value) || 0;
+    
+        // Total before GST
+        const subtotal = freight + lrCharges + hamali + otherCharges;
+    
+        // GST amount calculation
+        const gstAmount = subtotal * gstPercent / 100; // 12% GST
+    
+        // Update GST amount input field with the calculated value
+        const gstAmountInput = row.querySelector('.gst-amount');
+        if (gstAmountInput) {
+            gstAmountInput.value = gstAmount.toFixed(2); // Show calculated GST amount (e.g., 120)
+        }
+    
+        // Total Freight = subtotal + gst
+        const totalFreight = subtotal + gstAmount;
+    
+        // Balance Freight = total - less advance
+        const balance = totalFreight - lessAdvance;
+    
+        // Update values
+        if (row.querySelector('.total-freight')) {
+            row.querySelector('.total-freight').value = totalFreight.toFixed(2);
+        }
+    
+        if (row.querySelector('.balance-freight')) {
+            row.querySelector('.balance-freight').value = balance.toFixed(2);
+        }
+    });
     </script>
+    
     <script>
       function updateFreightAmount() {
           const byOrder = parseFloat(document.getElementById('byoder')?.value) || 0;
