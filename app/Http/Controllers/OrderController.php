@@ -82,6 +82,7 @@ class OrderController extends Controller
 
     public function store(Request $request)
     {
+        // return $request->all();
         $order = new Order();
         $order->order_id = 'ORD-' . time();
         $order->description = $request->description;
@@ -98,8 +99,7 @@ class OrderController extends Controller
         $order->pickup_addresss = $request->pickup_addresss;
         $order->order_method = $request->order_method;
         $order->byorder = $request->byOrder;
-        $order->bycontract = $request->byContract;
-
+       
         // Prepare LR Data
         $lrArray = [];
 
@@ -167,6 +167,7 @@ class OrderController extends Controller
                     'less_advance'        => $lr['less_advance'] ?? null,
                     'balance_freight'     => $lr['balance_freight'] ?? null,
                     'total_declared_value'=> $lr['total_declared_value'] ?? null,
+                    'order_rate'=> $lr['order_rate'] ?? null,
 
                     // Nested cargo
                     'cargo'               => $cargoArray,
