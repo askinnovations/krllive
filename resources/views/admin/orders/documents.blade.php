@@ -56,10 +56,10 @@
                                         <td>{{ $lr['lr_number'] ?? '-' }}</td>
                                         <td>{{ $cargo['document_name'] ?? '-' }}</td>
                                         <td>
-                                           
+                                           {{-- @dd($cargo['document_file']); --}}
                                             @if (!empty($cargo['document_file']))
-                                                <img src="{{ asset('storage/' . $cargo['document_file']) }}" alt="Document" width="100">
-                                               
+                                                <img src="{{ asset('storage/'. $cargo['document_file']) }}" alt="Document" width="100">
+
                                             @else
                                                 No Image
                                             @endif

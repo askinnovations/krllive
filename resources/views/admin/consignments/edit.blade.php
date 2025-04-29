@@ -107,7 +107,7 @@
                    
                     <div class="mb-3 ">
                      <label class="form-label">💰 ORDER AMOUNT</label>
-                     <input type="number" name="byOrder" class="form-control"  value="{{ $order->byorder }}" placeholder="Enter Amount" id="byoder">
+                     <input type="number" name="order_rate" class="form-control"  value="{{ old('order_rate', $lrData['order_rate'] ?? '') }}" placeholder="Enter Amount" id="byoder">
                   </div>
                   </div>
                   <!-- Consignee Details -->

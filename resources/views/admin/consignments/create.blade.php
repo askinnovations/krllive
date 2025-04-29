@@ -95,8 +95,8 @@
                         <input type="text" name="consignor_gst" id="consignor_gst" class="form-control" placeholder="Enter GST numbers" required>
                      </div>
                      <div class="mb-3 ">
-                        <label class="form-label">💰 ORDER AMOUNT</label>
-                        <input type="number" name="byOrder" class="form-control" placeholder="Enter Amount" id="byoder">
+                        <label class="form-label">💰 ORDER Rate</label>
+                        <input type="number" name="order_rate" class="form-control" placeholder="Enter Amount" id="byoder">
                      </div>
                   </div>
                   <!-- Consignee Details -->
@@ -633,45 +633,104 @@
    
    
 <script>
-   function updateFreightAmount() {
-       const byOrder = parseFloat(document.getElementById('byoder')?.value) || 0;
-       const chargedWeight = parseFloat(document.getElementById('totalChargedWeight')?.value) || 0;
-       const result = byOrder * chargedWeight;
+   // function updateFreightAmount() {
+   //     const byOrder = parseFloat(document.getElementById('byoder')?.value) || 0;
+   //     const chargedWeight = parseFloat(document.getElementById('totalChargedWeight')?.value) || 0;
+   //     const result = byOrder * chargedWeight;
    
-       const freightInput = document.querySelector('.freight-amount');
-       if (freightInput) {
-           freightInput.value = result.toFixed(2);
-       }
-   }
+   //     const freightInput = document.querySelector('.freight-amount');
+   //     if (freightInput) {
+   //         freightInput.value = result.toFixed(2);
+   //     }
+   // }
    
-   // Fire input event manually after fake filler or auto-fill
-   function triggerInputEvents() {
-       const byOrderInput = document.getElementById('byoder');
-       const chargedWeightInput = document.getElementById('totalChargedWeight');
+   // // Fire input event manually after fake filler or auto-fill
+   // function triggerInputEvents() {
+   //     const byOrderInput = document.getElementById('byoder');
+   //     const chargedWeightInput = document.getElementById('totalChargedWeight');
    
-       if (byOrderInput) {
-           byOrderInput.dispatchEvent(new Event('input', { bubbles: true }));
-       }
-       if (chargedWeightInput) {
-           chargedWeightInput.dispatchEvent(new Event('input', { bubbles: true }));
-       }
-   }
+   //     if (byOrderInput) {
+   //         byOrderInput.dispatchEvent(new Event('input', { bubbles: true }));
+   //     }
+   //     if (chargedWeightInput) {
+   //         chargedWeightInput.dispatchEvent(new Event('input', { bubbles: true }));
+   //     }
+   // }
    
-   // Attach event listeners safely after DOM is loaded
-   document.addEventListener('DOMContentLoaded', function() {
-       const byOrderInput = document.getElementById('byoder');
-       const chargedWeightInput = document.getElementById('totalChargedWeight');
+   // // Attach event listeners safely after DOM is loaded
+   // document.addEventListener('DOMContentLoaded', function() {
+   //     const byOrderInput = document.getElementById('byoder');
+   //     const chargedWeightInput = document.getElementById('totalChargedWeight');
    
-       if (byOrderInput) {
-           byOrderInput.addEventListener('input', updateFreightAmount);
-       }
-       if (chargedWeightInput) {
-           chargedWeightInput.addEventListener('input', updateFreightAmount);
-       }
+   //     if (byOrderInput) {
+   //         byOrderInput.addEventListener('input', updateFreightAmount);
+   //     }
+   //     if (chargedWeightInput) {
+   //         chargedWeightInput.addEventListener('input', updateFreightAmount);
+   //     }
    
-       // Trigger input events after slight delay for fake filler compatibility
-       setTimeout(triggerInputEvents, 500); // 500ms wait for fake filler to fill data
-   });
+   //     // Trigger input events after slight delay for fake filler compatibility
+   //     setTimeout(triggerInputEvents, 5); // 500ms wait for fake filler to fill data
+   // });
+   // Update freight amount based on byOrder and totalChargedWeight
+function updateFreightAmount() {
+    const byOrder = parseFloat(document.getElementById('byoder')?.value) || 0;
+    const chargedWeight = parseFloat(document.getElementById('totalChargedWeight')?.value) || 0;
+    const result = byOrder * chargedWeight;
+
+    const freightInput = document.querySelector('.freight-amount');
+    if (freightInput) {
+        freightInput.value = result.toFixed(2);
+        // Trigger input event on freight-amount to update dependent fields (e.g., GST, total freight)
+        freightInput.dispatchEvent(new Event('input', { bubbles: true }));
+    }
+}
+
+// Fire input events manually for fake filler or auto-fill
+function triggerInputEvents() {
+    const byOrderInput = document.getElementById('byoder');
+    const chargedWeightInput = document.getElementById('totalChargedWeight');
+
+    if (byOrderInput) {
+        byOrderInput.dispatchEvent(new Event('input', { bubbles: true }));
+    }
+    if (chargedWeightInput) {
+        chargedWeightInput.dispatchEvent(new Event('input', { bubbles: true }));
+    }
+}
+
+// Attach event listeners after DOM is loaded
+document.addEventListener('DOMContentLoaded', function () {
+    const byOrderInput = document.getElementById('byoder');
+    const chargedWeightInput = document.getElementById('totalChargedWeight');
+
+    if (byOrderInput) {
+        byOrderInput.addEventListener('input', updateFreightAmount);
+    }
+    if (chargedWeightInput) {
+        chargedWeightInput.addEventListener('input', updateFreightAmount);
+    }
+
+    // Trigger initial calculations after a delay for fake filler compatibility
+    setTimeout(triggerInputEvents, 500); // Increased to 500ms
+});
+
+// Ensure calculateTotalChargedWeight triggers freight amount update
+function calculateTotalChargedWeight() {
+    const chargedWeights = document.querySelectorAll('input[name$="[charged_weight]"]');
+    let total = 0;
+
+    chargedWeights.forEach(input => {
+        total += parseFloat(input.value) || 0;
+    });
+
+    const totalChargedWeightInput = document.getElementById('totalChargedWeight');
+    if (totalChargedWeightInput) {
+        totalChargedWeightInput.value = total.toFixed(2);
+        // Explicitly trigger input event to update freight amount
+        totalChargedWeightInput.dispatchEvent(new Event('input', { bubbles: true }));
+    }
+}
    </script>
    
    

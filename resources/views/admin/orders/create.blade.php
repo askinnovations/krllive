@@ -96,7 +96,7 @@
           <div class="col-md-3">
               <div class="mb-3">
                   <label class="form-label">🧾 GST NUMBER</label>
-                  <input type="text" name="gst_number" id="gst_number" class="form-control" readonly required>
+                  <input type="text" name="gst_number" id="gst_number" class="form-control"  placeholder="GST number" readonly required>
               </div>
           </div>
           
@@ -104,7 +104,7 @@
           <div class="col-md-3">
               <div class="mb-3">
                   <label class="form-label">📍 CUSTOMER ADDRESS</label>
-                  <input type="text" name="customer_address" id="customer_address" class="form-control" readonly required>
+                  <input type="text" name="customer_address" id="customer_address" class="form-control"  placeholder="Customer address" readonly required>
               </div>
           </div>
           
@@ -145,10 +145,10 @@
                </div>
                <!-- Input field for By Contract -->
                <div class="mb-3 d-none" id="contractNumberDiv">
-                <label class="form-label">💰 Contact AMOUNT</label>
-                <input type="number" name="byContract" class="form-control"  id="rate_input" placeholder="Enter Amount"
-                oninput="showContractAmountAlert(this.value)">
+                {{-- <label class="form-label">💰 Contact AMOUNT</label> --}}
+                <input type="hidden">
              </div>
+             
             </div>
             <div class="col-md-3">
                <div class="mb-3">
@@ -262,8 +262,13 @@
 <div class="mb-3">
     <label class="form-label">Consignor GST</label>
     <input type="text" name="lr[${counter}][consignor_gst]" id="consignor_gst_${counter}" class="form-control" placeholder="Enter GST number" required>
-</div>
 
+</div>
+<div class="mb-3 " >
+                <label class="form-label">💰 Order Rate</label>
+                <input type="number" name="lr[${counter}][order_rate]" class="form-control"  id="rate_input${counter}" placeholder="Enter Amount" readonly
+               >
+             </div>
                  </div>
                  
                  <!-- Consignee Details -->
@@ -300,16 +305,16 @@
     @endforeach
 </select>
 
-   
-   <div class="mb-3">
-   <label class="form-label">Consignee Unloading Address</label>
-   <textarea name="lr[${counter}][consignee_unloading]" id="consignee_unloading_${counter}" class="form-control" rows="2" placeholder="Enter unloading address" required></textarea>
-   </div>
-   
-   <div class="mb-3">
-   <label class="form-label">Consignee GST</label>
-   <input type="text" name="lr[${counter}][consignee_gst]" id="consignee_gst_${counter}" class="form-control" placeholder="Enter GST number" required>
-   </div>
+                  
+                  <div class="mb-3">
+                  <label class="form-label">Consignee Unloading Address</label>
+                  <textarea name="lr[${counter}][consignee_unloading]" id="consignee_unloading_${counter}" class="form-control" rows="2" placeholder="Enter unloading address" required></textarea>
+                  </div>
+                  
+                  <div class="mb-3">
+                  <label class="form-label">Consignee GST</label>
+                  <input type="text" name="lr[${counter}][consignee_gst]" id="consignee_gst_${counter}" class="form-control" placeholder="Enter GST number" required>
+                  </div>
    
    
                  </div>
@@ -331,7 +336,7 @@
                 <div class="col-md-4">
                     <div class="mb-3">
                         <label class="form-label">🚛 Vehicle Type</label>
-                        <select name="lr[${counter}][vehicle_type]" id="vehicle_type"  class="form-select " required>
+                        <select name="lr[${counter}][vehicle_type]" id="vehicle_type${counter}"  class="form-select " required>
                             <option value="">Select Vehicle Type</option>
                             @foreach ($vehiclesType as $type)
                                 <option value="{{ $type->id }}">{{ $type->vehicletype }}</option>
@@ -374,7 +379,7 @@
                    <div class="mb-3">
                      <label class="form-label">📍 From (Origin)</label>
                      
-                     <select name="lr[${counter}][from_location]" class="form-select"  id="from_location" required>
+                     <select name="lr[${counter}][from_location]" class="form-select"  id="from_location${counter}" required>
                         <option value="">Select Destination</option>
                         @foreach ($destination as $loc)
                             <option value="{{ $loc->id }}">{{ $loc->destination }}</option>
@@ -387,7 +392,7 @@
                  <div class="col-md-4">
                    <div class="mb-3">
                      <label class="form-label">📍 To (Destination)</label>
-                     <select name="lr[${counter}][to_location]" class="form-select" id="to_location" required>
+                     <select name="lr[${counter}][to_location]" class="form-select" id="to_location${counter}" required>
                        <option value="">Select Destination</option>
                       @foreach ($destination as $loc)
                             <option value="{{ $loc->id }}">{{ $loc->destination }}</option>
@@ -691,54 +696,113 @@
       // Placeholder for any future use
   });
 
-  // Event listener for vehicle_type, from_location, to_location selects
-  document.addEventListener('change', function(e) {
-      if (
-          e.target.matches('select[name^="lr"][name$="[vehicle_type]"], select[name^="lr"][name$="[to_location]"], select[name^="lr"][name$="[from_location]"]')
-      ) {
-          const vehicle_type = document.querySelector('select[name$="[vehicle_type]"]').value;
-          const from_location = document.querySelector('select[name$="[from_location]"]').value;
-          const to_location = document.querySelector('select[name$="[to_location]"]').value;
-          const customer_id = document.getElementById('customer_id').value;
+  
+  // Toggle visibility of Order Amount and Contract Amount inputs based on order method
+function toggleOrderMethod() {
+    const orderMethod = document.querySelector('input[name="order_method"]:checked').value;
+    const orderAmountDiv = document.getElementById('orderAmountDiv');
+    const contractInputs = document.querySelectorAll('input[id^="rate_input"]'); // All rate_input${counter} fields
 
-          // Check if order method is 'contract' before fetching
-          const orderMethod = document.querySelector('input[name="order_method"]:checked')?.value;
+    if (orderMethod === 'order') {
+        orderAmountDiv.classList.remove('d-none'); // Show Order Amount input
+        contractInputs.forEach(input => input.closest('.mb-3')?.classList.add('d-none')); // Hide Contract Amount inputs
+    } else if (orderMethod === 'contract') {
+        orderAmountDiv.classList.add('d-none'); // Hide Order Amount input
+        contractInputs.forEach(input => input.closest('.mb-3')?.classList.remove('d-none')); // Show Contract Amount inputs
+    }
+    updateFinalResult(); // Update UI after toggling
+}
 
-          if (orderMethod === 'contract') {
-              fetch('/admin/get-rate', {
-                  method: 'POST',
-                  headers: {
-                      'Content-Type': 'application/json',
-                      'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
-                  },
-                  body: JSON.stringify({
-                      customer_id: customer_id,
-                      vehicle_type: vehicle_type,
-                      from_location: from_location,
-                      to_location: to_location
-                  })
-              })
-              .then(res => res.json())
-              .then(data => {
-                  if (data.rate) {
-                      document.getElementById('rate_input').value = data.rate;
-                      currentOrderAmount = parseFloat(data.rate) || 0;
-                      updateFinalResult();
-                  } else {
-                      document.getElementById('rate_input').value = 0;
-                      currentOrderAmount = 0;
-                      updateFinalResult();
-                  }
-              })
-              .catch(err => {
-                  console.error('Error:', err);
-              });
-          } else {
-              // Agar order method "order" hai to kuch nahi karna
-              console.log('Order method is not "contract", skipping rate update.');
-          }
-      }
-  });
+// Handle Order Amount input changes
+function showOrderAmountAlert(value) {
+    window.currentOrderAmount = parseFloat(value) || 0;
+    // Apply the same order amount to all lr entries
+    document.querySelectorAll('input[id^="rate_input"]').forEach(input => {
+        input.value = window.currentOrderAmount;
+    });
+    updateFinalResult(); // Update UI
+}
+
+// Handle Contract Amount input changes (for each lr)
+function showContractAmountAlert(value, counter) {
+    window.lrRates = window.lrRates || {}; // Store rates per lr
+    window.lrRates[counter] = parseFloat(value) || 0;
+    updateFinalResult(); // Update UI
+}
+
+// Event listener for changes in vehicle_type, from_location, or to_location
+document.addEventListener('change', function (e) {
+    // Match select elements for vehicle_type, from_location, or to_location
+    if (e.target.matches('select[name^="lr"][name$="[vehicle_type]"], select[name^="lr"][name$="[to_location]"], select[name^="lr"][name$="[from_location]"]')) {
+        // Extract lr index (counter) from name attribute, e.g., lr[0][vehicle_type] -> 0
+        const nameAttr = e.target.name;
+        const match = nameAttr.match(/lr\[(\d+)\]/);
+        if (!match) return;
+        const counter = match[1];
+
+        // Query inputs specific to this lr entry
+        const vehicle_type = document.querySelector(`select[name="lr[${counter}][vehicle_type]"]`).value;
+        const from_location = document.querySelector(`select[name="lr[${counter}][from_location]"]`).value;
+        const to_location = document.querySelector(`select[name="lr[${counter}][to_location]"]`).value;
+        const customer_id = document.getElementById('customer_id').value;
+
+        // Check order method
+        const orderMethod = document.querySelector('input[name="order_method"]:checked')?.value;
+
+        if (orderMethod === 'contract') {
+            // Fetch rate for this specific lr entry
+            fetch('/admin/get-rate', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                },
+                body: JSON.stringify({
+                    customer_id: customer_id,
+                    vehicle_type: vehicle_type,
+                    from_location: from_location,
+                    to_location: to_location
+                })
+            })
+                .then(res => res.json())
+                .then(data => {
+                    const rateInput = document.getElementById(`rate_input${counter}`);
+                    window.lrRates = window.lrRates || {};
+                    if (data.rate) {
+                        rateInput.value = data.rate;
+                        window.lrRates[counter] = parseFloat(data.rate) || 0;
+                        showContractAmountAlert(data.rate, counter); // Trigger contract amount update
+                    } else {
+                        rateInput.value = 0;
+                        window.lrRates[counter] = 0;
+                        showContractAmountAlert(0, counter);
+                    }
+                })
+                .catch(err => {
+                    console.error('Error:', err);
+                });
+        } else if (orderMethod === 'order') {
+            // Apply the current order amount to this lr's rate input
+            const orderAmount = document.querySelector('input[name="byOrder"]').value;
+            const rateInput = document.getElementById(`rate_input${counter}`);
+            rateInput.value = orderAmount || 0;
+            window.lrRates = window.lrRates || {};
+            window.lrRates[counter] = parseFloat(orderAmount) || 0;
+            updateFinalResult();
+        }
+    }
+});
+
+// Initialize visibility on page load
+document.addEventListener('DOMContentLoaded', function () {
+    toggleOrderMethod(); // Set initial visibility based on selected order method
+    // Reapply order amount to all lr entries if "By Order" is selected
+    const orderMethod = document.querySelector('input[name="order_method"]:checked')?.value;
+    if (orderMethod === 'order') {
+        const orderAmount = document.querySelector('input[name="byOrder"]').value;
+        showOrderAmountAlert(orderAmount);
+    }
+});
   function updateFinalResult(lrForm, currentOrderAmount) {
     const amountField = lrForm.querySelector('.rate_input'); // Assuming there's a field for total amount in each LR form
     if (amountField) {
@@ -906,6 +970,7 @@
       const address = selectedOption.getAttribute('data-address') || '';
 
       document.getElementById(`consignor_gst_${counter}`).value = gst;
+      
       document.getElementById(`consignor_loading_${counter}`).value = address;
   }
 </script>
