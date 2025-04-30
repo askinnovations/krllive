@@ -266,7 +266,7 @@
 </div>
 <div class="mb-3 " >
                 <label class="form-label">💰 Order Rate</label>
-                <input type="number" name="lr[${counter}][order_rate]" class="form-control"  id="rate_input${counter}" placeholder="Enter Amount" readonly
+                <input type="number" name="lr[${counter}][order_rate]" class="form-control"  id="rate_input${counter}" placeholder="0" readonly
                >
              </div>
                  </div>
@@ -571,13 +571,13 @@
           
         </td>
         <td>
-          <input type="number" name="lr[${counter}][lr_charges]" class="form-control lr-charges" placeholder="Enter LR " required>
+          <input type="number" name="lr[${counter}][lr_charges]" class="form-control lr-charges" placeholder="Enter LR " >
         </td>
         <td>
-          <input type="number" name="lr[${counter}][hamali]" class="form-control hamali" placeholder="Enter Hamali " required>
+          <input type="number" name="lr[${counter}][hamali]" class="form-control hamali" placeholder="Enter Hamali " >
         </td>
         <td>
-          <input type="number" name="lr[${counter}][other_charges]" class="form-control other-charges" placeholder="Enter Other " required>
+          <input type="number" name="lr[${counter}][other_charges]" class="form-control other-charges" placeholder="Enter Other " >
         </td>
         <td>
           <input type="number" name="lr[${counter}][gst_amount]" class="form-control gst" placeholder="Enter GST %" readonly>
@@ -586,7 +586,7 @@
           <input type="number" name="lr[${counter}][total_freight]" class="form-control total-freight" placeholder="Total Freight" readonly>
         </td>
         <td>
-          <input type="number" name="lr[${counter}][less_advance]" class="form-control less-advance" placeholder="Less Advance Amount" required>
+          <input type="number" name="lr[${counter}][less_advance]" class="form-control less-advance" placeholder="Less Advance Amount" >
         </td>
         <td>
           <input type="number" name="lr[${counter}][balance_freight]" class="form-control balance-freight" placeholder="Balance Freight" readonly>
