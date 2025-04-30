@@ -44,10 +44,9 @@ class OrderController extends Controller
        $destination = Destination::all();
    
        
-       if (is_string($order->lr)) {
-           $order->lr = json_decode($order->lr, true);
-       }
-   
+       if (!empty($order) && isset($order->lr) && is_string($order->lr)) {
+        $order->lr = json_decode($order->lr, true);
+    }
  
    
        return view('admin.orders.edit', compact('order', 'vehicles', 'users','vehiclesType','destination'));
@@ -167,16 +166,16 @@ class OrderController extends Controller
                     'less_advance'        => $lr['less_advance'] ?? null,
                     'balance_freight'     => $lr['balance_freight'] ?? null,
                     'total_declared_value'=> $lr['total_declared_value'] ?? null,
-                    'order_rate'=> $lr['order_rate'] ?? null,
-
+                    'order_rate'          => $lr['order_rate'] ?? 0,
+                    'insurance_description'=> $lr['insurance_description'] ?? null,
+                    'insurance_status'     => $lr['insurance_status'] ?? null,
                     // Nested cargo
                     'cargo'               => $cargoArray,
                 ];
             }
         }
 
-        // Save LR array (even if empty)
-       // ✅ Force save [] if LR is missing or invalid
+        
         $order->lr = $lrArray ?? [];
 
         $order->save();
@@ -186,16 +185,14 @@ class OrderController extends Controller
     }
     public function getRate(Request $request)
     {
-        // Validate incoming request
-      
-        // Find the contract matching these fields
+     
        
 
             $rate = Contract::where('user_id', $request->customer_id)
-    ->where('type_id', $request->vehicle_type)
-    ->where('from_destination_id', $request->from_location)
-    ->where('to_destination_id', $request->to_location)
-    ->value('rate');
+                ->where('type_id', $request->vehicle_type)
+                ->where('from_destination_id', $request->from_location)
+                ->where('to_destination_id', $request->to_location)
+                ->value('rate');
 
         if ($rate) {
             return response()->json([
@@ -214,6 +211,7 @@ class OrderController extends Controller
 public function update(Request $request, $order_id)
 
 {
+    // return $request->all();
     $order = new Order();
     $order->order_id = 'ORD-' . time();
     $order->description = $request->description;
@@ -243,10 +241,11 @@ public function update(Request $request, $order_id)
             foreach ($lr['cargo'] as $cargo) {
                 $documentFilePath = null;
 
-                if (isset($cargo['document_file']) && $cargo['document_file']->isValid()) {
-                    $documentFile = $cargo['document_file'];
-                    $documentFilePath = $documentFile->store('orders/cargo_documents/', 'public');
-                }
+             
+if (isset($cargo['document_file']) && $cargo['document_file'] instanceof UploadedFile && $cargo['document_file']->isValid()) {
+    $documentFile = $cargo['document_file'];
+    $documentFilePath = $documentFile->store('orders/cargo_documents/', 'public');
+}
 
                 $cargoArray[] = [
                     'packages_no'         => $cargo['packages_no'] ?? null,
