@@ -288,7 +288,7 @@
                            </thead>
                            <tbody id="cargoTableBody">
                               <tr>
-                                 <td><input type="number" name="cargo[0][packages_no]" class="form-control" placeholder="0" required></td>
+                                 <td><input type="number" name="cargo[0][packages_no]" class="form-control" min="0"  placeholder="0" required></td>
                                  <td>
                                     <select name="cargo[0][package_type]" class="form-select " required>
                                        <option value="Pallets">Pallets</option>
@@ -297,8 +297,8 @@
                                     </select>
                                  </td>
                                  <td><input type="text" name="cargo[0][package_description]" class="form-control" placeholder="Enter description" required></td>
-                                 <td><input name="cargo[0][actual_weight]" type="number" class="form-control" placeholder="0" required></td>
-                                 <td><input name="cargo[0][charged_weight]" type="number" class="form-control" placeholder="0" required></td>
+                                 <td><input name="cargo[0][actual_weight]" type="number" class="form-control" min="0" placeholder="0" required></td>
+                                 <td><input name="cargo[0][charged_weight]" type="number" class="form-control" min="0"  placeholder="0" required></td>
                                  <td>
                                     <select class="form-select " name="cargo[0][unit]" required>
                                        <option value="">Select Unit</option>
@@ -312,7 +312,7 @@
                                  <td><input name="cargo[0][document_file]" type="file" class="form-control"></td>
                                  <td><input name="cargo[0][eway_bill]" type="text" class="form-control" placeholder="Eway Bill No." required></td>
                                  <td><input name="cargo[0][valid_upto]" type="date" class="form-control" required></td>
-                                 <td><input name="cargo[0][declared_value]" type="number" class="form-control" placeholder="0" required></td>
+                                 <td><input name="cargo[0][declared_value]" type="number" class="form-control"  min="0" placeholder="0" required></td>
                                  <td>
                                     <button class="btn btn-danger btn-sm" onclick="removeRow(this)">🗑</button>
                                  </td>
@@ -363,28 +363,28 @@
                            <tbody id="freightBody">
                               <tr>
                                  <td>
-                                    <input type="number" name="freight_amount" class="form-control freight-amount" placeholder="Enter Freight Amount" readonly>
+                                    <input type="number" name="freight_amount" class="form-control freight-amount"  min="0"  placeholder="Enter Freight Amount" readonly>
                                  </td>
                                  <td>
-                                    <input type="number" name="lr_charges" class="form-control lr-charges" placeholder="Enter LR " required>
+                                    <input type="number" name="lr_charges" class="form-control lr-charges"  min="0"  placeholder="Enter LR " required>
                                  </td>
                                  <td>
-                                    <input type="number" name="hamali" class="form-control hamali" placeholder="Enter Hamali " required>
+                                    <input type="number" name="hamali" class="form-control hamali"  min="0"  placeholder="Enter Hamali " required>
                                  </td>
                                  <td>
-                                    <input type="number" name="other_charges" class="form-control other-charges" placeholder="Enter Other " required>
+                                    <input type="number" name="other_charges" class="form-control other-charges"  min="0"  placeholder="Enter Other " required>
                                  </td>
                                  <td>
-                                    <input type="number" name="gst_amount" class="form-control gst-amount" placeholder=" GST Amount" readonly>
+                                    <input type="number" name="gst_amount" class="form-control gst-amount"  min="0"  placeholder=" GST Amount" readonly>
                                  </td>
                                  <td>
-                                    <input type="number" name="total_freight" class="form-control total-freight" placeholder="Total Freight" readonly>
+                                    <input type="number" name="total_freight" class="form-control total-freight"  min="0"  placeholder="Total Freight" readonly>
                                  </td>
                                  <td>
-                                    <input type="number" name="less_advance" class="form-control less-advance" placeholder="Less Advance Amount" required>
+                                    <input type="number" name="less_advance" class="form-control less-advance"  min="0"  placeholder="Less Advance Amount" required>
                                  </td>
                                  <td>
-                                    <input type="number" name="balance_freight" class="form-control balance-freight" placeholder="Balance Freight" readonly>
+                                    <input type="number" name="balance_freight" class="form-control balance-freight"  min="0"  placeholder="Balance Freight" readonly>
                                  </td>
                               </tr>
                            </tbody>

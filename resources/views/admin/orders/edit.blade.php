@@ -280,7 +280,7 @@
                </div>
                <div class="mb-3">
                   <label class="form-label">💰 Order Rate</label>
-                  <input type="number" name="lr[{{ $index }}][order_rate]" step="0.1"  class="form-control" id="rate_input{{ $index }}" placeholder="Enter Amount" value="{{ $lr['order_rate'] ?? '' }}" readonly>
+                  <input type="number" name="lr[{{ $index }}][order_rate]" step="0.01"  class="form-control" id="rate_input{{ $index }}" placeholder="Enter Amount" value="{{ $lr['order_rate'] ?? '' }}" readonly>
                   </div>
             </div>
             {{-- @dd($lr['order_rate']); --}}
@@ -351,35 +351,35 @@
                         <tbody id="cargoTableBody-{{ $index }}">
                            @foreach ($cargoData as $cargoIndex => $cargo)
                            <tr>
-                              <td><input type="number" name="lr[{{ $index }}][cargo][{{ $cargoIndex }}][packages_no]" class="form-control" value="{{ $cargo['packages_no'] ?? '' }}" required></td>
+                              <td><input type="number" name="lr[{{ $index }}][cargo][{{ $cargoIndex }}][packages_no]" class="form-control" min="0"  value="{{ $cargo['packages_no'] ?? '' }}" ></td>
                               <td>
-                                 <select name="lr[{{ $index }}][cargo][{{ $cargoIndex }}][package_type]" class="form-select" required>
+                                 <select name="lr[{{ $index }}][cargo][{{ $cargoIndex }}][package_type]" class="form-select" >
                                     <option value="Pallets" {{ $cargo['package_type'] == 'Pallets' ? 'selected' : '' }}>Pallets</option>
                                     <option value="Cartons" {{ $cargo['package_type'] == 'Cartons' ? 'selected' : '' }}>Cartons</option>
                                     <option value="Bags" {{ $cargo['package_type'] == 'Bags' ? 'selected' : '' }}>Bags</option>
                                  </select>
                               </td>
-                              <td><input type="text" name="lr[{{ $index }}][cargo][{{ $cargoIndex }}][package_description]" class="form-control" value="{{ $cargo['package_description'] ?? '' }}" required></td>
-                              <td><input type="number" name="lr[{{ $index }}][cargo][{{ $cargoIndex }}][actual_weight]" class="form-control" value="{{ $cargo['actual_weight'] ?? '' }}" required></td>
-                              <td><input type="number" name="lr[{{ $index }}][cargo][{{ $cargoIndex }}][charged_weight]" class="form-control charged-weight" value="{{ $cargo['charged_weight'] ?? '' }}" required oninput="calculateTotal({{ $index }}, 'charged-weight', 'totalChargedWeight-{{ $index }}')"></td>
+                              <td><input type="text" name="lr[{{ $index }}][cargo][{{ $cargoIndex }}][package_description]" class="form-control" value="{{ $cargo['package_description'] ?? '' }}" ></td>
+                              <td><input type="number" name="lr[{{ $index }}][cargo][{{ $cargoIndex }}][actual_weight]" min="0" class="form-control" step="0.01" value="{{ $cargo['actual_weight'] ?? '' }}" ></td>
+                              <td><input type="number" name="lr[{{ $index }}][cargo][{{ $cargoIndex }}][charged_weight]" min="0" class="form-control charged-weight" step="0.01"  value="{{ $cargo['charged_weight'] ?? '' }}"  oninput="calculateTotal({{ $index }}, 'charged-weight', 'totalChargedWeight-{{ $index }}')"></td>
                               <td>
-                                 <select class="form-select" name="lr[{{ $index }}][cargo][{{ $cargoIndex }}][unit]" required>
+                                 <select class="form-select" name="lr[{{ $index }}][cargo][{{ $cargoIndex }}][unit]" >
                                     <option value="">Select Unit</option>
                                     <option value="kg" {{ ($cargo['unit'] ?? '') == 'kg' ? 'selected' : '' }}>Kg</option>
                                     <option value="ton" {{ ($cargo['unit'] ?? '') == 'ton' ? 'selected' : '' }}>Ton</option>
                                  </select>
                               </td>
-                              <td><input type="text" name="lr[{{ $index }}][cargo][{{ $cargoIndex }}][document_no]" class="form-control" value="{{ $cargo['document_no'] ?? '' }}" required></td>
-                              <td><input type="text" name="lr[{{ $index }}][cargo][{{ $cargoIndex }}][document_name]" class="form-control" value="{{ $cargo['document_name'] ?? '' }}" required></td>
-                              <td><input type="date" name="lr[{{ $index }}][cargo][{{ $cargoIndex }}][document_date]" class="form-control" value="{{ $cargo['document_date'] ?? '' }}" required></td>
+                              <td><input type="text" name="lr[{{ $index }}][cargo][{{ $cargoIndex }}][document_no]" class="form-control" value="{{ $cargo['document_no'] ?? '' }}" ></td>
+                              <td><input type="text" name="lr[{{ $index }}][cargo][{{ $cargoIndex }}][document_name]" class="form-control" value="{{ $cargo['document_name'] ?? '' }}" ></td>
+                              <td><input type="date" name="lr[{{ $index }}][cargo][{{ $cargoIndex }}][document_date]" class="form-control" value="{{ $cargo['document_date'] ?? '' }}" ></td>
                               <td>
                                  <input type="file" name="lr[{{ $index }}][cargo][{{ $cargoIndex }}][document_file]" class="form-control">
                                  <input type="hidden" name="lr[{{ $index }}][cargo][{{ $cargoIndex }}][old_document_file]" value="{{ $cargo['document_file'] ?? '' }}">
                               </td>
-                              <td><input type="text" name="lr[{{ $index }}][cargo][{{ $cargoIndex }}][eway_bill]" class="form-control" value="{{ $cargo['eway_bill'] ?? '' }}" required></td>
-                              <td><input type="date" name="lr[{{ $index }}][cargo][{{ $cargoIndex }}][valid_upto]" class="form-control" value="{{ $cargo['valid_upto'] ?? '' }}" required></td>
+                              <td><input type="text" name="lr[{{ $index }}][cargo][{{ $cargoIndex }}][eway_bill]" class="form-control" value="{{ $cargo['eway_bill'] ?? '' }}" ></td>
+                              <td><input type="date" name="lr[{{ $index }}][cargo][{{ $cargoIndex }}][valid_upto]" class="form-control" value="{{ $cargo['valid_upto'] ?? '' }}" ></td>
                               <td>
-                                 <input name="lr[{{ $index }}][cargo][{{ $cargoIndex }}][declared_value]" type="number" value="{{ $cargo['declared_value'] ?? '' }}" class="form-control declared-value" placeholder="0" required oninput="calculateTotal({{ $index }}, 'declared-value', 'totalDeclaredValue-{{ $index }}')">
+                                 <input name="lr[{{ $index }}][cargo][{{ $cargoIndex }}][declared_value]" min="0" type="number" value="{{ $cargo['declared_value'] ?? '' }}" class="form-control declared-value" placeholder="0"  oninput="calculateTotal({{ $index }}, 'declared-value', 'totalDeclaredValue-{{ $index }}')">
                               </td>
                               <td>
                                  <button type="button" class="btn btn-danger btn-sm" onclick="removeRow(this, {{ $index }})">🗑</button>
@@ -431,14 +431,14 @@
                            </thead>
                            <tbody id="freightBody-{{ $index }}">
                               <tr>
-                                 <td><input name="lr[{{ $index }}][freight_amount]" id="finalResult-{{$index}}" type="number" class="form-control freight-amount"  step="0.1"   placeholder="Enter Freight Amount" readonly></td>
-                                 <td><input name="lr[{{ $index }}][lr_charges]" type="number" class="form-control lr-charges" value="{{ $lr['lr_charges'] ?? '' }}" step="0.1"   placeholder="Enter LR Charges" ></td>
-                                 <td><input name="lr[{{ $index }}][hamali]" type="number" class="form-control hamali" value="{{ $lr['hamali'] ?? '' }}" step="0.1"   placeholder="Enter Hamali Charges" ></td>
-                                 <td><input name="lr[{{ $index }}][other_charges]" type="number" class="form-control other-charges" value="{{ $lr['other_charges'] ?? '' }}" step="0.1"   placeholder="Enter Other Charges" ></td>
-                                 <td><input name="lr[{{ $index }}][gst_amount]" type="number" class="form-control gst" value="{{ $lr['gst_amount'] ?? '' }}" step="0.1"   placeholder="Enter GST Amount"  readonly></td>
-                                 <td><input name="lr[{{ $index }}][total_freight]" type="number" class="form-control total-freight" value="{{ $lr['total_freight'] ?? '' }}" step="0.1"   placeholder="Total Freight"  readonly></td>
-                                 <td><input name="lr[{{ $index }}][less_advance]" type="number" class="form-control less-advance" value="{{ $lr['less_advance'] ?? '' }}" step="0.1"   placeholder="Less Advance Amount" ></td>
-                                 <td><input name="lr[{{ $index }}][balance_freight]" type="number" class="form-control balance-freight" value="{{ $lr['balance_freight'] ?? '' }}" step="0.1"   placeholder="Balance Freight Amount"  readonly></td>
+                                 <td><input name="lr[{{ $index }}][freight_amount]" id="finalResult-{{$index}}" type="number" class="form-control freight-amount"   placeholder="Enter Freight Amount" value="{{ $lr['freight_amount'] ?? '' }}" readonly></td>
+                                 <td><input name="lr[{{ $index }}][lr_charges]" type="number" class="form-control lr-charges" value="{{ $lr['lr_charges'] ?? '' }}" step="0.01"   min="0"  placeholder="Enter LR Charges" ></td>
+                                 <td><input name="lr[{{ $index }}][hamali]" type="number" class="form-control hamali" value="{{ $lr['hamali'] ?? '' }}" step="0.01"   min="0"  placeholder="Enter Hamali Charges" ></td>
+                                 <td><input name="lr[{{ $index }}][other_charges]" type="number" class="form-control other-charges" value="{{ $lr['other_charges'] ?? '' }}" step="0.01"   min="0"  placeholder="Enter Other Charges" ></td>
+                                 <td><input name="lr[{{ $index }}][gst_amount]" type="number" class="form-control gst" value="{{ $lr['gst_amount'] ?? '' }}" step="0.01"   min="0"  placeholder="Enter GST Amount"  readonly></td>
+                                 <td><input name="lr[{{ $index }}][total_freight]" type="number" class="form-control total-freight" value="{{ $lr['total_freight'] ?? '' }}" step="0.01"   min="0"  placeholder="Total Freight"  readonly></td>
+                                 <td><input name="lr[{{ $index }}][less_advance]" type="number" class="form-control less-advance" value="{{ $lr['less_advance'] ?? '' }}" step="0.01"   min="0"  placeholder="Less Advance Amount" ></td>
+                                 <td><input name="lr[{{ $index }}][balance_freight]" type="number" class="form-control balance-freight" value="{{ $lr['balance_freight'] ?? '' }}" step="0.01"   min="0"  placeholder="Balance Freight Amount"  readonly></td>
                               </tr>
                            </tbody>
                      </table>
@@ -473,7 +473,7 @@
          </div>
       </div>
    </div>
-</div>
+
 </form>
 <script>
 let lrCounter = {{ count($lrData) }};
@@ -481,6 +481,7 @@ let cargoCounters = {};
 let currentOrderAmount = 0;
 let currentContractAmount = 0;
 window.lrRates = {}; // Store rates for each LR
+
 
 // Initialize on page load
 document.addEventListener('DOMContentLoaded', function () {
@@ -587,8 +588,7 @@ function toggleOrderMethod() {
     }
 }
 
-// Fetch rate for a specific LR via AJAX
-// Initialize window.lrRates with old order_rate on page load
+
 window.lrRates = window.lrRates || {};
 document.addEventListener('DOMContentLoaded', () => {
     // Assuming index is available from Blade loop
@@ -769,8 +769,8 @@ row.innerHTML = `
 </select>
 </td>
 <td><input type="text" name="lr[${index}][cargo][${cargoIndex}][package_description]" class="form-control" required></td>
-<td><input type="number" name="lr[${index}][cargo][${cargoIndex}][actual_weight]" class="form-control" required></td>
-<td><input type="number" name="lr[${index}][cargo][${cargoIndex}][charged_weight]" class="form-control charged-weight" required oninput="calculateTotal(${index}, 'charged-weight', 'totalChargedWeight-${index}')"></td>
+<td><input type="number" name="lr[${index}][cargo][${cargoIndex}][actual_weight]" min="0" class="form-control" required></td>
+<td><input type="number" name="lr[${index}][cargo][${cargoIndex}][charged_weight]" min="0" class="form-control charged-weight" required oninput="calculateTotal(${index}, 'charged-weight', 'totalChargedWeight-${index}')"></td>
 <td>
 <select name="lr[${index}][cargo][${cargoIndex}][unit]" class="form-select" required>
 <option value="">Select Unit</option>
@@ -784,7 +784,7 @@ row.innerHTML = `
 <td><input type="file" name="lr[${index}][cargo][${cargoIndex}][document_file]" class="form-control"></td>
 <td><input type="text" name="lr[${index}][cargo][${cargoIndex}][eway_bill]" class="form-control" required></td>
 <td><input type="date" name="lr[${index}][cargo][${cargoIndex}][valid_upto]" class="form-control" required></td>
-<td><input type="number" name="lr[${index}][cargo][${cargoIndex}][declared_value]" class="form-control declared-value" required oninput="calculateTotal(${index}, 'declared-value', 'totalDeclaredValue-${index}')"></td>
+<td><input type="number" name="lr[${index}][cargo][${cargoIndex}][declared_value]" min="0" class="form-control declared-value" required oninput="calculateTotal(${index}, 'declared-value', 'totalDeclaredValue-${index}')"></td>
 <td><button type="button" class="btn btn-danger btn-sm" onclick="removeRow(this, ${index})">🗑</button></td>
 `;
 
@@ -816,10 +816,8 @@ document.addEventListener('change', function (e) {
     }
 });
 
-// Initialize insurance visibility on load
-for (let i = 0; i < lrCounter; i++) {
-    toggleInsuranceInput(i);
-}
+
+
 </script>
 {{-- add lr code-----------------------------addlr code------------------------------------------------ --}}
 <script>
@@ -1015,7 +1013,7 @@ function addLrRow() {
                         </thead>
                         <tbody id="cargoTableBody_${lrIndex}">
                             <tr id="cargoRow_${lrIndex}_0">
-                                <td><input type="number" class="form-control" name="lr[${lrIndex}][cargo][0][packages_no]" placeholder="0" required></td>
+                                <td><input type="number" class="form-control" name="lr[${lrIndex}][cargo][0][packages_no]" min="0"  placeholder="0" required></td>
                                 <td>
                                     <select class="form-select" name="lr[${lrIndex}][cargo][0][package_type]" required>
                                         <option>Pallets</option>
@@ -1023,10 +1021,10 @@ function addLrRow() {
                                         <option>Bags</option>
                                     </select>
                                 </td>
-                                <td><input type="text" class="form-control" name="lr[${lrIndex}][cargo][0][package_description]" placeholder="Enter description" required></td>
-                                <td><input type="number" class="form-control" name="lr[${lrIndex}][cargo][0][actual_weight]" placeholder="0" required></td>
+                                <td><input type="text" class="form-control" name="lr[${lrIndex}][cargo][0][package_description]"  placeholder="Enter description" required></td>
+                                <td><input type="number" class="form-control" name="lr[${lrIndex}][cargo][0][actual_weight]" min="0" placeholder="0" required></td>
                                 <td>
-                                    <input type="number" class="form-control charged-weight" name="lr[${lrIndex}][cargo][0][charged_weight]" placeholder="0" required oninput="calculateTotals(${lrIndex})">
+                                    <input type="number" class="form-control charged-weight" name="lr[${lrIndex}][cargo][0][charged_weight]" min="0"   placeholder="0" required oninput="calculateTotals(${lrIndex})">
                                 </td>
                                 <td>
                                     <select class="form-select" name="lr[${lrIndex}][cargo][0][unit]" required>
@@ -1042,7 +1040,7 @@ function addLrRow() {
                                 <td><input type="text" class="form-control" name="lr[${lrIndex}][cargo][0][eway_bill]" placeholder="Eway Bill No." required></td>
                                 <td><input type="date" class="form-control" name="lr[${lrIndex}][cargo][0][valid_upto]" required></td>
                                 <td>
-                                    <input type="number" class="form-control declared-value" name="lr[${lrIndex}][cargo][0][declared_value]" placeholder="0" oninput="calculateTotals(${lrIndex})">
+                                    <input type="number" class="form-control declared-value" name="lr[${lrIndex}][cargo][0][declared_value]" min="0"  placeholder="0" oninput="calculateTotals(${lrIndex})">
                                 </td>
                                 <td><button class="btn btn-danger btn-sm" onclick="removeRow(${lrIndex}, 0)">🗑</button></td>
                             </tr>
@@ -1089,14 +1087,14 @@ function addLrRow() {
                         </thead>
                         <tbody id="freightTableBody-${lrIndex}">
                             <tr>
-                                <td><input type="number" name="lr[${lrIndex}][freight_amount]" class="form-control" id="finalResult-${lrIndex}" step="0.1"  placeholder="Enter Freight Amount" readonly></td>
-                                <td><input type="number" name="lr[${lrIndex}][lr_charges]" class="form-control" oninput="updateFreightAndTotals(${lrIndex})" step="0.1"  placeholder="Enter LR Charges" ></td>
-                                <td><input type="number" name="lr[${lrIndex}][hamali]" class="form-control" oninput="updateFreightAndTotals(${lrIndex})" step="0.1"  placeholder="Enter Hamali Charges"></td>
-                                <td><input type="number" name="lr[${lrIndex}][other_charges]" class="form-control" oninput="updateFreightAndTotals(${lrIndex})" step="0.1"  placeholder="Enter Other Charges"></td>
-                                <td><input type="number" name="lr[${lrIndex}][gst_amount]" class="form-control" readonly step="0.1"  placeholder="Enter GST Amount"></td>
-                                <td><input type="number" name="lr[${lrIndex}][total_freight]" class="form-control" readonly step="0.1"  placeholder="Total Freight"></td>
-                                <td><input type="number" name="lr[${lrIndex}][less_advance]" class="form-control" oninput="updateFreightAndTotals(${lrIndex})" step="0.1"  placeholder="Less Advance Amount"></td>
-                                <td><input type="number" name="lr[${lrIndex}][balance_freight]" class="form-control" readonly step="0.1"  placeholder="Balance Freight Amount"></td>
+                                <td><input type="number" name="lr[${lrIndex}][freight_amount]" class="form-control" id="finalResult-${lrIndex}" step="0.01"   min="0"  placeholder="Enter Freight Amount" readonly></td>
+                                <td><input type="number" name="lr[${lrIndex}][lr_charges]" class="form-control" oninput="updateFreightAndTotals(${lrIndex})" step="0.01"   min="0"  placeholder="Enter LR Charges" ></td>
+                                <td><input type="number" name="lr[${lrIndex}][hamali]" class="form-control" oninput="updateFreightAndTotals(${lrIndex})" step="0.01"   min="0"  placeholder="Enter Hamali Charges"></td>
+                                <td><input type="number" name="lr[${lrIndex}][other_charges]" class="form-control" oninput="updateFreightAndTotals(${lrIndex})" step="0.01"   min="0"  placeholder="Enter Other Charges"></td>
+                                <td><input type="number" name="lr[${lrIndex}][gst_amount]" class="form-control" readonly step="0.01"   min="0"  placeholder="Enter GST Amount"></td>
+                                <td><input type="number" name="lr[${lrIndex}][total_freight]" class="form-control" readonly step="0.01"   min="0"  placeholder="Total Freight"></td>
+                                <td><input type="number" name="lr[${lrIndex}][less_advance]" class="form-control" oninput="updateFreightAndTotals(${lrIndex})" step="0.01"   min="0"  placeholder="Less Advance Amount"></td>
+                                <td><input type="number" name="lr[${lrIndex}][balance_freight]" class="form-control" readonly step="0.01"   min="0"  placeholder="Balance Freight Amount"></td>
                             </tr>
                         </tbody>
                     </table>
@@ -1106,9 +1104,9 @@ function addLrRow() {
         <div class="row mt-3">
             <div class="col-md-6">
               
-                <input type="hidden" class="form-control" id="total_charged_weight_${lrIndex}" name="lr[${lrIndex}][total_charged_weight]" step="0.1"  placeholder="Total Charged Weight" readonly>
+                <input type="hidden" class="form-control" id="total_charged_weight_${lrIndex}" name="lr[${lrIndex}][total_charged_weight]" step="0.01"  placeholder="Total Charged Weight" readonly>
                 <label class="form-label"><strong>💰 Total Declared Value (Rs.)</strong></label>
-                <input type="text" class="form-control" id="total_declared_value_${lrIndex}" name="lr[${lrIndex}][total_declared_value]" step="0.1"  placeholder="Total Declared Value" readonly>
+                <input type="text" class="form-control" id="total_declared_value_${lrIndex}" name="lr[${lrIndex}][total_declared_value]" step="0.01"  placeholder="Total Declared Value" readonly>
             </div>
         </div>
         <div class="row mt-3">
@@ -1149,7 +1147,7 @@ function addCargoRowNew(lrIndex) {
     const newRowId = `cargoRow_${lrIndex}_${rowCount}`;
     const newRow = `
         <tr id="${newRowId}">
-            <td><input type="number" class="form-control" name="lr[${lrIndex}][cargo][${rowCount}][packages_no]" placeholder="0" required></td>
+            <td><input type="number" class="form-control" name="lr[${lrIndex}][cargo][${rowCount}][packages_no]" min="0" placeholder="0" required></td>
             <td>
                 <select class="form-select" name="lr[${lrIndex}][cargo][${rowCount}][package_type]" required>
                     <option>Pallets</option>
@@ -1158,9 +1156,9 @@ function addCargoRowNew(lrIndex) {
                 </select>
             </td>
             <td><input type="text" class="form-control" name="lr[${lrIndex}][cargo][${rowCount}][package_description]" placeholder="Enter description" required></td>
-            <td><input type="number" class="form-control" name="lr[${lrIndex}][cargo][${rowCount}][actual_weight]" placeholder="0" required></td>
+            <td><input type="number" class="form-control" name="lr[${lrIndex}][cargo][${rowCount}][actual_weight]" min="0" placeholder="0" required></td>
             <td>
-                <input type="number" class="form-control charged-weight" name="lr[${lrIndex}][cargo][${rowCount}][charged_weight]" placeholder="0" required oninput="calculateTotals(${lrIndex})">
+                <input type="number" class="form-control charged-weight" name="lr[${lrIndex}][cargo][${rowCount}][charged_weight]" min="0"  placeholder="0" required oninput="calculateTotals(${lrIndex})">
             </td>
             <td>
                 <select class="form-select" name="lr[${lrIndex}][cargo][${rowCount}][unit]" required>
@@ -1176,7 +1174,7 @@ function addCargoRowNew(lrIndex) {
             <td><input type="text" class="form-control" name="lr[${lrIndex}][cargo][${rowCount}][eway_bill]" placeholder="Eway Bill No." required></td>
             <td><input type="date" class="form-control" name="lr[${lrIndex}][cargo][${rowCount}][valid_upto]" required></td>
             <td>
-                <input type="number" class="form-control declared-value" name="lr[${lrIndex}][cargo][${rowCount}][declared_value]" placeholder="0" oninput="calculateTotals(${lrIndex})">
+                <input type="number" class="form-control declared-value" name="lr[${lrIndex}][cargo][${rowCount}][declared_value]" min="0"  placeholder="0" oninput="calculateTotals(${lrIndex})">
             </td>
             <td><button class="btn btn-danger btn-sm" onclick="removeRow(${lrIndex}, ${rowCount})">🗑</button></td>
         </tr>
@@ -1273,7 +1271,7 @@ function fetchRateForLR(lrIndex) {
         updateFreightAndTotals(lrIndex);
     })
     .catch(err => {
-        console.error('Error fetching rate:', err);
+        // console.error('Error fetching rate:', err);
         window.lrRates[lrIndex] = 0;
         document.getElementById(`rate_input${lrIndex}`).value = '0';
         updateFreightAndTotals(lrIndex);
@@ -1283,7 +1281,9 @@ function fetchRateForLR(lrIndex) {
 // Update freight calculations
 function updateFreightAndTotals(lrIndex) {
     const freightType = document.querySelector(`input[name="lr[${lrIndex}][freightType]"]:checked`)?.value;
-    const totalChargedWeight = parseFloat(document.getElementById(`total_charged_weight_${lrIndex}`).value) || 0;
+    // const totalChargedWeight = parseFloat(document.getElementById(`total_charged_weight_${lrIndex}`).value) || 0;
+    const weightInput = document.getElementById(`total_charged_weight_${lrIndex}`);
+const totalChargedWeight = weightInput ? parseFloat(weightInput.value) || 0 : 0;
     const rate = window.lrRates[lrIndex] || 0;
     const freightInput = document.getElementById(`finalResult-${lrIndex}`);
 
@@ -1455,5 +1455,5 @@ document.addEventListener('DOMContentLoaded', () => {
                 });
                 </script>
     
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
 @endsection

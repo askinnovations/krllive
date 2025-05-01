@@ -334,7 +334,7 @@
          @endphp
          @foreach ($cargoData as $index => $cargo)
          <tr>
-            <td><input type="number" name="cargo[{{ $index }}][packages_no]" class="form-control" value="{{ $cargo['packages_no'] }}" required></td>
+            <td><input type="number" name="cargo[{{ $index }}][packages_no]" class="form-control" value="{{ $cargo['packages_no'] }}" min="0"  required></td>
             <td>
                <select name="cargo[{{ $index }}][package_type]" class="form-select  " required>
                   <option value="Pallets" {{ $cargo['package_type'] == 'Pallets' ? 'selected' : '' }}>Pallets</option>
@@ -343,9 +343,9 @@
                </select>
             </td>
             <td><input type="text" name="cargo[{{ $index }}][package_description]" class="form-control" value="{{ $cargo['package_description'] }}" required></td>
-            <td><input type="number" name="cargo[{{ $index }}][actual_weight]" class="form-control" value="{{ $cargo['actual_weight'] }}" required></td>
+            <td><input type="number" name="cargo[{{ $index }}][actual_weight]" class="form-control" min="0" value="{{ $cargo['actual_weight'] }}" required></td>
             {{-- <td><input type="number" name="cargo[{{ $index }}][charged_weight]" class="form-control" value="{{ $cargo['charged_weight'] }}" required></td> --}}
-            <td><input type="number" name="cargo[{{ $index }}][charged_weight]"   value="{{ $cargo['charged_weight'] }}" class="form-control" oninput="calculateTotalChargedWeight()"></td>
+            <td><input type="number" name="cargo[{{ $index }}][charged_weight]" min="0"  value="{{ $cargo['charged_weight'] }}" class="form-control" oninput="calculateTotalChargedWeight()"></td>
 
             <td>
                <select class="form-select " name="cargo[{{ $index }}][unit]" required>
@@ -361,7 +361,7 @@
             <input type="hidden" name="cargo[{{ $index }}][old_document_file]" class="form-control" value="{{ $cargo['document_file'] }}" ></td>
             <td><input type="text" name="cargo[{{ $index }}][eway_bill]" class="form-control" value="{{ $cargo['eway_bill'] }}" required></td>
             <td><input type="date" name="cargo[{{ $index }}][valid_upto]" class="form-control" value="{{ $cargo['valid_upto'] }}" required></td>
-            <td><input name="cargo[{{ $index }}][declared_value]" type="number" value="{{ $cargo['declared_value'] }}" class="form-control" placeholder="0" required></td>
+            <td><input name="cargo[{{ $index }}][declared_value]" type="number" value="{{ $cargo['declared_value'] }}" min="0"  class="form-control" placeholder="0" required></td>
 
             <td>
                <button type="button" class="btn btn-danger btn-sm" onclick="removeRow(this)">🗑</button>
@@ -428,28 +428,28 @@
                            <tbody id="freightBody">
                                   <tr>
                                      <td>
-                                       <input type="number" name="freight_amount" value="{{ old('freight_amount', $lrData['freight_amount'] ?? '') }}" class="form-control freight-amount" placeholder="Enter Freight Amount" readonly>
+                                       <input type="number" name="freight_amount" value="{{ old('freight_amount', $lrData['freight_amount'] ?? '') }}" class="form-control freight-amount" min="0"  placeholder="Enter Freight Amount" readonly>
                                      </td>
                                      <td>
-                                       <input type="number" name="lr_charges"  value="{{ old('lr_charges', $lrData['lr_charges'] ?? '') }}" class="form-control lr-charges" placeholder="Enter LR " required>
+                                       <input type="number" name="lr_charges"  value="{{ old('lr_charges', $lrData['lr_charges'] ?? '') }}" class="form-control lr-charges" min="0"  placeholder="Enter LR " required>
                                      </td>
                                      <td>
-                                       <input type="number" name="hamali"  value="{{ old('hamali', $lrData['hamali'] ?? '') }}" class="form-control hamali" placeholder="Enter Hamali " required>
+                                       <input type="number" name="hamali"  value="{{ old('hamali', $lrData['hamali'] ?? '') }}" class="form-control hamali" min="0"  placeholder="Enter Hamali " required>
                                      </td>
                                      <td>
-                                       <input type="number" name="other_charges"   value="{{ old('other_charges', $lrData['other_charges'] ?? '') }}" class="form-control other-charges" placeholder="Enter Other " required>
+                                       <input type="number" name="other_charges"   value="{{ old('other_charges', $lrData['other_charges'] ?? '') }}" class="form-control other-charges" min="0"  placeholder="Enter Other " required>
                                      </td>
                                      <td>
-                                       <input type="number" name="gst_amount"  value="{{ old('gst_amount', $lrData['gst_amount'] ?? '') }}" class="form-control gst-amount" placeholder=" GST Amount" readonly>
+                                       <input type="number" name="gst_amount"  value="{{ old('gst_amount', $lrData['gst_amount'] ?? '') }}" class="form-control gst-amount" min="0"  placeholder=" GST Amount" readonly>
                                      </td>
                                      <td>
-                                       <input type="number" name="total_freight"  value="{{ old('total_freight', $lrData['total_freight'] ?? '') }}" class="form-control total-freight" placeholder="Total Freight" readonly>
+                                       <input type="number" name="total_freight"  value="{{ old('total_freight', $lrData['total_freight'] ?? '') }}" class="form-control total-freight" min="0"  placeholder="Total Freight" readonly>
                                      </td>
                                      <td>
-                                       <input type="number" name="less_advance"  value="{{ old('less_advance', $lrData['less_advance'] ?? '') }}" class="form-control less-advance" placeholder="Less Advance Amount" required>
+                                       <input type="number" name="less_advance"  value="{{ old('less_advance', $lrData['less_advance'] ?? '') }}" class="form-control less-advance" min="0"  placeholder="Less Advance Amount" required>
                                      </td>
                                      <td>
-                                       <input type="number" name="balance_freight"  value="{{ old('balance_freight', $lrData['balance_freight'] ?? '') }}" class="form-control balance-freight" placeholder="Balance Freight" readonly>
+                                       <input type="number" name="balance_freight"  value="{{ old('balance_freight', $lrData['balance_freight'] ?? '') }}" class="form-control balance-freight" min="0"  placeholder="Balance Freight" readonly>
                                      </td>
                                    </tr>
                            </tbody>
