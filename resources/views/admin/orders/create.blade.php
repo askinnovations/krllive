@@ -481,7 +481,7 @@
                                      </thead>
                                      <tbody id="cargoTableBody-${counter}" data-lr-index="${counter}">
                                           <tr>
-                                              <td><input type="number" class="form-control" name="lr[${counter}][cargo][0][packages_no]" placeholder="0" required></td>
+                                              <td><input type="number" class="form-control" name="lr[${counter}][cargo][0][packages_no]" min="0" placeholder="0" required></td>
                                               <td>
                                                   <select class="form-select" name="lr[${counter}][cargo][0][package_type]" required>
                                                       <option>Pallets</option>
@@ -489,10 +489,10 @@
                                                       <option>Bags</option>
                                                   </select>
                                               </td>
-                                              <td><input type="text" class="form-control" name="lr[${counter}][cargo][0][package_description]" placeholder="Enter description" required></td>
-                                              <td><input type="number" class="form-control" name="lr[${counter}][cargo][0][actual_weight]" placeholder="0" required></td>
+                                              <td><input type="text" class="form-control" name="lr[${counter}][cargo][0][package_description]"  placeholder="Enter description" required></td>
+                                              <td><input type="number" class="form-control" name="lr[${counter}][cargo][0][actual_weight]" min="0"  placeholder="0" required></td>
                                               
-                                              <td><input type="number" class="form-control charged_weight" name="lr[${counter}][cargo][0][charged_weight]" placeholder="0" required oninput="calculateTotalChargedWeight(${counter})"></td>
+                                              <td><input type="number" class="form-control charged_weight" name="lr[${counter}][cargo][0][charged_weight]"min="0"  placeholder="0" required oninput="calculateTotalChargedWeight(${counter})"></td>
                                              
                                              <td>
                                                 <select class="form-select" name="lr[${counter}][cargo][0][unit]" required>
@@ -501,14 +501,14 @@
                                                   <option value="ton">Ton</option>
                                                 </select>
                                               </td>
-                                              <td><input type="text" class="form-control" name="lr[${counter}][cargo][0][document_no]" placeholder="Doc No." required></td>
-                                              <td><input type="text" class="form-control" name="lr[${counter}][cargo][0][document_name]" placeholder="Doc Name" required></td>
+                                              <td><input type="text" class="form-control" name="lr[${counter}][cargo][0][document_no]"  placeholder="Doc No." required></td>
+                                              <td><input type="text" class="form-control" name="lr[${counter}][cargo][0][document_name]"  placeholder="Doc Name" required></td>
                                               <td><input type="date" class="form-control" name="lr[${counter}][cargo][0][document_date]" required></td>
                                               <td><input type="file" class="form-control" name="lr[${counter}][cargo][0][document_file]"></td>
-                                              <td><input type="text" class="form-control" name="lr[${counter}][cargo][0][eway_bill]" placeholder="Eway Bill No." required></td>
+                                              <td><input type="text" class="form-control" name="lr[${counter}][cargo][0][eway_bill]"  placeholder="Eway Bill No." required></td>
                                               <td><input type="date" class="form-control" name="lr[${counter}][cargo][0][valid_upto]" required></td>
                                               <td>
-                                                  <input type="number" name="lr[${counter}][cargo][0][declared_value]" class="form-control declared-value" placeholder="0" oninput="calculateTotalDeclaredValue(${counter})">
+                                                  <input type="number" name="lr[${counter}][cargo][0][declared_value]" class="form-control declared-value" min="0"  placeholder="0" oninput="calculateTotalDeclaredValue(${counter})">
                                                </td>
    
                                               <td>
@@ -566,30 +566,30 @@
     <tbody id="freightBody-${counter}">
       <tr>
         <td>
-          <input type="number" id="finalResult-${counter}" name="lr[${counter}][freight_amount]" class="form-control freight-amount" placeholder="Enter Freight Amount" readonly>
+          <input type="number" id="finalResult-${counter}" name="lr[${counter}][freight_amount]" class="form-control freight-amount" min="0" placeholder="Enter Freight Amount" readonly>
 
           
         </td>
         <td>
-          <input type="number" name="lr[${counter}][lr_charges]" class="form-control lr-charges" placeholder="Enter LR " >
+          <input type="number" name="lr[${counter}][lr_charges]" class="form-control lr-charges" min="0" placeholder="Enter LR " >
         </td>
         <td>
-          <input type="number" name="lr[${counter}][hamali]" class="form-control hamali" placeholder="Enter Hamali " >
+          <input type="number" name="lr[${counter}][hamali]" class="form-control hamali" min="0" placeholder="Enter Hamali " >
         </td>
         <td>
-          <input type="number" name="lr[${counter}][other_charges]" class="form-control other-charges" placeholder="Enter Other " >
+          <input type="number" name="lr[${counter}][other_charges]" class="form-control other-charges" min="0" placeholder="Enter Other " >
         </td>
         <td>
-          <input type="number" name="lr[${counter}][gst_amount]" class="form-control gst" placeholder="Enter GST %" readonly>
+          <input type="number" name="lr[${counter}][gst_amount]" class="form-control gst" min="0" placeholder="Enter GST %" readonly>
         </td>
         <td>
-          <input type="number" name="lr[${counter}][total_freight]" class="form-control total-freight" placeholder="Total Freight" readonly>
+          <input type="number" name="lr[${counter}][total_freight]" class="form-control total-freight" min="0" placeholder="Total Freight" readonly>
         </td>
         <td>
-          <input type="number" name="lr[${counter}][less_advance]" class="form-control less-advance" placeholder="Less Advance Amount" >
+          <input type="number" name="lr[${counter}][less_advance]" class="form-control less-advance" min="0" placeholder="Less Advance Amount" >
         </td>
         <td>
-          <input type="number" name="lr[${counter}][balance_freight]" class="form-control balance-freight" placeholder="Balance Freight" readonly>
+          <input type="number" name="lr[${counter}][balance_freight]" class="form-control balance-freight" min="0" placeholder="Balance Freight" readonly>
         </td>
       </tr>
     </tbody>
@@ -603,8 +603,8 @@
           <div class="col-md-6">
             <div class="mb-3">
                 <label class="form-label fw-bold">💰 Total Declared Value (Rs.)</label>
-          <input type="number" class="form-control"  id="totalDeclaredValue-${counter}" name="lr[${counter}][total_declared_value]" placeholder="0" ...>
-          <input type="hidden" class="form-control" id="totalChargedWeight-${counter}" name="" placeholder="0"  oninput="updateFinalAmount(${counter})" readonly>
+          <input type="number" class="form-control"  id="totalDeclaredValue-${counter}" name="lr[${counter}][total_declared_value]" min="0" placeholder="0" readonly>
+          <input type="hidden" class="form-control" id="totalChargedWeight-${counter}" min="0" placeholder="0"  oninput="updateFinalAmount(${counter})" readonly>
 
 
             </div>
