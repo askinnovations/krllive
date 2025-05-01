@@ -34,90 +34,88 @@
                   </a>
 
                   
-                <form id="lrForm" action="{{ route('admin.freight-bill.view') }}" method="post" style="display: inline;">
-                    @csrf
-                        <input type="hidden" id="lrInputVisible" readonly style="width: 300px;">
-                        <input type="hidden" name="lr[]" id="lrInputHidden">
-                        <button type="submit" id="generateBtn" class="btn custom-btn" 
-                        style="background-color: #ca2639; color: white; border: none;">Freight Bill LR Generate  </button>
-                </form>
+                
+
+                    <!-- Freight Bill Form -->
+<form id="lrForm" action="{{ route('admin.freight-bill.store') }}" method="post" style="display: inline;">
+    @csrf
+    <input type="hidden" name="selected_lrs" id="orderInputHidden">
+    <button type="submit" id="generateBtn" class="btn custom-btn"
+        style="background-color: #ca2639; color: white; border: none; display: none;">
+        Freight Bill LR Generate
+    </button>
+</form>
+
 
 
                </div>
                <div class="card-body">
-               <table id="datatable" class="table table-bordered dt-responsive nowrap w-100">
-                <thead>
-                    <tr>
-                        <th><input type="checkbox" id="selectAll"></th>  
-                        <th>S.No</th>
-                        <th>Order ID</th>
-                        <th>LR NO</th>
-                        <th>Consignor</th>
-                        <th>Consignee</th>
-                        <th>Date</th>
-                        <th>From</th>
-                        <th>To</th>
-                        <th>Action</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @php $rowCount = 1; @endphp
-                    @foreach($orders as $order)
-                        @php
-                            $lrDetails = is_array($order->lr) ? $order->lr : json_decode($order->lr, true);
-                        @endphp
-                    @if(!empty($lrDetails) && count($lrDetails) > 0)
-                    @foreach($lrDetails as $lr)
-                            <tr class="lr-row" data-id="{{ $order->id }}">
-                            <td>
-                            <input type="checkbox" class="lr-checkbox" value="{{ $lr['lr_number'] }}">
-
-
-                                </td>
-                            <td>{{ $rowCount++ }}</td>
-                            <td>{{ $order->order_id }}</td>
-                            <td>{{ $lr['lr_number'] ?? '-' }}</td>
-                            <td>
-                                @php
-                                    $consignorUser = \App\Models\User::find($lr['consignor_id'] ?? null);
-                                    $consignorName = $order->consignor->name ?? ($consignorUser->name ?? '-');
-                                @endphp
-                                {{ $consignorName }}
-                            </td>
-                            <td>
-                                @php
-                                    $consigneeUser = \App\Models\User::find($lr['consignee_id'] ?? null);
-                                    $consigneeName = $order->consignee->name ?? ($consigneeUser->name ?? '-');
-                                @endphp
-                                {{ $consigneeName }}
-                            </td>
-                            <td>{{ $lr['lr_date'] ?? '-' }}</td>
-                            @php
-                            $fromDestination = \App\Models\Destination::find($lr['from_location']);
-                            $toDestination = \App\Models\Destination::find($lr['to_location']);
-                        @endphp
-                        
-                        <td>{{ $fromDestination->destination ?? '-' }}</td>
-                        <td>{{ $toDestination->destination ?? '-' }}</td>
-                                {{-- <a href="{{ route('admin.consignments.documents', $lr['lr_number']) }}" >Documents</a></td> --}}
-                            
-                            <td>
-                                <a href="{{ route('admin.consignments.documents', $lr['lr_number']) }}" class="btn btn-sm btn-light view-btn"><i class="fas fa-file-alt text-primary"></i>
-                                </a>
-                                <a href="{{ route('admin.consignments.view', $lr['lr_number']) }}" class="btn btn-sm btn-light view-btn"><i class="fas fa-eye text-primary"></i></a>
-                                <a href="{{ route('admin.consignments.edit', $order->order_id) }}" class="btn btn-sm btn-light edit-btn"><i class="fas fa-pen text-warning"></i></a>
-                                <a href="{{ route('admin.consignments.delete', $order->order_id) }}" class="btn btn-sm btn-light delete-btn"><i class="fas fa-trash text-danger"></i></a>
-                            </td>
+                    <table id="datatable" class="table table-bordered dt-responsive nowrap w-100">
+                        <thead>
+                            <tr>
+                                <th><input type="checkbox" id="selectAll"></th>  
+                                <th>S.No</th>
+                                <th>Order ID</th>
+                                <th>LR NO</th>
+                                <th>Consignor</th>
+                                <th>Consignee</th>
+                                <th>Date</th>
+                                <th>From</th>
+                                <th>To</th>
+                                <th>Action</th>
                             </tr>
-                        @endforeach
-                        @endif
-                    @endforeach
-                   
-                </tbody>
+                        </thead>
+                        <tbody>
+                            @php $rowCount = 1; @endphp
+                            @foreach($orders as $order)
+                                @php
+                                    $lrDetails = is_array($order->lr) ? $order->lr : json_decode($order->lr, true);
+                                @endphp
+                                @if(!empty($lrDetails) && count($lrDetails) > 0)
+                                    @foreach($lrDetails as $lr)
+                                        <tr class="lr-row" data-id="{{ $order->id }}">
+                                            <td>
+                                                <input type="checkbox" class="lr-checkbox" value="{{ $order->order_id }}|{{ $lr['lr_number'] ?? '' }}">
+                                            </td>
+                                            <td>{{ $rowCount++ }}</td>
+                                            <td>{{ $order->order_id }}</td>
+                                            <td>{{ $lr['lr_number'] ?? '-' }}</td>
+                                            <td>
+                                                @php
+                                                    $consignorUser = \App\Models\User::find($lr['consignor_id'] ?? null);
+                                                    $consignorName = $order->consignor->name ?? ($consignorUser->name ?? '-');
+                                                @endphp
+                                                {{ $consignorName }}
+                                            </td>
+                                            <td>
+                                                @php
+                                                    $consigneeUser = \App\Models\User::find($lr['consignee_id'] ?? null);
+                                                    $consigneeName = $order->consignee->name ?? ($consigneeUser->name ?? '-');
+                                                @endphp
+                                                {{ $consigneeName }}
+                                            </td>
+                                            <td>{{ $lr['lr_date'] ?? '-' }}</td>
+                                            @php
+                                                $fromDestination = \App\Models\Destination::find($lr['from_location']);
+                                                $toDestination = \App\Models\Destination::find($lr['to_location']);
+                                            @endphp
+                                            <td>{{ $fromDestination->destination ?? '-' }}</td>
+                                            <td>{{ $toDestination->destination ?? '-' }}</td>
+                                            <td>
+                                                <a href="{{ route('admin.consignments.documents', $lr['lr_number']) }}" class="btn btn-sm btn-light"><i class="fas fa-file-alt text-primary"></i></a>
+                                                <a href="{{ route('admin.consignments.view', $lr['lr_number']) }}" class="btn btn-sm btn-light"><i class="fas fa-eye text-primary"></i></a>
+                                                <a href="{{ route('admin.consignments.edit', $order->order_id) }}" class="btn btn-sm btn-light"><i class="fas fa-pen text-warning"></i></a>
+                                                <a href="{{ route('admin.consignments.delete', $order->order_id) }}" class="btn btn-sm btn-light"><i class="fas fa-trash text-danger"></i></a>
+                                            </td>
+                                        </tr>
+                                    @endforeach
+                                @endif
+                            @endforeach
+                        </tbody>
+                    </table>
+                </div>
 
-                </table>
-
-               </div>
+               
             </div>
          </div>
       </div>
@@ -127,49 +125,49 @@
 <!-- end main content-->
 <!-- Add this before any script that uses jQuery -->
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+<!-- Script to collect selected order IDs and submit the form -->
+<!-- JavaScript -->
 <script>
-    const checkboxes = document.querySelectorAll('.lr-checkbox');
-    const selectAllCheckbox = document.getElementById('selectAll');
-    const visibleInput = document.getElementById('lrInputVisible');
-    const hiddenContainer = document.getElementById('lrForm');
-    const generateBtn = document.getElementById('generateBtn');
+  const generateBtn = document.getElementById("generateBtn");
+  const orderInputHidden = document.getElementById("orderInputHidden");
 
-    function updateInputs() {
-        const selected = Array.from(checkboxes)
-            .filter(cb => cb.checked)
-            .map(cb => cb.value);
+  function updateSelectedLRs() {
+    const selectedData = [];
 
-        // Update visible input for debugging or preview (optional)
-        visibleInput.value = selected.join(', ');
+    document.querySelectorAll(".lr-checkbox:checked").forEach(cb => {
+      const [order_id, lr_number] = cb.value.split("|");
+      selectedData.push({ order_id, lr_number });
+    });
 
-        // Show or hide the button
-        generateBtn.style.display = selected.length > 0 ? 'inline-block' : 'none';
+    orderInputHidden.value = JSON.stringify(selectedData);
+    generateBtn.style.display = selectedData.length > 0 ? "inline-block" : "none";
+  }
 
-        // Remove existing hidden inputs
-        document.querySelectorAll('#lrForm input[name="lr[]"]').forEach(el => el.remove());
+  // Individual checkbox
+  document.querySelectorAll(".lr-checkbox").forEach(cb =>
+    cb.addEventListener("change", updateSelectedLRs)
+  );
 
-        // Create new hidden inputs
-        selected.forEach(val => {
-            const input = document.createElement('input');
-            input.type = 'hidden';
-            input.name = 'lr[]';
-            input.value = val;
-            hiddenContainer.appendChild(input);
-        });
-    }
+  // Select All checkbox
+  document.getElementById("selectAll").addEventListener("change", function () {
+    document.querySelectorAll(".lr-checkbox").forEach(cb => cb.checked = this.checked);
+    updateSelectedLRs();
+  });
 
-    checkboxes.forEach(cb => cb.addEventListener('change', updateInputs));
+  // On button click
+  generateBtn.addEventListener("click", function (e) {
+    e.preventDefault();
+    document.getElementById("lrForm").submit();
+  });
 
-    if (selectAllCheckbox) {
-        selectAllCheckbox.addEventListener('change', function () {
-            checkboxes.forEach(cb => cb.checked = this.checked);
-            updateInputs();
-        });
-    }
-
-    // Just in case - initialize visibility on page load
-    updateInputs();
+  // Initially hide
+  generateBtn.style.display = "none";
 </script>
+
+
+
+
 
 
 

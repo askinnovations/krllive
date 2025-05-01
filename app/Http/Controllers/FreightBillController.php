@@ -5,6 +5,9 @@ use Illuminate\Support\Facades\Storage;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Order;
+use App\Models\FreightBill;
+use App\Models\Destination;
+use Illuminate\Support\Str;
 use App\Models\Vehicle;
 use App\Models\User;
 use Carbon\Carbon;
@@ -13,172 +16,191 @@ use Illuminate\Support\Facades\DB;
 
 class FreightBillController extends Controller
 {
-    public function index(){
-        $orders = Order::latest()->get();
-        return view('admin.freight-bill.index',compact('orders'));
-    }
-    public function create()
+  
+
+public function index()
+{
+    // Eager load Order → Consignor/Consignee
+    // we only need the `order` relation—remove consignor/consignee here
+    $bills = FreightBill::with('order')->get()
+               ->groupBy('freight_bill_number');
+            //    return($bills);
+
+
+    // Pass the grouped collection to view
+    return view('admin.freight-bill.index', compact('bills'));
+}
+
+
+    public function destroy($id)
    {
-    // Vehicles table से सभी records fetch करें
-    $vehicles = Vehicle::all();
-    $users = User::all(); 
-    return view('admin.freight-bill.create', compact('vehicles','users'));
-    }
+    try {
+        $tyre = FreightBill::findOrFail($id);
 
-    public function edit($order_id)
-    {
-        // dd($order_id);
-        $order = Order::with(['consignor', 'consignee'])->where('order_id', $order_id)->firstOrFail();
-        $vehicles = Vehicle::all();
-        $users = User::all();
-        // All associated LRs with same order_id (excluding the main one if needed)
-        $lrEntries = Order::where('order_id', $order->order_id)
-                        ->where('order_date', '!=', $order->order_date) // Optional: Exclude main by any field
-                        ->get();
+        if ($tyre->delete()) {
+            return response()->json([
+                'status' => 'success',
+                'message' => 'Freight-bill deleted successfully!'
+            ]);
+        }
 
-        return view('admin.freight-bill.edit', compact('order', 'lrEntries','vehicles','users'));
+        return response()->json([
+            'status' => 'error',
+            'message' => 'Failed to delete the freight-bill.'
+        ], 400);
+
+    } catch (Exception $e) {
+        return response()->json([
+            'status' => 'error',
+            'message' => 'Something went wrong: ' . $e->getMessage()
+        ], 500);
+    }
     }
     
-    public function show(Request $request)
+
+    
+
+    public function store(Request $request)
     {
-        $inputLrNumbers = $request->input('lr'); // array of LR numbers
-        
+        $selectedLrs = json_decode($request->input('selected_lrs'), true);
     
-        $matchedEntries = [];
+        if (!$selectedLrs || !is_array($selectedLrs)) {
+            return back()->with('error', 'No LR selected.');
+        }
     
-        $orders = DB::table('orders')->get();
+        $freightBillNumber = 'FB' . now()->format('Ymd') . '-' . str_pad(FreightBill::count() + 1, 3, '0', STR_PAD_LEFT);
+        $freightBillId = null;
     
-        foreach ($orders as $order) {
-            $lrJson = $order->lr;
+        foreach ($selectedLrs as $item) {
+            $order = Order::where('order_id', $item['order_id'])->first();
+            $lrArray = is_array($order->lr) ? $order->lr : json_decode($order->lr, true);
+            $matchedLr = collect($lrArray)->firstWhere('lr_number', $item['lr_number']);
     
-            $lrData = json_decode($lrJson, true);
+            if ($matchedLr) {
+                $freightBill = FreightBill::create([
+                    'order_id' => $item['order_id'],
+                    'freight_bill_number' => $freightBillNumber,
+                    'lr_number' => $matchedLr['lr_number'],
+                    'notes' => null,
+                ]);
     
-            // If still not array, decode again (nested)
-            if (!is_array($lrData)) {
-                $lrData = json_decode(json_decode($lrJson), true);
-            }
-    
-            // Ab har entry check karo
-            foreach ($lrData as $entry) {
-                if (
-                    isset($entry['lr_number']) &&
-                    in_array(trim($entry['lr_number']), array_map('trim', $inputLrNumbers))
-                ) {
-                    // Extra data chahiye to order se attach kar lo
-                    $entry['order_id'] = $order->id ?? null;
-                    $matchedEntries[] = $entry;
+                if ($freightBillId === null) {
+                    $freightBillId = $freightBill->id;
                 }
             }
         }
     
-        if (empty($matchedEntries)) {
-            return redirect()->back()->with('error', 'No matching LR Numbers found.');
-        }
-    
-        $vehicles = \App\Models\Vehicle::all();
-        $users = \App\Models\User::all();
-    
-        return view('admin.freight-bill.view', compact('matchedEntries', 'vehicles', 'users'));
+        return redirect()->route('admin.freight-bill.view', $freightBillId)
+            ->with('success', 'Freight bill generated successfully.');
     }
     
-    
-    
 
-    public function update(Request $request, $id)
+
+    public function show($id)
     {
-        // Validate the input
-        $validated = $request->validate([
-            'consignor_name' => 'required|string|max:255',
-            'consignor_loading' => 'nullable|string|max:255',
-            'consignor_gst' => 'nullable|string|max:20',
+        // 1) fetch the “anchor” FreightBill
+        $anchor = FreightBill::with('order')->findOrFail($id);
+    
+        // 2) grab its bill-number, then all entries with that same bill-number
+        $allEntries = FreightBill::where('freight_bill_number', $anchor->freight_bill_number)
+                                 ->get();
+    
+        $matchedEntries = [];
+    
+        foreach ($allEntries as $entry) {
+            // 3) for each FreightBill row, load the original Order
+            $order = Order::where('order_id', $entry->order_id)->first();
 
-            'consignee_name' => 'required|string|max:255',
-            'consignee_unloading' => 'nullable|string|max:255',
-            'consignee_gst' => 'nullable|string|max:20',
+            if (! $order) continue;
+    
+            // 4) decode that order’s JSON “lr” field
+            $lrs = is_array($order->lr)
+                   ? $order->lr
+                   : json_decode($order->lr, true);
+    
+            // 5) find the one sub-array whose lr_number matches this entry
+            foreach ($lrs as $lrDetail) {
+                if (($lrDetail['lr_number'] ?? null) === $entry->lr_number) {
+                    // ✅ Add from/to location names
+                $lrDetail['destination'] = Destination::find($lrDetail['from_location'])->destination ?? '-';
+                $lrDetail['destination'] = Destination::find($lrDetail['to_location'])->destination ?? '-';
+                
+                // ✅ Add order_method as freight_type
+                $lrDetail['freight_type'] = $order->order_method ?? '-';
 
-            'vehicle_date'         => 'required|date',
-            'vehicle_type'         => 'required|string|max:100',
-            'vehicle_ownership'    => 'required|in:Own,Other',
-
-            'delivery_mode'        => 'required|string|in:Road,Rail,Air',
-            'from_location'        => 'required|string|max:100',
-            'to_location'          => 'required|string|max:100',
+                    $matchedEntries[] = $lrDetail;
+                    break;
+                }
+            }
+        }
+    
+        // 6) get the order once from anchor
+        $order = $anchor->order;
+    
+        // 7) pass everything to view
+        return view('admin.freight-bill.view', [
+            'freightBill'    => $anchor,
+            'matchedEntries' => $matchedEntries,
+            'order'          => $order, // ✅ FIX: sending $order to view
+        ]);
+    }
+    
+    public function editByNumber($freight_bill_number)
+    {
+        $freightBills = FreightBill::where('freight_bill_number', $freight_bill_number)->get();
+    
+        if ($freightBills->isEmpty()) {
+            abort(404, 'Freight Bill not found.');
+        }
+    
+        $matchedEntries = [];
+    
+        foreach ($freightBills as $freightBill) {
+            $order = Order::where('order_id', $freightBill->order_id)->first();
+    
+            if ($order) {
+                $matchedEntries[] = [
+                    'lr_number' => $freightBill->lr_number,
+                    'lr_date' => $order->order_date,
+                    'destination' => $order->from . ' - ' . $order->to,
+                    'freight_type' => $order->order_method,
+                    'rate' => $freightBill->rate ?? '-',
+                    'amount' => $freightBill->amount ?? '-',
+                    'cargo' => [
+                        [
+                            'package_description' => $order->description ?? '-',
+                            'weight' => $freightBill->weight ?? '-',
+                        ]
+                    ]
+                ];
+            }
+        }
+    
+        // Optionally send first order if needed
+        $firstOrder = Order::where('order_id', $freightBills->first()->order_id)->first();
+    
+        return view('admin.freight-bill.edit', [
+            'freightBillNumber' => $freight_bill_number,
+            'order' => $firstOrder, // optional
+            'matchedEntries' => $matchedEntries
+        ]);
+    }
+    
+    // नया update method
+    public function update(Request $request, $freight_bill_number)
+    {
+        $data = $request->validate([
+            'notes' => 'nullable|string|max:2000',
         ]);
 
-        // Find the order by ID and update
-        $order = Order::findOrFail($id);
-        $order->update($validated);
+        // सभी रिकॉर्ड्स में same notes अपडेट कर देते हैं
+        FreightBill::where('freight_bill_number', $freight_bill_number)
+                   ->update(['notes' => $data['notes']]);
 
-        // Redirect back to the list page with success
-        return redirect()->route('admin.freight-bill.index')->with('success', 'Consignment updated successfully!');
+        return redirect()
+            ->route('admin.freight-bill.edit', $freight_bill_number)
+            ->with('success', 'Notes updated successfully.');
     }
 
-   
-
-    public function store(Request $request)
-   {
-    // ✅ Step 1: Validation
-    $validated = $request->validate([
-        'consignor_name' => 'required|string|max:255',
-        'consignor_loading' => 'nullable|string|max:255',
-        'consignor_gst' => 'nullable|string|max:20',
-
-        'consignee_name' => 'required|string|max:255',
-        'consignee_unloading' => 'nullable|string|max:255',
-        'consignee_gst' => 'nullable|string|max:20',
-
-        'vehicle_date'         => 'required|date',
-        'vehicle_type'         => 'required|string|max:100',
-        'vehicle_ownership'    => 'required|in:Own,Other',
-
-        'delivery_mode'        => 'required|string|in:Road,Rail,Air',
-        'from_location'        => 'required|string|max:100',
-        'to_location'          => 'required|string|max:100',
-    ]);
-
-    // ✅ Step 2: Generate Unique Order ID
-    $order_id = strtoupper(uniqid('LR_'));
-
-    // ✅ Step 3: Get vehicle_id using vehicle_type
-    $vehicle = Vehicle::where('vehicle_type', $request->input('vehicle_type'))->first();
-
-    // ✅ Step 4: Prepare data
-    $data = array_merge($validated, [
-        'order_id' => $order_id,
-        'vehicle_id' => $vehicle ? $vehicle->id : null,
-    ]);
-    // ✅ Step 4: Insert into DB
-    try {
-        $order = Order::create($data);
-
-        return redirect()->route('admin.freight-bill.index')
-            ->with('success', 'Consignment created successfully with Order ID: ' . $order_id);
-    } catch (\Exception $e) {
-        return back()->withErrors(['msg' => 'Error creating order: ' . $e->getMessage()]);
-    }
-   }
-
-
-
-   public function destroy($order_id)
-    {
-        // Get all orders with the same order_id
-        $orders = Order::where('order_id', $order_id)->get();
-    
-        if ($orders->isEmpty()) {
-            return response()->json(['status' => 'error', 'message' => 'No entries found for this order_id.'], 404);
-        }
-    
-        try {
-            // Delete all related LRs
-            foreach ($orders as $order) {
-                $order->delete();
-            }
-    
-            return response()->json(['status' => 'success', 'message' => 'All entries under this Order ID deleted successfully.']);
-        } catch (\Exception $e) {
-            return response()->json(['status' => 'error', 'message' => 'Error while deleting entries.'], 500);
-        }
-    }
 
 }
