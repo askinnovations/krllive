@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Backend;
 use Illuminate\Support\Facades\Storage;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
@@ -121,11 +121,11 @@ public function index()
             // 5) find the one sub-array whose lr_number matches this entry
             foreach ($lrs as $lrDetail) {
                 if (($lrDetail['lr_number'] ?? null) === $entry->lr_number) {
-                    // ✅ Add from/to location names
+                    
                 $lrDetail['destination'] = Destination::find($lrDetail['from_location'])->destination ?? '-';
                 $lrDetail['destination'] = Destination::find($lrDetail['to_location'])->destination ?? '-';
                 
-                // ✅ Add order_method as freight_type
+             
                 $lrDetail['freight_type'] = $order->order_method ?? '-';
 
                     $matchedEntries[] = $lrDetail;
@@ -141,7 +141,7 @@ public function index()
         return view('admin.freight-bill.view', [
             'freightBill'    => $anchor,
             'matchedEntries' => $matchedEntries,
-            'order'          => $order, // ✅ FIX: sending $order to view
+            'order'          => $order, 
         ]);
     }
     

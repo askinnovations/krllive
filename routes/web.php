@@ -5,10 +5,13 @@ use App\Http\Controllers\Frontend\HomeController;
 use App\Http\Controllers\Frontend\DashboardController;
 use App\Http\Controllers\Frontend\Auth\RegisterController as FrontendRegisterController;
 use App\Http\Controllers\Frontend\Auth\LoginController as FrontendLoginController;
+use App\Http\Controllers\Backend\Auth\LoginController as BackendLoginController;
 
 
-use App\Http\Controllers\{
-    EmployeeController, PayrollController, Auth\LoginController, AdminDashboardController, DestinationController,
+
+
+use App\Http\Controllers\Backend\{
+    EmployeeController, PayrollController, AdminDashboardController, DestinationController,
     UserController, TyreController, WarehouseController, OrderController, PackageTypeController,
     ConsignmentNoteController, FreightBillController, StockTransferController, DriverController,
     AttendanceController, MaintenanceController, VehicleController, TaskManagmentController, ContractController,
@@ -39,7 +42,7 @@ Route::prefix('user')->name('user.')->group(function () {
     });
 });
 
-// ✅ Frontend Pages
+
 Route::get('/', [HomeController::class, 'index'])->name('front.index');
 Route::get('/about', [HomeController::class, 'about'])->name('front.about');
 Route::get('/contact', [HomeController::class, 'contact'])->name('front.contact');
@@ -54,9 +57,9 @@ Route::post('/save-order', [HomeController::class, 'saveOrder'])->name('order.sa
 Route::prefix('admin')->group(function () {
 
     // Login & Logout Routes
-    Route::get('/login', [LoginController::class, 'showLoginForm'])->name('admin.login');
-    Route::post('/login', [LoginController::class, 'login'])->name('admin.login.submit');
-    Route::get('/logout', [LoginController::class, 'logout'])->name('admin.logout');
+    Route::get('/login', [BackendLoginController::class, 'showLoginForm'])->name('admin.login');
+    Route::post('/login', [BackendLoginController::class, 'login'])->name('admin.login.submit');
+    Route::get('/logout', [BackendLoginController::class, 'logout'])->name('admin.logout');
 
     // Dashboard Route
     Route::get('/dashboard', [AdminDashboardController::class, 'index'])->name('admin.dashboard');
@@ -195,14 +198,14 @@ Route::prefix('admin')->group(function () {
 
    });
       
-   // Orders Management
+ 
     Route::prefix('orders')->group(function () {
         Route::get('/', [OrderController::class, 'index'])->name('admin.orders.index');
         Route::get('/create', [OrderController::class, 'create'])->name('admin.orders.create');
         Route::post('/store', [OrderController::class, 'store'])->name('admin.orders.store');
         Route::get('/edit/{order_id}', [OrderController::class, 'edit'])->name('admin.orders.edit');
         Route::get('/view/{order_id}', [OrderController::class, 'show'])->name('admin.orders.view');
-        Route::get('/documents/{order_id}', [OrderCon0troller::class, 'docView'])->name('admin.orders.documents');
+        Route::get('/documents/{order_id}', [OrderController::class, 'docView'])->name('admin.orders.documents');
         Route::post('/update/{order_id}', [OrderController::class, 'update'])->name('admin.orders.update');
         Route::delete('/delete/{order_id}', [OrderController::class, 'destroy'])->name('admin.orders.delete');
     });
