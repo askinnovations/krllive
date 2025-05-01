@@ -334,7 +334,7 @@
          @endphp
          @foreach ($cargoData as $index => $cargo)
          <tr>
-            <td><input type="number" name="cargo[{{ $index }}][packages_no]" class="form-control" value="{{ $cargo['packages_no'] }}" required></td>
+            <td><input type="number" name="cargo[{{ $index }}][packages_no]" class="form-control" value="{{ $cargo['packages_no'] }}" ></td>
             <td>
                <select name="cargo[{{ $index }}][package_type]" class="form-select  " required>
                   <option value="Pallets" {{ $cargo['package_type'] == 'Pallets' ? 'selected' : '' }}>Pallets</option>
@@ -342,26 +342,27 @@
                   <option value="Bags" {{ $cargo['package_type'] == 'Bags' ? 'selected' : '' }}>Bags</option>
                </select>
             </td>
-            <td><input type="text" name="cargo[{{ $index }}][package_description]" class="form-control" value="{{ $cargo['package_description'] }}" required></td>
-            <td><input type="number" name="cargo[{{ $index }}][actual_weight]" class="form-control" value="{{ $cargo['actual_weight'] }}" required></td>
-            {{-- <td><input type="number" name="cargo[{{ $index }}][charged_weight]" class="form-control" value="{{ $cargo['charged_weight'] }}" required></td> --}}
+            <td><input type="text" name="cargo[{{ $index }}][package_description]" class="form-control" value="{{ $cargo['package_description'] }}" ></td>
+            <td><input type="number" name="cargo[{{ $index }}][actual_weight]" class="form-control" value="{{ $cargo['actual_weight'] }}" ></td>
+            
             <td><input type="number" name="cargo[{{ $index }}][charged_weight]"   value="{{ $cargo['charged_weight'] }}" class="form-control" oninput="calculateTotalChargedWeight()"></td>
 
             <td>
-               <select class="form-select " name="cargo[{{ $index }}][unit]" required>
-                  <option value="">Select Unit</option>
-                  <option value="kg" {{ ($cargo['unit'] ?? '') == 'kg' ? 'selected' : '' }}>Kg</option>
-                  <option value="ton" {{ ($cargo['unit'] ?? '') == 'ton' ? 'selected' : '' }}>Ton</option>
-              </select>
-             </td>
-            <td><input type="text" name="cargo[{{ $index }}][document_no]" class="form-control" value="{{ $cargo['document_no'] }}" required></td>
-            <td><input type="text" name="cargo[{{ $index }}][document_name]" class="form-control" value="{{ $cargo['document_name'] }}" required></td>
-            <td><input type="date" name="cargo[{{ $index }}][document_date]" class="form-control" value="{{ $cargo['document_date'] }}" required></td>
+            <select class="form-select" name="cargo[{{ $index }}][unit]">
+                <option value="">Select Unit</option>
+                <option value="kg" {{ ($cargo['unit'] ?? '') == 'kg' ? 'selected' : '' }}>Kg</option>
+                <option value="ton" {{ ($cargo['unit'] ?? '') == 'ton' ? 'selected' : '' }}>Ton</option>
+            </select>
+            </td>
+
+            <td><input type="text" name="cargo[{{ $index }}][document_no]" class="form-control" value="{{ $cargo['document_no'] }}" ></td>
+            <td><input type="text" name="cargo[{{ $index }}][document_name]" class="form-control" value="{{ $cargo['document_name'] }}" ></td>
+            <td><input type="date" name="cargo[{{ $index }}][document_date]" class="form-control" value="{{ $cargo['document_date'] }}" ></td>
             <td><input type="file" name="cargo[{{ $index }}][document_file]" class="form-control" >
             <input type="hidden" name="cargo[{{ $index }}][old_document_file]" class="form-control" value="{{ $cargo['document_file'] }}" ></td>
-            <td><input type="text" name="cargo[{{ $index }}][eway_bill]" class="form-control" value="{{ $cargo['eway_bill'] }}" required></td>
-            <td><input type="date" name="cargo[{{ $index }}][valid_upto]" class="form-control" value="{{ $cargo['valid_upto'] }}" required></td>
-            <td><input name="cargo[{{ $index }}][declared_value]" type="number" value="{{ $cargo['declared_value'] }}" class="form-control" placeholder="0" required></td>
+            <td><input type="text" name="cargo[{{ $index }}][eway_bill]" class="form-control" value="{{ $cargo['eway_bill'] }}" ></td>
+            <td><input type="date" name="cargo[{{ $index }}][valid_upto]" class="form-control" value="{{ $cargo['valid_upto'] }}" ></td>
+            <td><input name="cargo[{{ $index }}][declared_value]" type="number" value="{{ $cargo['declared_value'] }}" class="form-control" placeholder="0" ></td>
 
             <td>
                <button type="button" class="btn btn-danger btn-sm" onclick="removeRow(this)">🗑</button>
@@ -380,83 +381,69 @@
                </div>
                <!-- Freight Details Section -->
                <div class="row mt-4">
-                  <div class="col-12">
-                     <h5 class=" pb-3">🚚 Freight Details</h5>
-                     <div class="mb-3 d-flex gap-3">
+                <div class="col-12">
+                    <h5 class="pb-3">🚚 Freight Details</h5>
+                    <div class="mb-3 d-flex gap-3">
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input freight-type" type="radio" name="freightType"
+                            id="freightPaid" value="paid"
+                            onchange="toggleFreightTable()"
+                            {{ (isset($lrData['freightType']) && $lrData['freightType'] == 'paid') ? 'checked' : '' }}>
+                            <label class="form-check-label" for="freightPaid">Paid</label>
+                        </div>
 
                         <div class="form-check form-check-inline">
                             <input class="form-check-input freight-type" type="radio" name="freightType"
-                                id="freightPaid" value="paid"
-                                onchange="toggleFreightTable()"
-                                {{ (isset($lrData['freightType']) && $lrData['freightType'] == 'paid') ? 'checked' : '' }}>
-                            <label class="form-check-label" for="freightPaid">Paid</label>
-                        </div>
-                    
-                        <div class="form-check form-check-inline">
-                            <input class="form-check-input freight-type" type="radio" name="freightType"
-                                id="freightToPay" value="to_pay"
-                                onchange="toggleFreightTable()"
-                                {{ (isset($lrData['freightType']) && $lrData['freightType'] == 'to_pay') ? 'checked' : '' }}>
+                            id="freightToPay" value="to_pay"
+                            onchange="toggleFreightTable()"
+                            {{ (isset($lrData['freightType']) && $lrData['freightType'] == 'to_pay') ? 'checked' : '' }}>
                             <label class="form-check-label" for="freightToPay">To Pay</label>
                         </div>
-                    
+
                         <div class="form-check form-check-inline">
                             <input class="form-check-input freight-type" type="radio" name="freightType"
-                                id="freightToBeBilled" value="to_be_billed"
-                                onchange="toggleFreightTable()"
-                                {{ (isset($lrData['freightType']) && $lrData['freightType'] == 'to_be_billed') ? 'checked' : '' }}>
+                            id="freightToBeBilled" value="to_be_billed"
+                            onchange="toggleFreightTable()"
+                            {{ (isset($lrData['freightType']) && $lrData['freightType'] == 'to_be_billed') ? 'checked' : '' }}>
                             <label class="form-check-label" for="freightToBeBilled">To Be Billed</label>
                         </div>
-                    
                     </div>
-                    
-                     <!-- Freight Charges Table -->
-                     <div class="table-responsive">
+
+                    <!-- Freight Charges Table -->
+                    <div class="table-responsive" id="freightTableContainer">
                         <table class="table table-bordered align-middle text-center" id="freight-table">
-                           <thead>
-                              <tr>
-                                 <th>Freight</th>
-                                 <th>LR Charges</th>
-                                 <th>Hamali</th>
-                                 <th>Other Charges</th>
-                                 <th>GST</th>
-                                 <th>Total Freight</th>
-                                 <th>Less Advance</th>
-                                 <th>Balance Freight</th>
-                              </tr>
-                           </thead>
-                           <tbody id="freightBody">
-                                  <tr>
-                                     <td>
-                                       <input type="number" name="freight_amount" value="{{ old('freight_amount', $lrData['freight_amount'] ?? '') }}" class="form-control freight-amount" placeholder="Enter Freight Amount" readonly>
-                                     </td>
-                                     <td>
-                                       <input type="number" name="lr_charges"  value="{{ old('lr_charges', $lrData['lr_charges'] ?? '') }}" class="form-control lr-charges" placeholder="Enter LR " required>
-                                     </td>
-                                     <td>
-                                       <input type="number" name="hamali"  value="{{ old('hamali', $lrData['hamali'] ?? '') }}" class="form-control hamali" placeholder="Enter Hamali " required>
-                                     </td>
-                                     <td>
-                                       <input type="number" name="other_charges"   value="{{ old('other_charges', $lrData['other_charges'] ?? '') }}" class="form-control other-charges" placeholder="Enter Other " required>
-                                     </td>
-                                     <td>
-                                       <input type="number" name="gst_amount"  value="{{ old('gst_amount', $lrData['gst_amount'] ?? '') }}" class="form-control gst-amount" placeholder=" GST Amount" readonly>
-                                     </td>
-                                     <td>
-                                       <input type="number" name="total_freight"  value="{{ old('total_freight', $lrData['total_freight'] ?? '') }}" class="form-control total-freight" placeholder="Total Freight" readonly>
-                                     </td>
-                                     <td>
-                                       <input type="number" name="less_advance"  value="{{ old('less_advance', $lrData['less_advance'] ?? '') }}" class="form-control less-advance" placeholder="Less Advance Amount" required>
-                                     </td>
-                                     <td>
-                                       <input type="number" name="balance_freight"  value="{{ old('balance_freight', $lrData['balance_freight'] ?? '') }}" class="form-control balance-freight" placeholder="Balance Freight" readonly>
-                                     </td>
-                                   </tr>
-                           </tbody>
+                            <thead>
+                            <tr>
+                                <th>Freight</th>
+                                <th>LR Charges</th>
+                                <th>Hamali</th>
+                                <th>Other Charges</th>
+                                <th>GST</th>
+                                <th>Total Freight</th>
+                                <th>Less Advance</th>
+                                <th>Balance Freight</th>
+                            </tr>
+                            </thead>
+                            <tbody id="freightBody">
+                               
+                            <tr>
+                                <td><input type="number" name="freight_amount" value="{{ old('freight_amount', $lrData['freight_amount'] ?? '') }}" class="form-control freight-amount" placeholder="Enter Freight Amount" readonly></td>
+                                <td><input type="number" name="lr_charges" value="{{ old('lr_charges', $lrData['lr_charges'] ?? '') }}" class="form-control lr-charges" placeholder="Enter LR" required></td>
+                                <td><input type="number" name="hamali" value="{{ old('hamali', $lrData['hamali'] ?? '') }}" class="form-control hamali" placeholder="Enter Hamali" required></td>
+                                <td><input type="number" name="other_charges" value="{{ old('other_charges', $lrData['other_charges'] ?? '') }}" class="form-control other-charges" placeholder="Enter Other" required></td>
+                                <td><input type="number" name="gst_amount" value="{{ old('gst_amount', $lrData['gst_amount'] ?? '') }}" class="form-control gst-amount" placeholder="GST Amount" readonly></td>
+                                <td><input type="number" name="total_freight" value="{{ old('total_freight', $lrData['total_freight'] ?? '') }}" class="form-control total-freight" placeholder="Total Freight" readonly></td>
+                                <td><input type="number" name="less_advance" value="{{ old('less_advance', $lrData['less_advance'] ?? '') }}" class="form-control less-advance" placeholder="Less Advance Amount" required></td>
+                                <td><input type="number" name="balance_freight" value="{{ old('balance_freight', $lrData['balance_freight'] ?? '') }}" class="form-control balance-freight" placeholder="Balance Freight" readonly></td>
+                            </tr>
+                            </tbody>
                         </table>
-                     </div>
-                  </div>
-               </div>
+                    </div>
+                </div>
+                </div>
+                <!-- Freight Details Section -->
+
+
                <div class="row">
                   <!-- Declared Value -->
                   <div class="col-md-6 mt-3">
@@ -747,4 +734,22 @@
   
     
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<!-- jQuery Script -->
+
+<script>
+   function toggleFreightTable() {
+      const selectedType = $('input[name="freightType"]:checked').val();
+      if (selectedType === 'to_be_billed') {
+         $('#freightTableContainer').hide();
+      } else {
+         $('#freightTableContainer').show();
+      }
+   }
+
+   // Run on page load
+   $(document).ready(function () {
+      toggleFreightTable();
+   });
+</script>
+
 @endsection

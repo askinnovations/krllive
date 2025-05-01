@@ -130,9 +130,6 @@ Route::prefix('admin')->group(function () {
         Route::get('/delete/{id}', [VehicleTypeController::class, 'destroy'])->name('admin.vehicletype.delete');
     }); 
 
-    
-
-
     // SettingsController
 
     Route::prefix('settings')->group(function () {
@@ -140,8 +137,6 @@ Route::prefix('admin')->group(function () {
         Route::post('/store', [SettingsController::class, 'store'])->name('admin.settings.store');
 
     });
-
-    
 
 
     // Warehouse Management
@@ -207,7 +202,7 @@ Route::prefix('admin')->group(function () {
         Route::post('/store', [OrderController::class, 'store'])->name('admin.orders.store');
         Route::get('/edit/{order_id}', [OrderController::class, 'edit'])->name('admin.orders.edit');
         Route::get('/view/{order_id}', [OrderController::class, 'show'])->name('admin.orders.view');
-        Route::get('/documents/{order_id}', [OrderController::class, 'docView'])->name('admin.orders.documents');
+        Route::get('/documents/{order_id}', [OrderCon0troller::class, 'docView'])->name('admin.orders.documents');
         Route::post('/update/{order_id}', [OrderController::class, 'update'])->name('admin.orders.update');
         Route::delete('/delete/{order_id}', [OrderController::class, 'destroy'])->name('admin.orders.delete');
     });
@@ -230,15 +225,13 @@ Route::prefix('admin')->group(function () {
         Route::get('/', [FreightBillController::class, 'index'])->name('admin.freight-bill.index');
         Route::get('/create', [FreightBillController::class, 'create'])->name('admin.freight-bill.create');
         Route::post('/store', [FreightBillController::class, 'store'])->name('admin.freight-bill.store');
-        Route::put('/update/{id}', [FreightBillController::class, 'update'])->name('admin.freight-bill.update');
+        Route::get('/view/{id}', [FreightBillController::class, 'show'])->name('admin.freight-bill.view');
+        Route::get('/edit-by-number/{freight_bill_number}', [FreightBillController::class, 'editByNumber'])->name('admin.freight-bill.edit');
+        Route::put('/update/{freight_bill_number}', [FreightBillController::class, 'update'])->name('admin.freight-bill.update');
         Route::delete('/delete/{id}', [FreightBillController::class, 'destroy'])->name('admin.freight-bill.delete');
-        
     });
 
     Route::get('/stock-transfer/index', [StockTransferController::class, 'index'])->name('admin.stock.index');
-    // Route::post('/get-contract-rate', [ContractController::class, 'getRate'])->name('get.contract.rate');
-   
-
     
 });
 

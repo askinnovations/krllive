@@ -103,7 +103,7 @@ class ConsignmentNoteController extends Controller
             'insurance_description' => $request->insurance_description,
             'insurance_status'    => $request->insurance_status,
             'total_declared_value' => $request->total_declared_value,
-            'order_rate' => $request->order_rate,
+            'order_rate'         => $request->order_rate,
     
             // Consignor data
             'consignor_id'        => $request->consignor_id,
@@ -231,6 +231,7 @@ class ConsignmentNoteController extends Controller
             'less_advance'           => $less_advance,
             'balance_freight'        => $balance_freight,
             'total_declared_value'   => $request->total_declared_value,
+            'order_rate'             => $request->order_rate,
     
             // Cargo list
             'cargo'                  => $cargoArray,

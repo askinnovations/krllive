@@ -191,26 +191,29 @@
       <div class="box left-box">
         <strong>BILL TO / CONSIGNMENT SENT TO:</strong><br>
         [Party Name & Address Here]<br>
-        <strong>Freight:</strong> [Type]
+        <strong>Freight Type:</strong> {{ $order->order_method }}
       </div>
       <div class="box right-box">
-        <strong>Bill No.:</strong> ___________<br>
-        <strong>Date:</strong> ______________
+        <strong>Bill No.:</strong>{{ $freightBill->freight_bill_number ?? '-' }}<br>
+        <strong>Date:</strong>{{ \Carbon\Carbon::parse($order->order_date)->format('d-m-Y') }}
       </div>
     </div>
 
+
+    @foreach ($matchedEntries as $entry)
     <div class="section">
-  <div class="box half-box">
-    <strong>From:</strong><br>
-    
-      
-  </div>
-  
-  <div class="box half-box">
-    <strong>To:</strong><br>
-   
-  </div>
-</div>
+      <div class="box half-box">
+        <strong>From:</strong><br>
+        {{ $entry['destination'] }}
+      </div>
+
+      <div class="box half-box">
+        <strong>To:</strong><br>
+        {{ $entry['destination'] }}
+      </div>
+    </div>
+  @endforeach
+
 
     
 
@@ -228,18 +231,18 @@
       </tr>
   </thead>
   <tbody>
-      @foreach($matchedEntries as $index => $entry)
-          <tr>
-              <td>{{ $index + 1 }}</td>
-              <td>{{ $entry['lr_number'] }}</td>
-              <td>{{ \Carbon\Carbon::parse($entry['lr_date'])->format('Y-m-d') }}</td>
-              <td>{{ $entry['cargo'][0]['package_description'] ?? '-' }}</td>
-              <td>{{ $entry['freight_type'] ?? '-' }}</td>
-              <td>{{ $entry['cargo'][0]['weight'] ?? '-' }}</td>
-              <td>{{ $entry['rate'] ?? '-' }}</td>
-              <td>{{ $entry['amount'] ?? '-' }}</td>
-          </tr>
-      @endforeach
+  @foreach($matchedEntries as $index => $entry)
+      <tr>
+        <td>{{ $index + 1 }}</td>
+        <td>{{ $entry['lr_number'] }}</td>
+        <td>{{ \Carbon\Carbon::parse($entry['lr_date'])->format('Y-m-d') }}</td>
+        <td>{{ $entry['cargo'][0]['package_description'] ?? '-' }}</td>
+        <td>{{ $entry['freight_type'] ?? '-' }}</td>
+        <td>{{ $entry['cargo'][0]['weight'] ?? '-' }}</td>
+        <td>{{ $entry['rate'] ?? '-' }}</td>
+        <td>{{ $entry['amount'] ?? '-' }}</td>
+      </tr>
+    @endforeach
   </tbody>
 </table>
 

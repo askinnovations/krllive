@@ -35,7 +35,7 @@
                <h4>🚚 Add LR / Consignment</h4>
                <p class="mb-0">Fill in the required details for shipment and delivery.</p>
             </div>
-            <a href="{{ route('admin.consignments.create') }}" class="btn" id="backToListBtn"
+            <a href="{{ route('admin.consignments.index') }}" class="btn" id="backToListBtn"
                style="background-color: #ca2639; color: white; border: none;">
             ⬅ Back to Listing
             </a>
@@ -96,7 +96,7 @@
                      </div>
                      <div class="mb-3 ">
                         <label class="form-label">💰 ORDER Rate</label>
-                        <input type="number" name="order_rate" class="form-control" placeholder="Enter Amount" id="byoder">
+                        <input type="number" name="order_rate" step="0.01" class="form-control" placeholder="Enter Amount" id="byoder">
                      </div>
                   </div>
                   <!-- Consignee Details -->
@@ -330,7 +330,7 @@
                <!-- Freight Details Section -->
                <div class="row mt-4">
                   <div class="col-12">
-                     <h5 class=" pb-3">🚚 Freight Details</h5>
+                     <h5 class="pb-3">🚚 Freight Details</h5>
                      <div class="mb-3 d-flex gap-3">
                         <div class="form-check form-check-inline">
                            <input class="form-check-input freight-type" type="radio" name="freightType" id="freightPaid" value="paid" onchange="toggleFreightTable()" checked>
@@ -345,8 +345,9 @@
                            <label class="form-check-label" for="freightToBeBilled">To Be Billed</label>
                         </div>
                      </div>
+
                      <!-- Freight Charges Table -->
-                     <div class="table-responsive">
+                     <div class="table-responsive" id="freightTableContainer">
                         <table class="table table-bordered align-middle text-center" id="freight-table">
                            <thead>
                               <tr>
@@ -360,38 +361,24 @@
                                  <th>Balance Freight</th>
                               </tr>
                            </thead>
-                           <tbody id="freightBody">
+                           <tbody>
                               <tr>
-                                 <td>
-                                    <input type="number" name="freight_amount" class="form-control freight-amount" placeholder="Enter Freight Amount" readonly>
-                                 </td>
-                                 <td>
-                                    <input type="number" name="lr_charges" class="form-control lr-charges" placeholder="Enter LR " required>
-                                 </td>
-                                 <td>
-                                    <input type="number" name="hamali" class="form-control hamali" placeholder="Enter Hamali " required>
-                                 </td>
-                                 <td>
-                                    <input type="number" name="other_charges" class="form-control other-charges" placeholder="Enter Other " required>
-                                 </td>
-                                 <td>
-                                    <input type="number" name="gst_amount" class="form-control gst-amount" placeholder=" GST Amount" readonly>
-                                 </td>
-                                 <td>
-                                    <input type="number" name="total_freight" class="form-control total-freight" placeholder="Total Freight" readonly>
-                                 </td>
-                                 <td>
-                                    <input type="number" name="less_advance" class="form-control less-advance" placeholder="Less Advance Amount" required>
-                                 </td>
-                                 <td>
-                                    <input type="number" name="balance_freight" class="form-control balance-freight" placeholder="Balance Freight" readonly>
-                                 </td>
+                                 <td><input type="number" name="freight_amount" step="0.01" class="form-control freight-amount" placeholder="Enter Freight Amount" readonly></td>
+                                 <td><input type="number" name="lr_charges" step="0.01"class="form-control lr-charges" placeholder="Enter LR " ></td>
+                                 <td><input type="number" name="hamali" step="0.01"class="form-control hamali" placeholder="Enter Hamali " ></td>
+                                 <td><input type="number" name="other_charges" step="0.01" class="form-control other-charges" placeholder="Enter Other " ></td>
+                                 <td><input type="number" name="gst_amount" step="0.01"class="form-control gst-amount" placeholder="GST Amount" readonly></td>
+                                 <td><input type="number" name="total_freight" step="0.01" class="form-control total-freight" placeholder="Total Freight" readonly></td>
+                                 <td><input type="number" name="less_advance" step="0.01" class="form-control less-advance" placeholder="Less Advance Amount"></td>
+                                 <td><input type="number" name="balance_freight" step="0.01" class="form-control balance-freight" placeholder="Balance Freight" ></td>
                               </tr>
                            </tbody>
                         </table>
                      </div>
                   </div>
                </div>
+               <!-- Freight Details Section -->
+
                <div class="row">
                   <!-- Declared Value -->
                   <div class="col-md-6 mt-3">
@@ -588,6 +575,7 @@
         document.getElementById('consignee_unloading').value = address;
     }
 </script>
+
 <script>
    document.addEventListener('input', function(e) {
        const row = e.target.closest('tr');
@@ -633,45 +621,7 @@
    
    
 <script>
-   // function updateFreightAmount() {
-   //     const byOrder = parseFloat(document.getElementById('byoder')?.value) || 0;
-   //     const chargedWeight = parseFloat(document.getElementById('totalChargedWeight')?.value) || 0;
-   //     const result = byOrder * chargedWeight;
    
-   //     const freightInput = document.querySelector('.freight-amount');
-   //     if (freightInput) {
-   //         freightInput.value = result.toFixed(2);
-   //     }
-   // }
-   
-   // // Fire input event manually after fake filler or auto-fill
-   // function triggerInputEvents() {
-   //     const byOrderInput = document.getElementById('byoder');
-   //     const chargedWeightInput = document.getElementById('totalChargedWeight');
-   
-   //     if (byOrderInput) {
-   //         byOrderInput.dispatchEvent(new Event('input', { bubbles: true }));
-   //     }
-   //     if (chargedWeightInput) {
-   //         chargedWeightInput.dispatchEvent(new Event('input', { bubbles: true }));
-   //     }
-   // }
-   
-   // // Attach event listeners safely after DOM is loaded
-   // document.addEventListener('DOMContentLoaded', function() {
-   //     const byOrderInput = document.getElementById('byoder');
-   //     const chargedWeightInput = document.getElementById('totalChargedWeight');
-   
-   //     if (byOrderInput) {
-   //         byOrderInput.addEventListener('input', updateFreightAmount);
-   //     }
-   //     if (chargedWeightInput) {
-   //         chargedWeightInput.addEventListener('input', updateFreightAmount);
-   //     }
-   
-   //     // Trigger input events after slight delay for fake filler compatibility
-   //     setTimeout(triggerInputEvents, 5); // 500ms wait for fake filler to fill data
-   // });
    // Update freight amount based on byOrder and totalChargedWeight
 function updateFreightAmount() {
     const byOrder = parseFloat(document.getElementById('byoder')?.value) || 0;
@@ -733,6 +683,25 @@ function calculateTotalChargedWeight() {
 }
    </script>
    
+
+   <!-- freight details -->
+   <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+   function toggleFreightTable() {
+      const selectedType = $('input[name="freightType"]:checked').val();
+      if (selectedType === 'to_be_billed') {
+         $('#freightTableContainer').hide(); // hide table
+      } else {
+         $('#freightTableContainer').show(); // show table
+      }
+   }
+
+   // Initialize on page load
+   $(document).ready(function () {
+      toggleFreightTable();
+   });
+</script>
+    <!-- freight details -->
    
    
 @endsection
