@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Backend;
 use Illuminate\Support\Facades\Storage;
 use App\Models\Vehicle;
 use App\Models\User;
