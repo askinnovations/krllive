@@ -9,7 +9,7 @@ use Spatie\Permission\Models\Permission;
 use App\Models\Module;
 use Illuminate\Routing\Controllers\HasMiddleware;
 use Illuminate\Routing\Controllers\Middleware;
-
+use Illuminate\Support\Facades\Auth;
 
 
 
@@ -18,7 +18,7 @@ class RoleController extends Controller implements HasMiddleware
     public static function middleware(): array
     {
         return [
-            new Middleware('admin.permission:view role', only: ['index']),
+            new Middleware('admin.permission:manage role', only: ['index']),
             new Middleware('admin.permission:create role', only: ['create']),
             new Middleware('admin.permission:edit role', only: ['edit']),
             new Middleware('admin.permission:delete role', only: ['destroy']),
@@ -44,7 +44,16 @@ class RoleController extends Controller implements HasMiddleware
         
 public function store(Request $request)
 {
+    // $admin = auth()->guard('admin')->user();
     
+    
+    // $role = $admin ? \App\Models\Role::find($admin->role) : null;
+
+   
+    // if (!$role || $role->name !== 'superadmin') {
+    //     return redirect()->route('admin.role.index')->with('error', 'Only Super Admin can add roles.');
+    // }
+
     $request->validate([
         'name' => 'required|string|unique:roles,name',
         'permissions' => 'required|array',

@@ -64,7 +64,8 @@
                                         <th>Description</th>
                                         <th>Format</th>
                                         <th>Health Status</th>
-                                        <th>Action</th>
+                                @if (hasAdminPermission('edit tyres') || hasAdminPermission('delete tyres')|| hasAdminPermission('view tyres'))
+                                <th>Action</th>@endif
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -79,6 +80,7 @@
                                             <td>{{ $tyre->format }}</td>
 
                                             <td><span class="badge bg-success">{{ $tyre->tyre_health }}</span></td>
+                                @if (hasAdminPermission('edit tyres') || hasAdminPermission('delete tyres')|| hasAdminPermission('view tyres'))
                                             <td>
                                                 @if (hasAdminPermission('view tyres'))
                                                 <button class="btn btn-sm btn-light view-btn"
@@ -115,9 +117,8 @@
                                                     </a>
                                                 </button>
                                                 @endif
-                                                
-
                                             </td>
+                                            @endif
                                         </tr>
                                     @endforeach
 

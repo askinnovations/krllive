@@ -64,7 +64,9 @@
             <th>Vendor</th>
             <th>Odometer Reading</th>
             <th>Autoparts</th>
-            <th>Action</th>
+        @if (hasAdminPermission('edit maintenance') || hasAdminPermission('delete maintenance')|| hasAdminPermission('view maintenance'))
+        <th>Action</th>
+        @endif
           </tr>
           </thead>
           <tbody>
@@ -99,6 +101,8 @@
       @endforeach
         </ul>
         </td>
+        @if (hasAdminPermission('edit maintenance') || hasAdminPermission('delete maintenance')|| hasAdminPermission('view maintenance'))
+
         <td>
           @if (hasAdminPermission('view maintenance'))
         <button class="btn btn-sm btn-light view-btn" data-id="{{ $maintenance->id }}"
@@ -126,6 +130,7 @@
         </button>
         @endif
         </td>
+        @endif
         </tr>
       @endforeach
           </tbody>

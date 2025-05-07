@@ -59,13 +59,17 @@
                                     <tr>
                                         <th>S.No</th>
                                         <th>Destination </th>
+                                @if (hasAdminPermission('edit destination') || hasAdminPermission('delete destination')|| hasAdminPermission('view destination'))
                                         <th>Action</th>
+                                        @endif
                                     </tr>
                                 </thead>
                                 <tbody>
                                     @foreach($tyres as $tyre)
                                     <td>{{ $loop->iteration  }}</td>
                                      <td>{{ $tyre->destination }}</td>
+                                @if (hasAdminPermission('edit destination') || hasAdminPermission('delete destination')|| hasAdminPermission('view destination'))
+
                                           <td>
 
                                             @if (hasAdminPermission('view destination'))
@@ -93,9 +97,8 @@
                                                     </a>
                                                 </button>
                                                 @endif
-                                                
-
                                             </td>
+                                            @endif
                                         </tr>
                                     @endforeach
 

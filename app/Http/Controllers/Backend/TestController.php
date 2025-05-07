@@ -21,7 +21,7 @@ class TestController extends Controller implements HasMiddleware
     public static function middleware(): array
     {
         return [
-            new Middleware('admin.permission:view users', only: ['index']),
+            new Middleware('admin.permission:manage users', only: ['index']),
             new Middleware('admin.permission:create users', only: ['create']),
             new Middleware('admin.permission:edit users', only: ['edit']),
             new Middleware('admin.permission:delete users', only: ['destroy']),

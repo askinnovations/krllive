@@ -17,7 +17,7 @@ class TaskManagmentController extends Controller implements HasMiddleware
     public static function middleware(): array
     {
         return [
-            new Middleware('admin.permission:view task_managment', only: ['index']),
+            new Middleware('admin.permission:manage task_managment', only: ['index']),
             new Middleware('admin.permission:create task_managment', only: ['create']),
             new Middleware('admin.permission:edit task_managment', only: ['edit']),
             new Middleware('admin.permission:delete task_managment', only: ['destroy']),

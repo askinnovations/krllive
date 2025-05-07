@@ -15,7 +15,7 @@ class WarehouseController extends Controller implements HasMiddleware
     public static function middleware(): array
     {
         return [
-            new Middleware('admin.permission:view warehouse', only: ['index']),
+            new Middleware('admin.permission:manage warehouse', only: ['index']),
             new Middleware('admin.permission:create warehouse', only: ['create']),
             new Middleware('admin.permission:edit warehouse', only: ['edit']),
             new Middleware('admin.permission:delete warehouse', only: ['destroy']),
@@ -48,8 +48,6 @@ class WarehouseController extends Controller implements HasMiddleware
         return redirect()->back()->with('error', 'Warehouse not created!');
 
     }
-
-
     public function update(Request $request,$id){
         $warehouse=Warehouse::find($id);
         $request->validate([

@@ -64,7 +64,9 @@
                                 <th>Date</th>
                                 <th>From</th>
                                 <th>To</th>
+                                @if (hasAdminPermission('edit lr_consignment') || hasAdminPermission('delete lr_consignment')|| hasAdminPermission('view lr_consignment'))
                                 <th>Action</th>
+                                @endif
                             </tr>
                         </thead>
                         <tbody>
@@ -103,7 +105,10 @@
                                             @endphp
                                             <td>{{ $fromDestination->destination ?? '-' }}</td>
                                             <td>{{ $toDestination->destination ?? '-' }}</td>
-                                            <td>
+
+
+                                             @if (hasAdminPermission('edit lr_consignment') || hasAdminPermission('delete lr_consignment')|| hasAdminPermission('view lr_consignment'))
+                                             <td>
                                                 @if (hasAdminPermission('view lr_consignment'))
                                                 <a href="{{ route('admin.consignments.documents', $lr['lr_number']) }}" class="btn btn-sm btn-light"><i class="fas fa-file-alt text-primary"></i></a>
                                                 @endif
@@ -118,6 +123,7 @@
                                                 <a href="{{ route('admin.consignments.delete', $order->order_id) }}" class="btn btn-sm btn-light"><i class="fas fa-trash text-danger"></i></a>
                                                @endif
                                             </td>
+                                            @endif
                                         </tr>
                                     @endforeach
                                 @endif

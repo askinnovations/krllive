@@ -44,7 +44,8 @@
                            <th>Consignment Details</th>
                            <th>Consignment Pickup Date</th>
                            <th>Status   </th>
-                           <th>Action</th>
+                          @if (hasAdminPermission('edit order_booking') || hasAdminPermission('delete order_booking')|| hasAdminPermission('view order_booking'))
+                           <th>Action</th>@endif
                         </tr>
                      </thead>
                     <tbody>
@@ -65,6 +66,8 @@
                                 {{-- <a href="{{ route('admin.orders.documents', $order->order_id) }}">documents
                               </a> --}}
                             </td>
+                        @if (hasAdminPermission('edit order_booking') || hasAdminPermission('delete order_booking')|| hasAdminPermission('view order_booking'))
+
                             <td>
                               @if (hasAdminPermission('view order_booking'))
                             <a href="{{ route('admin.orders.documents', $order->order_id) }}" class="btn btn-sm btn-light view-btn"><i class="fas fa-file-alt text-primary"></i>
@@ -83,6 +86,7 @@
                               <a href="{{ route('admin.orders.delete', $order->order_id) }}" class="btn btn-sm btn-light delete-btn"><i class="fas fa-trash text-danger"></i></a>
                               @endif
                             </td>
+                            @endif
                         </tr>
                         @endforeach
                     </tbody>

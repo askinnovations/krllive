@@ -14,7 +14,7 @@ class DestinationController extends Controller implements HasMiddleware
     public static function middleware(): array
     {
         return [
-            new Middleware('admin.permission:view destination', only: ['index']),
+            new Middleware('admin.permission:manage destination', only: ['index']),
             new Middleware('admin.permission:create destination', only: ['create']),
             new Middleware('admin.permission:edit destination', only: ['edit']),
             new Middleware('admin.permission:delete destination', only: ['destroy']),
