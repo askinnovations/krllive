@@ -315,8 +315,6 @@
                   <label class="form-label">Consignee GST</label>
                   <input type="text" name="lr[${counter}][consignee_gst]" id="consignee_gst_${counter}" class="form-control" placeholder="Enter GST number" required>
                   </div>
-   
-   
                  </div>
                </div>
                
@@ -325,8 +323,8 @@
                  <div class="col-md-4">
                    <div class="mb-3">
                      <label class="form-label">🚚 Vehicle Number</label>
-                    <select name="lr[${counter}][vehicle_no]" class="form-select search-select" required>
-                        <option value="" >Select vehicle number</option>
+                    <select name="lr[${counter}][vehicle_no]" class="form-select" required>
+                        <option  >Select vehicle number</option>
                           @foreach ($vehicles as $vehicle)
                            <option value="{{ $vehicle->vehicle_no }}">
                               {{ $vehicle->vehicle_no }}

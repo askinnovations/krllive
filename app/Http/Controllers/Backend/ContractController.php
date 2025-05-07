@@ -19,7 +19,7 @@ class ContractController extends Controller implements HasMiddleware
     public static function middleware(): array
     {
         return [
-            new Middleware('admin.permission:view contract', only: ['index']),
+            new Middleware('admin.permission:manage contract', only: ['index']),
             new Middleware('admin.permission:create contract', only: ['create']),
             new Middleware('admin.permission:edit contract', only: ['edit']),
             new Middleware('admin.permission:delete contract', only: ['destroy']),

@@ -59,13 +59,17 @@
                                     <tr>
                                         <th>S.No</th>
                                         <th>VehicleType </th>
-                                        <th>Action</th>
+                                            @if (hasAdminPermission('edit vehicle_type') || hasAdminPermission('delete vehicle_type') || hasAdminPermission('view vehicle_type') )
+                                            <th>Action</th>
+                                            @endif
                                     </tr>
                                 </thead>
                                 <tbody>
                                     @foreach($tyres as $tyre)
                                     <td>{{ $loop->iteration  }}</td>
                                             <td>{{ $tyre->vehicletype }}</td>
+                                            @if (hasAdminPermission('edit vehicle_type') || hasAdminPermission('delete vehicle_type') || hasAdminPermission('view vehicle_type') )
+
                                             <td>
                                                 @if (hasAdminPermission('view vehicle_type'))
                                                 <button class="btn btn-sm btn-light view-btn"
@@ -93,6 +97,7 @@
                                                 </button>
                                                 @endif
                                             </td>
+                                            @endif
                                         </tr>
                                     @endforeach
 

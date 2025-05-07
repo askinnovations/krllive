@@ -41,7 +41,9 @@
                            <th>Dates</th>
                            <th>From</th>
                            <th>To</th>
+                           @if (hasAdminPermission('edit freight_bill') || hasAdminPermission('delete freight_bill')|| hasAdminPermission('view freight_bill'))
                            <th>Action</th>
+                           @endif
                         </tr>
                      </thead>
                      <tbody>
@@ -135,6 +137,8 @@
                               {{ $toLocation->destination ?? 'Unknown Location' }}<br>
                               @endforeach
                            </td>
+                           @if (hasAdminPermission('edit freight_bill') || hasAdminPermission('delete freight_bill')|| hasAdminPermission('view freight_bill'))
+
                            <td>
                               @if (hasAdminPermission('view freight_bill'))
                               <button class="btn btn-sm btn-light view-btn"><i
@@ -149,7 +153,7 @@
                                  class="fas fa-trash text-danger"></i></button>
                                  @endif
                            </td>
-                           </td>
+                           @endif
                         </tr>
                         @endforeach
                      </tbody>

@@ -81,7 +81,9 @@
                <th>From</th>
                <th>To</th>
                <th>Rate</th>
+               @if (hasAdminPermission('edit contract') || hasAdminPermission('delete contract'))
                <th>Action</th>
+               @endif
             </tr>
          </thead>
          <tbody>
@@ -92,6 +94,8 @@
                <td>{{ $contract->fromDestination->destination ?? 'N/A' }}</td>
                <td>{{ $contract->toDestination->destination ?? 'N/A' }}</td>
                <td>{{ $contract->rate }}</td>
+               @if (hasAdminPermission('edit contract') || hasAdminPermission('delete contract'))
+
                <td>
                 @if (hasAdminPermission('edit contract'))
                <button class="btn btn-sm btn-warning edit-btn"
@@ -111,9 +115,8 @@
                   </a>
                  </button> 
                  @endif
-                   
-
                </td>
+               @endif
             </tr>
             @endforeach
          </tbody>

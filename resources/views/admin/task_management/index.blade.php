@@ -100,7 +100,8 @@
                             <th>Priority</th>
                             <th>Status</th>
                             <th>Task Date</th>
-                            <th>Action</th>
+                                @if (hasAdminPermission('edit task_managment') || hasAdminPermission('delete task_managment')|| hasAdminPermission('view task_managment'))
+                                <th>Action</th>@endif
                         </tr>
                     </thead>
                     <tbody>
@@ -127,6 +128,7 @@
                                     </button>
                                 </a></td>
                                 <td>{{ \Carbon\Carbon::parse($task->date)->format('Y-m-d') }}</td>
+                                @if (hasAdminPermission('edit task_managment') || hasAdminPermission('delete task_managment')|| hasAdminPermission('view task_managment'))
                                 <td>
                              @if (hasAdminPermission('view task_managment'))
                                  <button class="btn btn-sm btn-light view-btn"><i class="fas fa-eye text-primary"></i></button>
@@ -142,10 +144,10 @@
                                 </button>
                                 @endif
                                 @if (hasAdminPermission('delete task_managment'))
-                        <a href="{{ route('admin.task_management.delete',$task->id) }}"  >  <button class="btn btn-sm btn-light delete-btn"><i class="fas fa-trash text-danger"></i></button></a>
-                        @endif
-                              
+                                <a href="{{ route('admin.task_management.delete',$task->id) }}"  >  <button class="btn btn-sm btn-light delete-btn"><i class="fas fa-trash text-danger"></i></button></a>
+                                @endif
                                 </td>
+                                @endif
                             </tr>
                         @empty
                             <tr>

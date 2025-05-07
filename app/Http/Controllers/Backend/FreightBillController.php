@@ -22,7 +22,7 @@ class FreightBillController extends Controller implements HasMiddleware
     public static function middleware(): array
     {
         return [
-            new Middleware('admin.permission:view freight_bill', only: ['index']),
+            new Middleware('admin.permission:manage freight_bill', only: ['index']),
             new Middleware('admin.permission:create freight_bill', only: ['create']),
             new Middleware('admin.permission:edit freight_bill', only: ['edit']),
             new Middleware('admin.permission:delete freight_bill', only: ['destroy']),
@@ -31,42 +31,34 @@ class FreightBillController extends Controller implements HasMiddleware
 
 public function index()
 {
-    // Eager load Order → Consignor/Consignee
-    // we only need the `order` relation—remove consignor/consignee here
+   
+   
     $bills = FreightBill::with('order')->get()
                ->groupBy('freight_bill_number');
-            //    return($bills);
-
-
-    // Pass the grouped collection to view
     return view('admin.freight-bill.index', compact('bills'));
 }
 
 
-    public function destroy($id)
-   {
+public function destroy($id)
+{
     try {
         $tyre = FreightBill::findOrFail($id);
 
         if ($tyre->delete()) {
-            return response()->json([
-                'status' => 'success',
-                'message' => 'Freight-bill deleted successfully!'
-            ]);
+            return redirect()->route('admin.freight-bill.index')
+                ->with('success', 'Freight-bill deleted successfully!');
         }
 
-        return response()->json([
-            'status' => 'error',
-            'message' => 'Failed to delete the freight-bill.'
-        ], 400);
+        return redirect()->route('admin.freight-bill.index')
+            ->with('error', 'Failed to delete the freight-bill.');
+            
+    } catch (\Exception $e) {
+        return redirect()->route('admin.freight-bill.index')
+            ->with('error', 'Something went wrong: ' . $e->getMessage());
+    }
+}
 
-    } catch (Exception $e) {
-        return response()->json([
-            'status' => 'error',
-            'message' => 'Something went wrong: ' . $e->getMessage()
-        ], 500);
-    }
-    }
+    
     
 
     

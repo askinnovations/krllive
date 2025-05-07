@@ -45,11 +45,11 @@
                                 </p>
                             </div>
                             @if (hasAdminPermission('create users'))
-                            <a class="btn" href="{{ route('admin.user.create') }}" 
-                            style="background-color: #ca2639; color: white; border: none;">
-                             <i class="fas fa-plus"></i> Add User
-                         </a>
-                         @endif
+                                <a class="btn" href="{{ route('admin.user.create') }}"
+                                    style="background-color: #ca2639; color: white; border: none;">
+                                    <i class="fas fa-plus"></i> Add User
+                                </a>
+                            @endif
                         </div>
                         <div class="card-body">
                             <table class="table table-bordered" id="datatable">
@@ -61,40 +61,43 @@
                                         <th>Email</th>
                                         <th>Role</th>
                                         <th>
-                                        @if (hasAdminPermission('edit users') || hasAdminPermission('delete users') )
-                                       Action
-                                        @endif
-                                    </th>
+                                            @if (hasAdminPermission('edit users') || hasAdminPermission('delete users'))
+                                                Action
+                                            @endif
+                                        </th>
                                     </tr>
                                 </thead>
                                 <tbody>
 
                                     @foreach ($users as $user)
-                                    <tr>
-                                        <td>{{ $loop->iteration }}</td>
-                                        {{-- <td>{{ $loop->iteration }} {{ auth()->guard($user->role)->user() }}</td> --}}
-                                        
-                                        <td>##{{ $user->id }}</td>
-                                        <td>{{ $user->name }}</td>
-                                        <td>{{ $user->email }}</td>
-                                        <td>{{ \App\Models\Role::find($user->role)->name ?? 'N/A' }}</td>
+                                        <tr>
+                                            <td>{{ $loop->iteration }}</td>
+                                            {{-- <td>{{ $loop->iteration }} {{ auth()->guard($user->role)->user() }}</td> --}}
 
-                                        <td>
-                                            @if (hasAdminPermission('edit users'))
-                                          
-                                            <a href="{{ route('admin.user.edit', $user->id) }}" class="btn btn-sm btn-light">
-                                                <i class="fas fa-pen text-warning"></i>
-                                            </a>
+                                            <td>##{{ $user->id }}</td>
+                                            <td>{{ $user->name }}</td>
+                                            <td>{{ $user->email }}</td>
+                                            <td>{{ \App\Models\Role::find($user->role)->name ?? 'N/A' }}</td>
+                                            @if (hasAdminPermission('edit users') || hasAdminPermission('delete users'))
+
+                                                <td>
+                                                    @if (hasAdminPermission('edit users'))
+
+                                                        <a href="{{ route('admin.user.edit', $user->id) }}"
+                                                            class="btn btn-sm btn-light">
+                                                            <i class="fas fa-pen text-warning"></i>
+                                                        </a>
+                                                    @endif
+                                                    @if (hasAdminPermission('delete users'))
+                                                        <a href="{{ route('admin.user.delete', $user->id) }}"
+                                                            class="btn btn-sm btn-light"
+                                                            onclick="return confirm('Are you sure you want to delete this user?')">
+                                                            <i class="fas fa-trash text-danger"></i>
+                                                        </a>
+                                                    @endif
+                                                </td>
                                             @endif
-                                            @if (hasAdminPermission('delete users'))
-                                            <a href="{{ route('admin.user.delete', $user->id) }}"
-                                                class="btn btn-sm btn-light"
-                                                onclick="return confirm('Are you sure you want to delete this user?')">
-                                                <i class="fas fa-trash text-danger"></i>
-                                             </a>
-                                             @endif
-                                              </td>
-                                    </tr>
+                                        </tr>
                                     @endforeach
                                 </tbody>
                             </table>

@@ -24,7 +24,7 @@ class OrderController extends Controller implements HasMiddleware
     public static function middleware(): array
     {
         return [
-            new Middleware('admin.permission:view order_booking', only: ['index']),
+            new Middleware('admin.permission:manage order_booking', only: ['index']),
             new Middleware('admin.permission:create order_booking', only: ['create']),
             new Middleware('admin.permission:edit order_booking', only: ['edit']),
             new Middleware('admin.permission:delete order_booking', only: ['destroy']),

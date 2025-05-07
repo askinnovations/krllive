@@ -19,7 +19,7 @@ class PayrollController extends Controller implements HasMiddleware
     public static function middleware(): array
     {
         return [
-            new Middleware('admin.permission:view payroll', only: ['index']),
+            new Middleware('admin.permission:manage payroll', only: ['index']),
             new Middleware('admin.permission:create payroll', only: ['create']),
             new Middleware('admin.permission:edit payroll', only: ['edit']),
             new Middleware('admin.permission:delete payroll', only: ['destroy']),

@@ -16,7 +16,7 @@ class DriverController extends Controller implements HasMiddleware
     public static function middleware(): array
     {
         return [
-            new Middleware('admin.permission:view drivers', only: ['index']),
+            new Middleware('admin.permission:manage drivers', only: ['index']),
             new Middleware('admin.permission:create drivers', only: ['create']),
             new Middleware('admin.permission:edit drivers', only: ['edit']),
             new Middleware('admin.permission:delete drivers', only: ['destroy']),

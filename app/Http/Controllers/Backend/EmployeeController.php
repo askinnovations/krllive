@@ -13,7 +13,7 @@ class EmployeeController extends Controller implements HasMiddleware
     public static function middleware(): array
     {
         return [
-            new Middleware('admin.permission:view employees', only: ['index']),
+            new Middleware('admin.permission:manage employees', only: ['index']),
             new Middleware('admin.permission:create employees', only: ['create']),
             new Middleware('admin.permission:edit employees', only: ['edit']),
             new Middleware('admin.permission:delete employees', only: ['destroy']),

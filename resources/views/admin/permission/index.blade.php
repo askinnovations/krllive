@@ -57,7 +57,9 @@
                                     <tr>
                                         <th>Sno.</th>
                                         <th>Permission</th>
+                                        @if (hasAdminPermission('edit permissions') || hasAdminPermission('delete permissions'))
                                         <th>Action</th>
+                                        @endif
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -65,6 +67,7 @@
                                     <tr>
                                         <td>{{ $loop->iteration }}</td>
                                         <td>{{ $permission->name }}</td>
+                                        @if (hasAdminPermission('edit permissions') || hasAdminPermission('delete permissions'))
                                         <td class="action">
                                             @if (hasAdminPermission('edit permissions'))
                                             <a href="">
@@ -81,6 +84,7 @@
                                             </button>
                                             @endif
                                         </td>
+                                        @endif
                                     </tr>
                                     @endforeach
                                 </tbody>

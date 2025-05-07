@@ -64,7 +64,9 @@
                                         <th>Designation</th>
                                         <th>Department</th>
                                         <th>join Date</th>
+                                  @if (hasAdminPermission('edit employees') || hasAdminPermission('delete employees')|| hasAdminPermission('view employees'))
                                         <th>Action</th>
+                                    @endif
                                     </tr>
                                 </thead>
 
@@ -80,6 +82,7 @@
                                             <td>{{ $employee->department}}</td>
                                             <td>{{ $employee->date_of_joining}}</td>
 
+                                            @if (hasAdminPermission('edit employees') || hasAdminPermission('delete employees')|| hasAdminPermission('view employees'))
 
                                             <td>
                                                 @if (hasAdminPermission('view employees'))
@@ -107,6 +110,7 @@
                                                 </button>
                                                 @endif
                                             </td>
+                                            @endif
                                         </tr>
                                     @endforeach
                                 </tbody>

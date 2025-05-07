@@ -59,7 +59,9 @@
                                         <th>Salary Amount</th>
                                         <th>Present  days</th>
                                         <th>Working days</th>
+                                        @if (hasAdminPermission('edit payroll'))
                                         <th>Action</th>
+                                        @endif
                                     </tr>
                                 </thead>
 

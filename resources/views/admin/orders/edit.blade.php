@@ -430,14 +430,14 @@
                            </thead>
                            <tbody id="freightBody-{{ $index }}">
                               <tr>
-                                 <td><input name="lr[{{ $index }}][freight_amount]" id="finalResult-{{$index}}" type="number" class="form-control freight-amount" value="{{ $lr['freight_amount'] ?? '' }}" placeholder="Enter Freight Amount" required></td>
-                                 <td><input name="lr[{{ $index }}][lr_charges]" type="number" class="form-control lr-charges" value="{{ $lr['lr_charges'] ?? '' }}" placeholder="Enter LR Charges" required></td>
-                                 <td><input name="lr[{{ $index }}][hamali]" type="number" class="form-control hamali" value="{{ $lr['hamali'] ?? '' }}" placeholder="Enter Hamali Charges" required></td>
-                                 <td><input name="lr[{{ $index }}][other_charges]" type="number" class="form-control other-charges" value="{{ $lr['other_charges'] ?? '' }}" placeholder="Enter Other Charges" required></td>
-                                 <td><input name="lr[{{ $index }}][gst_amount]" type="number" class="form-control gst" value="{{ $lr['gst_amount'] ?? '' }}" placeholder="Enter GST Amount" required readonly></td>
-                                 <td><input name="lr[{{ $index }}][total_freight]" type="number" class="form-control total-freight" value="{{ $lr['total_freight'] ?? '' }}" placeholder="Total Freight" required readonly></td>
-                                 <td><input name="lr[{{ $index }}][less_advance]" type="number" class="form-control less-advance" value="{{ $lr['less_advance'] ?? '' }}" placeholder="Less Advance Amount" required></td>
-                                 <td><input name="lr[{{ $index }}][balance_freight]" type="number" class="form-control balance-freight" value="{{ $lr['balance_freight'] ?? '' }}" placeholder="Balance Freight Amount" required readonly></td>
+                                 <td><input name="lr[{{ $index }}][freight_amount]" id="finalResult-{{$index}}" type="number" class="form-control freight-amount" value="{{ $lr['freight_amount'] ?? '' }}" placeholder="Enter Freight Amount" ></td>
+                                 <td><input name="lr[{{ $index }}][lr_charges]" type="number" class="form-control lr-charges" value="{{ $lr['lr_charges'] ?? '' }}" placeholder="Enter LR Charges" ></td>
+                                 <td><input name="lr[{{ $index }}][hamali]" type="number" class="form-control hamali" value="{{ $lr['hamali'] ?? '' }}" placeholder="Enter Hamali Charges" ></td>
+                                 <td><input name="lr[{{ $index }}][other_charges]" type="number" class="form-control other-charges" value="{{ $lr['other_charges'] ?? '' }}" placeholder="Enter Other Charges" ></td>
+                                 <td><input name="lr[{{ $index }}][gst_amount]" type="number" class="form-control gst" value="{{ $lr['gst_amount'] ?? '' }}" placeholder="Enter GST Amount"  readonly></td>
+                                 <td><input name="lr[{{ $index }}][total_freight]" type="number" class="form-control total-freight" value="{{ $lr['total_freight'] ?? '' }}" placeholder="Total Freight"  readonly></td>
+                                 <td><input name="lr[{{ $index }}][less_advance]" type="number" class="form-control less-advance" value="{{ $lr['less_advance'] ?? '' }}" placeholder="Less Advance Amount" ></td>
+                                 <td><input name="lr[{{ $index }}][balance_freight]" type="number" class="form-control balance-freight" value="{{ $lr['balance_freight'] ?? '' }}" placeholder="Balance Freight Amount"  readonly></td>
                               </tr>
                            </tbody>
                      </table>

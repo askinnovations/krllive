@@ -49,6 +49,7 @@
          </div>
          <form method="POST" action="{{ route('admin.consignments.update', $order->order_id) }}" enctype="multipart/form-data">
             @csrf
+            
             <div class="card-body">
                @php
                $lrList = is_array($order->lr) ? $order->lr : json_decode($order->lr, true);
@@ -56,6 +57,7 @@
                $lrData = $lrList[0] ?? []; 
                
                @endphp
+
                <div class="row">
                   <!-- Consignor Details -->
                   <div class="col-md-6">
@@ -169,8 +171,10 @@
                   <div class="col-md-4">
                    
                      <div class="mb-3">
+                        
                         <label class="form-label">🚚 Vehicle Number</label>
                         <select name="vehicle_no" class="form-select my-select">
+                           
                            @foreach ($vehicles as $vehicle)
                               <option 
                                     value="{{ $vehicle->vehicle_no }}" 
@@ -180,6 +184,7 @@
                                     {{ $vehicle->vehicle_no }}
                               </option>
                            @endforeach
+                         
                         </select>
                         </div>
                   </div>

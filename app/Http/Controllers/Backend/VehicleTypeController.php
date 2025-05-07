@@ -14,7 +14,7 @@ class VehicleTypeController extends Controller implements HasMiddleware
     public static function middleware(): array
     {
         return [
-            new Middleware('admin.permission:view vehicle_type', only: ['index']),
+            new Middleware('admin.permission:manage vehicle_type', only: ['index']),
             new Middleware('admin.permission:create vehicle_type', only: ['create']),
             new Middleware('admin.permission:edit vehicle_type', only: ['edit']),
             new Middleware('admin.permission:delete vehicle_type', only: ['destroy']),

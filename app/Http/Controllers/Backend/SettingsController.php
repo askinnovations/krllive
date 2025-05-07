@@ -17,7 +17,7 @@ class SettingsController extends Controller implements HasMiddleware
     public static function middleware(): array
     {
         return [
-            new Middleware('admin.permission:view settings', only: ['index']),
+            new Middleware('admin.permission:manage settings', only: ['index']),
             new Middleware('admin.permission:create settings', only: ['create']),
             new Middleware('admin.permission:edit settings', only: ['edit']),
             new Middleware('admin.permission:delete settings', only: ['destroy']),

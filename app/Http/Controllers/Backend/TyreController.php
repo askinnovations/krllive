@@ -14,7 +14,7 @@ class TyreController extends Controller implements HasMiddleware
     public static function middleware(): array
     {
         return [
-            new Middleware('admin.permission:view tyres', only: ['index']),
+            new Middleware('admin.permission:manage tyres', only: ['index']),
             new Middleware('admin.permission:create tyres', only: ['create']),
             new Middleware('admin.permission:edit tyres', only: ['edit']),
             new Middleware('admin.permission:delete tyres', only: ['destroy']),

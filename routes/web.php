@@ -239,7 +239,7 @@ Route::prefix('admin')->group(function () {
         Route::get('/view/{id}', [ConsignmentNoteController::class, 'show'])->name('admin.consignments.view');
         Route::get('/documents/{id}', [ConsignmentNoteController::class, 'docView'])->name('admin.consignments.documents');
         Route::post('/update/{order_id}', [ConsignmentNoteController::class, 'update'])->name('admin.consignments.update');
-        Route::delete('/delete/{order_id}', [ConsignmentNoteController::class, 'destroy'])->name('admin.consignments.delete');
+        Route::get('/delete/{order_id}', [ConsignmentNoteController::class, 'destroy'])->name('admin.consignments.delete');
     });
 
     // Freight Bill Management
@@ -250,7 +250,7 @@ Route::prefix('admin')->group(function () {
         Route::get('/view/{id}', [FreightBillController::class, 'show'])->name('admin.freight-bill.view');
         Route::get('/edit-by-number/{freight_bill_number}', [FreightBillController::class, 'editByNumber'])->name('admin.freight-bill.edit');
         Route::put('/update/{freight_bill_number}', [FreightBillController::class, 'update'])->name('admin.freight-bill.update');
-        Route::delete('/delete/{id}', [FreightBillController::class, 'destroy'])->name('admin.freight-bill.delete');
+        Route::get('/delete/{id}', [FreightBillController::class, 'destroy'])->name('admin.freight-bill.delete');
     });
 
    

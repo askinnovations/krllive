@@ -59,13 +59,16 @@
                                     <tr>
                                         <th>S.No</th>
                                         <th>Package Type </th>
+                                        @if (hasAdminPermission('edit package_type') || hasAdminPermission('delete package_type')|| hasAdminPermission('view package_type'))
                                         <th>Action</th>
+                                        @endif
                                     </tr>
                                 </thead>
                                 <tbody>
                                     @foreach($tyres as $tyre)
                                     <td>{{ $loop->iteration  }}</td>
                                      <td>{{ $tyre->package_type }}</td>
+                                     @if (hasAdminPermission('edit package_type') || hasAdminPermission('delete package_type')|| hasAdminPermission('view package_type'))
                                           <td>
                                             @if (hasAdminPermission('view package_type'))
                                                 <button class="btn btn-sm btn-light view-btn"
@@ -96,6 +99,7 @@
                                                 @endif
                                             
                                             </td>
+                                            @endif
                                         </tr>
                                     @endforeach
 

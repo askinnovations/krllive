@@ -20,7 +20,7 @@ class ConsignmentNoteController extends Controller implements HasMiddleware
     public static function middleware(): array
     {
         return [
-            new Middleware('admin.permission:view lr_consignment', only: ['index']),
+            new Middleware('admin.permission:manage lr_consignment', only: ['index']),
             new Middleware('admin.permission:create lr_consignment', only: ['create']),
             new Middleware('admin.permission:edit lr_consignment', only: ['edit']),
             new Middleware('admin.permission:delete lr_consignment', only: ['destroy']),
@@ -45,8 +45,7 @@ class ConsignmentNoteController extends Controller implements HasMiddleware
     
     public function store(Request $request)
     {
-        // return $request->all();
-        // Step 1: Create a new order
+        
         $order = new Order();
     
         // Generate unique order ID
@@ -344,7 +343,8 @@ public function docView($id)
         $orders = Order::where('order_id', $order_id)->get();
     
         if ($orders->isEmpty()) {
-            return response()->json(['status' => 'error', 'message' => 'No entries found for this order_id.'], 404);
+            return redirect()->route('admin.consignments.index')
+                ->with('error', 'No entries found for this order ID.');
         }
     
         try {
@@ -353,11 +353,14 @@ public function docView($id)
                 $order->delete();
             }
     
-            return response()->json(['status' => 'success', 'message' => 'All entries under this Order ID deleted successfully.']);
+            return redirect()->route('admin.consignments.index')
+                ->with('success', 'All entries under this Order ID deleted successfully.');
         } catch (\Exception $e) {
-            return response()->json(['status' => 'error', 'message' => 'Error while deleting entries.'], 500);
+            return redirect()->route('admin.consignments.index')
+                ->with('error', 'Error while deleting entries.');
         }
     }
+    
     
 }
 

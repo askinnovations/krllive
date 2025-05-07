@@ -64,7 +64,8 @@
                                                 <th>Name</th>
                                                 <th>Address</th>
                                                 <th>Incharge</th>
-                                                <th>Action</th>
+                                            @if (hasAdminPermission('edit warehouse') || hasAdminPermission('delete warehouse') || hasAdminPermission('view warehouse') )
+                                            <th>Action</th>@endif
                                             </tr>
                                         </thead>
                                         <tbody>
@@ -76,7 +77,7 @@
                                                 <td>{{$warehouse->warehouse_name}}</td>
                                                 <td>{{$warehouse->address}}</td>
                                                 <td>{{$warehouse->incharge}}</td>
-
+                                                @if (hasAdminPermission('edit warehouse') || hasAdminPermission('delete warehouse') || hasAdminPermission('view warehouse') )
                                                 <td>
                                                     @if (hasAdminPermission('view warehouse'))
                                                    <button class="btn btn-sm btn-light view-btn" data-bs-toggle="modal"
@@ -95,6 +96,7 @@
                                                     </button>
                                                         @endif
                                                 </td>
+                                                @endif
                                             </tr>
                                             @endforeach
                                 

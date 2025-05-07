@@ -76,6 +76,7 @@
                                                     </span>
                                                 @endforeach
                                             </td>
+                                            @if (hasAdminPermission('edit role') || hasAdminPermission('delete role'))
                                             <td class="Action">
                                                 @if (hasAdminPermission('edit role'))
                                                 <a href="{{ route('admin.role.edit', $role->id) }}"> <button
@@ -90,10 +91,10 @@
                                                 </button>
                                                 @endif
                                             </td>
+                                            @endif
                                         </tr>
                                     @endforeach
                                 </tbody>
-
                             </table>
                         </div>
                     </div>
