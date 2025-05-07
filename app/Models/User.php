@@ -27,6 +27,7 @@ class User extends Authenticatable
         'gst_number',
         'mobile_number',
         'address',
+        'role',
     ];
     // ✅ JSON से Array में Convert करने के लिए
     protected $casts = [

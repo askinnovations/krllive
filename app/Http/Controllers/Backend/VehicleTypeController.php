@@ -5,9 +5,21 @@ namespace App\Http\Controllers\Backend;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\VehicleType;
+use Illuminate\Routing\Controllers\HasMiddleware;
+use Illuminate\Routing\Controllers\Middleware;
 
-class VehicleTypeController extends Controller
+
+class VehicleTypeController extends Controller implements HasMiddleware
 {
+    public static function middleware(): array
+    {
+        return [
+            new Middleware('admin.permission:view vehicle_type', only: ['index']),
+            new Middleware('admin.permission:create vehicle_type', only: ['create']),
+            new Middleware('admin.permission:edit vehicle_type', only: ['edit']),
+            new Middleware('admin.permission:delete vehicle_type', only: ['destroy']),
+        ];
+    }
     public function index()
     {
         $tyres = VehicleType::all();

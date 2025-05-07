@@ -10,7 +10,7 @@ class AdminLocalize
 {
     public function handle(Request $request, Closure $next)
     {
-        // ✅ Check if language exists in session, then set locale
+       
         if (session()->has('admin_locale')) {
             App::setLocale(session('admin_locale'));
         }

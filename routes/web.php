@@ -15,7 +15,7 @@ use App\Http\Controllers\Backend\{
     UserController, TyreController, WarehouseController, OrderController, PackageTypeController,
     ConsignmentNoteController, FreightBillController, StockTransferController, DriverController,
     AttendanceController, MaintenanceController, VehicleController, TaskManagmentController, ContractController,
-    SettingsController, VehicleTypeController
+    SettingsController, VehicleTypeController,RoleController,PermissionController,TestController
 };
 
 // 🌐 Frontend Routes Group (user side)
@@ -57,26 +57,26 @@ Route::post('/save-order', [HomeController::class, 'saveOrder'])->name('order.sa
 Route::prefix('admin')->group(function () {
 
     // Login & Logout Routes
-    Route::get('/login', [BackendLoginController::class, 'showLoginForm'])->name('admin.login');
+    Route::get('/login', [BackendLoginController::class, 'showLoginForm'])->middleware('admin.guest')->name('admin.login');
     Route::post('/login', [BackendLoginController::class, 'login'])->name('admin.login.submit');
     Route::get('/logout', [BackendLoginController::class, 'logout'])->name('admin.logout');
 
     // Dashboard Route
-    Route::get('/dashboard', [AdminDashboardController::class, 'index'])->name('admin.dashboard');
+    Route::get('/dashboard', [AdminDashboardController::class, 'index']) ->middleware('auth.admin')->name('admin.dashboard');
 
     // User Management
-    Route::prefix('users')->group(function () {
+    Route::prefix('users')->middleware('auth.admin')->group(function () {
         Route::get('/', [UserController::class, 'index'])->name('admin.users.index');
         Route::get('/create', [UserController::class, 'create'])->name('admin.users.create');
         Route::post('/store', [UserController::class, 'store'])->name('admin.users.store');
         Route::get('/view/{id}', [UserController::class, 'show'])->name('admin.users.view');
-        Route::get('/edit/{id}', [UserController::class, 'edit'])->name('admin.users.edit');
+        // Route::get('/edit/{id}', [UserController::class, 'edit'])->name('admin.users.edit');
         Route::post('/update/{id}', [UserController::class, 'update'])->name('admin.users.update');
         Route::delete('/delete/{id}', [UserController::class, 'destroy'])->name('admin.users.delete');
     });
 
     // Vehicles Management
-    Route::prefix('vehicles')->group(function () {
+    Route::prefix('vehicles')->middleware('auth.admin')->group(function () {
         Route::get('/', [VehicleController::class, 'index'])->name('admin.vehicles.index');
         Route::get('/create', [VehicleController::class, 'create'])->name('admin.vehicles.create');
         Route::post('/store', [VehicleController::class, 'store'])->name('admin.vehicles.store');
@@ -87,7 +87,7 @@ Route::prefix('admin')->group(function () {
     });
 
    // Tyres Management
-    Route::prefix('tyres')->group(function () {
+    Route::prefix('tyres')->middleware('auth.admin')->group(function () {
         Route::get('/', [TyreController::class, 'index'])->name('admin.tyres.index');
         Route::post('/store', [TyreController::class, 'store'])->name('admin.tyres.store');
         Route::put('/update/{id}', [TyreController::class, 'update'])->name('admin.tyres.update');
@@ -96,7 +96,7 @@ Route::prefix('admin')->group(function () {
     });
     
     // PackageTypeController
-    Route::prefix('packagetype')->group(function () {
+    Route::prefix('packagetype')->middleware('auth.admin')->group(function () {
         Route::get('/', [PackageTypeController::class, 'index'])->name('admin.packagetype.index');
         Route::post('/store', [PackageTypeController::class, 'store'])->name('admin.packagetype.store');
         Route::put('/update/{id}', [PackageTypeController::class, 'update'])->name('admin.packagetype.update');
@@ -105,7 +105,7 @@ Route::prefix('admin')->group(function () {
     });
 
     // DestinationController
-    Route::prefix('destination')->group(function () {
+    Route::prefix('destination')->middleware('auth.admin')->group(function () {
         Route::get('/', [DestinationController::class, 'index'])->name('admin.destination.index');
         Route::post('/store', [DestinationController::class, 'store'])->name('admin.destination.store');
         Route::put('/update/{id}', [DestinationController::class, 'update'])->name('admin.destination.update');
@@ -115,7 +115,7 @@ Route::prefix('admin')->group(function () {
 
 
     // ContractController
-    Route::prefix('contract')->group(function () {
+    Route::prefix('contract')->middleware('auth.admin')->group(function () {
         Route::get('/', [ContractController::class, 'index'])->name('admin.contract.index');
         Route::get('/view/{id}', [ContractController::class, 'show'])->name('admin.contract.view');
         Route::post('/store', [ContractController::class, 'store'])->name('admin.contract.store');
@@ -126,7 +126,7 @@ Route::prefix('admin')->group(function () {
 
 
     // VehicleTypeController
-    Route::prefix('vehicletype')->group(function () {
+    Route::prefix('vehicletype')->middleware('auth.admin')->group(function () {
         Route::get('/', [VehicleTypeController::class, 'index'])->name('admin.vehicletype.index');
         Route::post('/store', [VehicleTypeController::class, 'store'])->name('admin.vehicletype.store');
         Route::put('/update/{id}', [VehicleTypeController::class, 'update'])->name('admin.vehicletype.update');
@@ -135,7 +135,7 @@ Route::prefix('admin')->group(function () {
 
     // SettingsController
 
-    Route::prefix('settings')->group(function () {
+    Route::prefix('settings')->middleware('auth.admin')->group(function () {
         Route::get('/', [SettingsController::class, 'index'])->name('admin.settings.index');
         Route::post('/store', [SettingsController::class, 'store'])->name('admin.settings.store');
 
@@ -143,32 +143,49 @@ Route::prefix('admin')->group(function () {
 
 
     // Warehouse Management
-    Route::prefix('warehouse')->group(function () {
+    Route::prefix('warehouse')->middleware('auth.admin')->group(function () {
         Route::get('/', [WarehouseController::class, 'index'])->name('admin.warehouse.index');
         Route::post('/store', [WarehouseController::class, 'store'])->name('admin.warehouse.store');
         Route::put('/update/{id}', [WarehouseController::class, 'update'])->name('admin.warehouse.update');
         Route::delete('/delete/{id}', [WarehouseController::class, 'destroy'])->name('admin.warehouse.delete');
     });
         //maintenanceController
-    Route::prefix('maintenance')->group(function () {
+    Route::prefix('maintenance')->middleware('auth.admin')->group(function () {
         Route::get('/', [MaintenanceController::class, 'index'])->name('admin.maintenance.index');
         Route::post('/store', [MaintenanceController::class, 'store'])->name('admin.maintenance.store');
         Route::put('/update/{id}', [MaintenanceController::class, 'update'])->name('admin.maintenance.update');
         Route::get('/delete/{id}', [MaintenanceController::class, 'destroy'])->name('admin.maintenance.delete');
     });
-      
+  
+
    
- Route::prefix('employees')->group( function(){
-    Route::get('/', [EmployeeController::class, 'index'])->name('admin.employees.index');
-    Route::get('/create', [EmployeeController::class, 'create'])->name('admin.employees.create');
-    Route::post('/store', [EmployeeController::class, 'store'])->name('admin.employees.store');
-    Route::get('/edit/{id}', [EmployeeController::class, 'edit'])->name('admin.employees.edit');
-    Route::get('/show/{id}', [EmployeeController::class, 'show'])->name('admin.employees.show');
-    Route::get('/task/{id}', [EmployeeController::class, 'task'])->name('admin.employees.task');
-    Route::post('/update/{id}', [EmployeeController::class, 'update'])->name('admin.employees.update');
-    Route::get('/delete/{id}', [EmployeeController::class, 'destroy'])->name('admin.employees.delete');
-  });
-    Route::prefix('drivers')->group( function(){
+    Route::prefix('employees')->middleware('auth.admin')->group(function () {
+        Route::get('/', [EmployeeController::class, 'index'])
+            ->name('admin.employees.index');
+    
+        Route::get('/create', [EmployeeController::class, 'create'])
+            ->name('admin.employees.create');
+    
+        Route::post('/store', [EmployeeController::class, 'store'])
+            ->name('admin.employees.store');
+    
+        Route::get('/edit/{id}', [EmployeeController::class, 'edit'])
+            ->name('admin.employees.edit');
+    
+        Route::post('/update/{id}', [EmployeeController::class, 'update'])
+            ->name('admin.employees.update');
+    
+        Route::get('/show/{id}', [EmployeeController::class, 'show'])
+            ->name('admin.employees.show');
+    
+        Route::get('/task/{id}', [EmployeeController::class, 'task'])
+            ->name('admin.employees.task');
+    
+        Route::get('/delete/{id}', [EmployeeController::class, 'destroy'])
+            ->name('admin.employees.delete');
+    });
+    
+    Route::prefix('drivers')->middleware('auth.admin')->group( function(){
     Route::get('', [DriverController::class, 'index'])->name('admin.drivers.index');
     Route::get('/create', action: [DriverController::class, 'create'])->name('admin.drivers.create');
     Route::post('/store', [DriverController::class, 'store'])->name('admin.drivers.store');
@@ -178,17 +195,17 @@ Route::prefix('admin')->group(function () {
     Route::get('/delete/{id}', [DriverController::class, 'destroy'])->name('admin.drivers.delete');
     });
    // attendance
-    Route::prefix('attendance')->group( function(){
+    Route::prefix('attendance')->middleware('auth.admin')->group( function(){
     Route::get('/', [AttendanceController::class, 'index'])->name('admin.attendance.index');
     Route::post('/update', [AttendanceController::class, 'update'])->name('admin.attendance.update');
    });
 
-   Route::prefix('payroll')->group( function(){
+   Route::prefix('payroll')->middleware('auth.admin')->group( function(){
    Route::get('/', [PayrollController::class, 'index'])->name('admin.payroll.index');
    Route::get('/show/{id}', [PayrollController::class, 'show'])->name('admin.payroll.show');
    });
 
-     Route::prefix('task-managment')->group(function(){
+     Route::prefix('task-managment')->middleware('auth.admin')->group(function(){
      Route::get('/', [TaskManagmentController::class, 'index'])->name('admin.task_management.index');
      Route::post('/store', [TaskManagmentController::class, 'store'])->name('admin.task_management.store');
      Route::put('/update/{id}', [TaskManagmentController::class, 'update'])->name('admin.task_management.update');
@@ -199,8 +216,8 @@ Route::prefix('admin')->group(function () {
    });
       
  
-    Route::prefix('orders')->group(function () {
-        Route::get('/', [OrderController::class, 'index'])->name('admin.orders.index');
+    Route::prefix('orders')->middleware('auth.admin')->group(function () {
+        Route::get('/', [OrderController::class, 'index'])->name('admin.orders.index');        
         Route::get('/create', [OrderController::class, 'create'])->name('admin.orders.create');
         Route::post('/store', [OrderController::class, 'store'])->name('admin.orders.store');
         Route::get('/edit/{order_id}', [OrderController::class, 'edit'])->name('admin.orders.edit');
@@ -209,10 +226,12 @@ Route::prefix('admin')->group(function () {
         Route::post('/update/{order_id}', [OrderController::class, 'update'])->name('admin.orders.update');
         Route::delete('/delete/{order_id}', [OrderController::class, 'destroy'])->name('admin.orders.delete');
     });
+   
+    
     
     
     // Consignment Management
-    Route::prefix('consignments')->group(function () {
+    Route::prefix('consignments')->middleware('auth.admin')->group(function () {
         Route::get('/', [ConsignmentNoteController::class, 'index'])->name('admin.consignments.index');
         Route::get('/create', [ConsignmentNoteController::class, 'create'])->name('admin.consignments.create');
         Route::post('/store', [ConsignmentNoteController::class, 'store'])->name('admin.consignments.store');
@@ -224,7 +243,7 @@ Route::prefix('admin')->group(function () {
     });
 
     // Freight Bill Management
-    Route::prefix('freight-bill')->group(function () {
+    Route::prefix('freight-bill')->middleware('auth.admin')->group(function () {
         Route::get('/', [FreightBillController::class, 'index'])->name('admin.freight-bill.index');
         Route::get('/create', [FreightBillController::class, 'create'])->name('admin.freight-bill.create');
         Route::post('/store', [FreightBillController::class, 'store'])->name('admin.freight-bill.store');
@@ -234,7 +253,36 @@ Route::prefix('admin')->group(function () {
         Route::delete('/delete/{id}', [FreightBillController::class, 'destroy'])->name('admin.freight-bill.delete');
     });
 
-    Route::get('/stock-transfer/index', [StockTransferController::class, 'index'])->name('admin.stock.index');
+   
+  
+Route::prefix('role')->middleware('auth.admin')->group(function () {
+    Route::get('/', [RoleController::class, 'index'])->name('admin.role.index');
+    Route::get('/create', [RoleController::class, 'create'])->name('admin.role.create');
+    Route::post('/store', [RoleController::class, 'store'])->name('admin.role.store');
+    Route::get('/delete/{id}', [RoleController::class, 'destroy'])->name('admin.role.delete');
+    Route::get('/edit/{id}', [RoleController::class, 'edit'])->name('admin.role.edit');
+    Route::post('/update/{id}', [RoleController::class, 'update'])->name('admin.role.update');
+}); 
+Route::prefix('permissions')->middleware('auth.admin')->group(function () {
+    Route::get('/', [PermissionController::class, 'index'])->name('admin.permission.index');
+    Route::get('/create', [PermissionController::class, 'create'])->name('admin.permission.create');
+    Route::post('/store', [PermissionController::class, 'store'])->name('admin.permission.store');
+    Route::get('/edit/{id}', [PermissionController::class, 'edit'])->name('admin.permission.edit');
+    Route::post('/update/{id}', [PermissionController::class, 'update'])->name('admin.permission.update');
+    Route::get('/delete/{id}', [PermissionController::class, 'destroy'])->name('admin.permission.delete');
+}); 
+
+Route::prefix('user')->middleware('auth.admin')->group(function () {
+    Route::get('/', [TestController::class, 'index'])->name('admin.user.index');
+    Route::get('/create', [TestController::class, 'create'])->name('admin.user.create');
+    Route::post('/stote', [TestController::class, 'store'])->name('admin.user.store'); 
+    Route::get('/edit/{id}', [TestController::class, 'edit'])->name('admin.user.edit');
+    Route::post('/update/{id}', [TestController::class, 'update'])->name('admin.user.update');
+    Route::get('/delete/{id}', [TestController::class, 'destroy'])->name('admin.user.delete');
+
+});
+ Route::get('/stock-transfer/index', [StockTransferController::class, 'index'])->name('admin.stock.index');
+
     
 });
 

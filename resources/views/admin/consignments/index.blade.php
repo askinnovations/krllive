@@ -28,22 +28,24 @@
                      <h4 class="card-title">📦 LR / Consignment</h4>
                      <p class="card-title-desc">View, edit, or delete order details below.</p>
                   </div>
+                  @if (hasAdminPermission('create lr_consignment'))
                   <a href="{{ route('admin.consignments.create') }}" class="btn" id="addOrderBtn"
                      style="background-color: #ca2639; color: white; border: none; margin-left: 46%;">
                   <i class="fas fa-plus"></i> Add LR / Consignment
                   </a>
-
-                  
+                  @endif
                 
 
                     <!-- Freight Bill Form -->
 <form id="lrForm" action="{{ route('admin.freight-bill.store') }}" method="post" style="display: inline;">
     @csrf
     <input type="hidden" name="selected_lrs" id="orderInputHidden">
+    {{-- @if (hasAdminPermission('add lr_consignment')) --}}
     <button type="submit" id="generateBtn" class="btn custom-btn"
         style="background-color: #ca2639; color: white; border: none; display: none;">
         Freight Bill LR Generate
     </button>
+    {{-- @endif --}}
 </form>
 
 
@@ -102,10 +104,19 @@
                                             <td>{{ $fromDestination->destination ?? '-' }}</td>
                                             <td>{{ $toDestination->destination ?? '-' }}</td>
                                             <td>
+                                                @if (hasAdminPermission('view lr_consignment'))
                                                 <a href="{{ route('admin.consignments.documents', $lr['lr_number']) }}" class="btn btn-sm btn-light"><i class="fas fa-file-alt text-primary"></i></a>
+                                                @endif
+                                                @if (hasAdminPermission('view lr_consignment'))
                                                 <a href="{{ route('admin.consignments.view', $lr['lr_number']) }}" class="btn btn-sm btn-light"><i class="fas fa-eye text-primary"></i></a>
+                                                @endif
+                                                @if (hasAdminPermission('edit lr_consignment'))
                                                 <a href="{{ route('admin.consignments.edit', $order->order_id) }}" class="btn btn-sm btn-light"><i class="fas fa-pen text-warning"></i></a>
+                                                @endif
+                                                @if (hasAdminPermission('delete lr_consignment'))
+
                                                 <a href="{{ route('admin.consignments.delete', $order->order_id) }}" class="btn btn-sm btn-light"><i class="fas fa-trash text-danger"></i></a>
+                                               @endif
                                             </td>
                                         </tr>
                                     @endforeach

@@ -46,11 +46,7 @@
                                     sorting, and pagination via DataTables.
                                 </p>
                             </div>
-                            {{-- <a class="btn"  href="{{ route('admin.employees.create') }}"  id="addVehicleBtn"
-                            style="background-color: #ca2639; color: white; border: none;">
-                            <i class="fas fa-plus"></i> Add Employee
-                        </a> --}}
-                           
+                        
                         </div>
                         <div class="card-body">
                             <table id="datatable" class="table table-bordered dt-responsive nowrap w-100">
@@ -78,10 +74,14 @@
                                             <td>{{ $data['payable_salary'] }}</td>
                                             <td>{{ $data['present_days'] }}</td>
                                             <td>{{ $data['working_days'] }}</td>
-                                            <td> <a href="{{ route('admin.payroll.show', $data['employee']->id) }}"> <button
+
+                                            <td>
+                                                @if (hasAdminPermission('view payroll'))
+                                                 <a href="{{ route('admin.payroll.show', $data['employee']->id) }}"> <button
                                                 class="btn btn-light btn-sm edit-btn">
                                                 <i class="fas fa-eye text-primary"></i>
                                             </button></a>
+                                            @endif
 
                                         <a href=""> <button
                                                 class="btn btn-light btn-sm edit-btn">

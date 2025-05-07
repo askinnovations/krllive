@@ -1,5 +1,7 @@
 <?php
 
+// app/Http/Middleware/AuthenticateAdmin.php
+
 namespace App\Http\Middleware;
 
 use Closure;
@@ -11,9 +13,10 @@ class AuthenticateAdmin
     public function handle(Request $request, Closure $next)
     {
         if (!Auth::guard('admin')->check()) {
-            return redirect()->route('admin.login'); // ✅ Admin Login Page pe Redirect
+            return redirect()->route('admin.login');
         }
 
         return $next($request);
     }
 }
+

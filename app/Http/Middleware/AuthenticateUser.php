@@ -11,7 +11,7 @@ class AuthenticateUser
     public function handle(Request $request, Closure $next)
     {
         if (!Auth::check()) {
-            return redirect()->route('user.login'); // 🔁 Redirect to user login
+            return redirect()->route('user.login'); 
         }
 
         return $next($request);

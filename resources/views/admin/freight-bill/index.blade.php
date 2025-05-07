@@ -136,12 +136,18 @@
                               @endforeach
                            </td>
                            <td>
+                              @if (hasAdminPermission('view freight_bill'))
                               <button class="btn btn-sm btn-light view-btn"><i
                                  class="fas fa-eye text-primary"></i></button>
+                                 @endif
+                                 @if (hasAdminPermission('edit freight_bill'))
                               <a href="" class="btn btn-sm btn-light"><i
                                  class="fas fa-pen text-warning"></i></a>
+                                 @endif
+                                 @if (hasAdminPermission('delete freight_bill'))
                               <button class="btn btn-sm btn-light delete-btn"><i
                                  class="fas fa-trash text-danger"></i></button>
+                                 @endif
                            </td>
                            </td>
                         </tr>
@@ -175,8 +181,10 @@
                   </div>
                </div>
                <div class="text-end">
+                  @if (hasAdminPermission('add freight_bill'))
                   <button type="submit" class="btn btn-primary">Add
                   freight bill</button>
+                  @endif
                </div>
             </form>
          </div>

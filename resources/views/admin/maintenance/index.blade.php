@@ -46,13 +46,15 @@
           sorting, and pagination via DataTables.
           </p>
         </div>
+        @if (hasAdminPermission('create maintenance'))
         <button class="btn" id="addMaintenanceBtn" style="background-color: #ca2639; color: white; border: none;"
           data-bs-toggle="modal" data-bs-target="#addMaintenanceModal">
           <i class="fas fa-plus"></i> Add Maintenance
         </button>
+        @endif
         </div>
         <div class="card-body">
-        <table id="datatable" class="table table-bordered dt-responsive nowrap w-100">
+        <table id="" class="table table-bordered ">
           <thead>
 
           <tr>
@@ -98,6 +100,7 @@
         </ul>
         </td>
         <td>
+          @if (hasAdminPermission('view maintenance'))
         <button class="btn btn-sm btn-light view-btn" data-id="{{ $maintenance->id }}"
           data-vehicle="{{ $maintenance->vehicle }}" data-category="{{ $maintenance->category }}"
           data-vendor="{{ $maintenance->vendor}}"
@@ -105,6 +108,8 @@
           data-autoparts='@json($maintenance->autoparts)'>
           <i class="fas fa-eye text-primary"></i>
         </button>
+        @endif
+        @if (hasAdminPermission('edit maintenance'))
         <button class="btn btn-sm btn-light edit-btn" data-bs-toggle="modal"
           data-bs-target="#updateMaintenanceModal" data-id="{{ $maintenance->id }}"
           data-vehicle="{{ $maintenance->vehicle }}" data-category="{{ $maintenance->category }}"
@@ -113,11 +118,13 @@
           data-autoparts='@json($maintenance->autoparts)'>
           <i class="fas fa-pen text-warning"></i>
         </button>
-
+        @endif
+        @if (hasAdminPermission('delete maintenance'))
         <button class="btn btn-sm btn-light delete-btn"><A
           href="{{ route('admin.maintenance.delete', $maintenance->id) }}"  onclick="return confirm('Are you sure you want to delete this maintenance record?')">
           <i class="fas fa-trash text-danger"></i></a>
         </button>
+        @endif
         </td>
         </tr>
       @endforeach

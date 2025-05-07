@@ -29,6 +29,7 @@
               
             <div class="col-md-6 text-end">
                 <!-- Bulk Status Update Form -->
+                @if (hasAdminPermission('create attendance'))
                 <form id="bulkAttendanceForm" method="POST" action="{{ route('admin.attendance.update') }}">
                     @csrf
                     <div class="input-group">
@@ -46,6 +47,7 @@
                         <button type="submit" class="btn btn-sm btn-danger">Apply to Selected</button>
                     </div>
                 </form>
+                @endif
             </div>
         </div>
 
