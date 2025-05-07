@@ -1,14 +1,26 @@
 <?php
 
 namespace App\Http\Controllers\Backend;
+use App\Http\Controllers\Controller;
 
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Routing\Controllers\HasMiddleware;
+use Illuminate\Routing\Controllers\Middleware;
 
-class UserController extends Controller
+class UserController extends Controller implements HasMiddleware
 {
+    public static function middleware(): array
+    {
+        return [
+            new Middleware('admin.permission:view customer', only: ['index']),
+            new Middleware('admin.permission:create customer', only: ['create']),
+            new Middleware('admin.permission:edit customer', only: ['edit']),
+            new Middleware('admin.permission:delete customer', only: ['destroy']),
+        ];
+    }
     public function index()
     {   
       $users = User::all();

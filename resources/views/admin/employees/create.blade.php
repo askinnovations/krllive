@@ -15,7 +15,7 @@
                                     ⬅ Back to Listing
                                 </a>
                                 </div>
-                      <form method="post" action="{{ route('admin.employees.store') }}" style="padding: 20px;">
+                      <form method="post" action="{{ route('admin.employees.store') }}" style="padding: 20px;" enctype="multipart/form-data">
                                 @csrf
                                 <div class="row">
                                     <!-- First Name -->
@@ -227,6 +227,14 @@
                                             <div class="text-danger mt-1">{{ $message }}</div>
                                         @enderror
                                     </div>
+                                    <div class="col-md-6 mb-3">
+                                        <label class="form-label">📸 Employee Photo</label>
+                                        <input type="file" class="form-control @error('photo_url') is-invalid @enderror" name="employee_photo" required>
+                                        @error('employee_photo')
+                                            <div class="invalid-feedback">{{ $message }}</div>
+                                        @enderror
+                                    </div>
+                            
 
                                 </div>
 

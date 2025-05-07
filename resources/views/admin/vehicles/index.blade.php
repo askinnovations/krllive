@@ -41,10 +41,12 @@
                                         <h4 class="card-title">🚛 Vehicle Listing</h4>
                                         <p class="card-title-desc">View, edit, or delete vehicle details below.</p>
                                     </div>
+                                    @if (hasAdminPermission('create vehicles'))
                                     <a class="btn"  href="{{ route('admin.vehicles.create') }}"  id="addVehicleBtn"
                                         style="background-color: #ca2639; color: white; border: none;">
                                         <i class="fas fa-plus"></i> Add Vehicle
                                     </a>
+                                    @endif
                                 </div>
                                 <div class="card-body">
                                     <table id="datatable" class="table table-bordered dt-responsive nowrap w-100">
@@ -70,16 +72,21 @@
                                                 <td>{{ $vehicle->registered_mobile_number }}</td>
                                                 <td>{{ $vehicle->number_of_tyres }}</td>
                                                 <td>
+                                                   
+                                                    @if (hasAdminPermission('view vehicles'))
                                                     <a href="{{ route('admin.vehicles.view', ['id' => $vehicle->id]) }}" class="btn btn-sm btn-light view-btn"><i class="fas fa-eye text-primary"></i></a>
+                                                    @endif
+                                                    @if (hasAdminPermission('edit vehicles'))
                                                     <a href="{{ route('admin.vehicles.edit', ['id' => $vehicle->id]) }}" class="btn btn-sm btn-light edit-btn"><i class="fas fa-pen text-warning"></i></a>
+                                                    @endif
+                                                    @if (hasAdminPermission('delete vehicles'))
                                                     <button class="btn btn-sm btn-light delete-btn"
                                                     data-id="{{ $vehicle->id }}"
                                                     data-bs-toggle="modal"
                                                     data-bs-target="#deleteUserModal">
                                                     <i class="fas fa-trash text-danger"></i>
                                                 </button>
-                                                
-                                                   
+                                                @endif
                                                 </td>
                                             </tr>
                                         @endforeach
@@ -89,8 +96,6 @@
                             </div>
                         </div>
                     </div>
-
-                   
     </div>
 </div>
 

@@ -13,7 +13,7 @@
                                 <div class="page-title-right">
                                     <ol class="breadcrumb m-0">
                                         <li class="breadcrumb-item"><a href="javascript: void(0);">Dashboard</a></li>
-                                        <li class="breadcrumb-item active">Customer</li>
+                                        <li class="breadcrumb-item active">Customers</li>
                                     </ol>
                                 </div>
 
@@ -27,13 +27,15 @@
                             <div class="card">
                                 <div class="card-header d-flex justify-content-between align-items-center">
                                     <div>
-                                        <h4 class="card-title">🧑‍💼 Customer List</h4>
+                                        <h4 class="card-title">🧑‍💼 Customers List</h4>
                                         <p class="card-title-desc">View, edit, or delete customer details below.</p>
                                     </div>
+                                    @if (hasAdminPermission('create customer'))
                                     <button class="btn" id="addCustomerBtn"
                                         style="background-color: #ca2639; color: white; border: none;">
                                         <i class="fas fa-plus"></i> Add Customer
                                     </button>
+                                    @endif
                                 </div>
                                 <div class="card-body">
                                     <table id="datatable" class="table table-bordered dt-responsive nowrap w-100">
@@ -99,13 +101,18 @@
 
                                                 <td class="text-center">
                                                     <div class="d-flex  align-items-center gap-2">
+                                                        @if (hasAdminPermission('view customer'))
                                                         <button class="btn btn-sm btn-light view-btn"><i class="fas fa-eye text-primary"></i></button>
+                                                        @endif
+                                                        @if (hasAdminPermission('edit customer'))
                                                         <button class="btn btn-sm btn-light edit-btn"><i class="fas fa-pen text-warning"></i></button>
-                                                        <!-- Delete Button -->
-                                                        
+                                                        @endif
+
+                                                          @if (hasAdminPermission('delete customer'))
                                                         <button class="btn btn-sm btn-light delete-btn" data-id="{{ $user->id }}" data-bs-toggle="modal" data-bs-target="#deleteUserModal">
                                                                 <i class="fas fa-trash text-danger"></i>
                                                             </button>
+                                                            @endif
                                                     </div>
                                                 </td>
                                             </tr>

@@ -46,10 +46,12 @@
                                             sorting, and pagination via DataTables.
                                         </p>
                                     </div>
+                                    @if (hasAdminPermission('create  drivers'))
                                     <a class="btn"  href="{{ route('admin.drivers.create') }}"  id="addVehicleBtn"
                                     style="background-color: #ca2639; color: white; border: none;">
                                     <i class="fas fa-plus"></i> Add Driver
                                 </a>
+                                @endif
                                 </div>
                                 <div class="card-body">
                                     <table id="datatable" class="table table-bordered dt-responsive nowrap w-100">
@@ -73,20 +75,25 @@
                                                 <td>{{$driver->vehicle_number ?? ' '}}</td>
                                               
                                                 <td><span class="badge bg-success">{{$driver->status}}</span></td>
-                                                <td>
+                                                <td>  @if (hasAdminPermission('view drivers'))
                                                     <a href="{{ route('admin.drivers.show',$driver->id) }}">
                                                     <button class="btn btn-sm btn-light view-btn">
                                                         <i class="fas fa-eye text-primary"></i>
                                                     </button>
                                                     </a>
+                                                    @endif
+                                                    @if (hasAdminPermission('edit drivers'))
                                                     <a href="{{ route('admin.drivers.edit',$driver->id) }}">
                                                     <button class="btn btn-sm btn-light edit-btn">
                                                         <i class="fas fa-pen text-warning"></i>
                                                     </button></a>
+                                                    @endif
+                                                    @if (hasAdminPermission('delete drivers'))
                                                     <a href="{{ route('admin.drivers.delete',$driver->id) }}">
                                                     <button class="btn btn-sm btn-light delete-btn">
                                                         <i class="fas fa-trash text-danger"></i>
                                                     </button></a>
+                                                    @endif
                                                 </td>
                                             </tr>   
                                             @endforeach

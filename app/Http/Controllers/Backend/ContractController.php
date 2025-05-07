@@ -9,9 +9,22 @@ use App\Models\Vehicle;
 use App\Models\Destination;
 use App\Models\Contract;
 use App\Models\VehicleType;
+use Illuminate\Routing\Controllers\HasMiddleware;
+use Illuminate\Routing\Controllers\Middleware;
 
-class ContractController extends Controller
+
+class ContractController extends Controller implements HasMiddleware
+
 {
+    public static function middleware(): array
+    {
+        return [
+            new Middleware('admin.permission:view contract', only: ['index']),
+            new Middleware('admin.permission:create contract', only: ['create']),
+            new Middleware('admin.permission:edit contract', only: ['edit']),
+            new Middleware('admin.permission:delete contract', only: ['destroy']),
+        ];
+    }
     /**
      * Display a listing of the resource.
      */

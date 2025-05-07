@@ -9,10 +9,22 @@ use App\Models\Attendance;
 
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Routing\Controllers\HasMiddleware;
+use Illuminate\Routing\Controllers\Middleware;
 
 
-class PayrollController extends Controller
+
+class PayrollController extends Controller implements HasMiddleware
 {
+    public static function middleware(): array
+    {
+        return [
+            new Middleware('admin.permission:view payroll', only: ['index']),
+            new Middleware('admin.permission:create payroll', only: ['create']),
+            new Middleware('admin.permission:edit payroll', only: ['edit']),
+            new Middleware('admin.permission:delete payroll', only: ['destroy']),
+        ];
+    }
     public function index()
     {
         $month = 4;

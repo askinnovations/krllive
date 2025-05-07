@@ -2,14 +2,28 @@
 
 namespace App\Http\Controllers\Backend;
 use Illuminate\Support\Facades\Storage;
+use App\Http\Controllers\Controller;
+
 use App\Models\Vehicle;
 use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Routing\Controllers\HasMiddleware;
+use Illuminate\Routing\Controllers\Middleware;
 
-class VehicleController extends Controller
+
+class VehicleController extends Controller implements HasMiddleware
 {
+    public static function middleware(): array
+    {
+        return [
+            new Middleware('admin.permission:view vehicles', only: ['index']),
+            new Middleware('admin.permission:create vehicles', only: ['create']),
+            new Middleware('admin.permission:edit vehicles', only: ['edit']),
+            new Middleware('admin.permission:delete vehicles', only: ['destroy']),
+        ];
+    }
     public function index()
     {
         $vehicles = Vehicle::all();

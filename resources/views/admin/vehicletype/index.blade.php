@@ -46,10 +46,12 @@
                                     sorting, and pagination via DataTables.
                                 </p>
                             </div>
+                            @if (hasAdminPermission('create vehicle_type'))
                             <button class="btn" id="addTyreBtn"
                                 style="background-color: #ca2639; color: white; border: none;">
                                 <i class="fas fa-plus"></i> Add VehicleType
                             </button>
+                            @endif
                         </div>
                         <div class="card-body">
                             <table id=""  class="table table-bordered dt-responsive nowrap w-100">
@@ -63,17 +65,18 @@
                                 <tbody>
                                     @foreach($tyres as $tyre)
                                     <td>{{ $loop->iteration  }}</td>
-                        <td>{{ $tyre->vehicletype }}</td>
-                        <td>
+                                            <td>{{ $tyre->vehicletype }}</td>
+                                            <td>
+                                                @if (hasAdminPermission('view vehicle_type'))
                                                 <button class="btn btn-sm btn-light view-btn"
                                                     data-bs-toggle="modal"
                                                     data-bs-target="#viewTyreModal"
                                                     data-vehicletype="{{ $tyre->vehicletype }}"
-                                                    
-
                                                     onclick="viewTyreData(this)">
                                                     <i class="fas fa-eye text-primary"></i>
                                                 </button>
+                                                @endif
+                                                @if (hasAdminPermission('edit vehicle_type'))
                                                 <button class="btn btn-sm btn-light edit-btn"
                                                     data-id="{{ $tyre->id }}"
                                                     data-name="{{ $tyre->vehicletype }}"
@@ -81,13 +84,14 @@
                                                     data-bs-target="#updateTyreModal">
                                                     <i class="fas fa-pen text-warning"></i>
                                                 </button>
+                                                @endif
+                                                @if (hasAdminPermission('delete vehicle_type'))
                                                 <button class="btn btn-sm btn-light delete-btn"><a
                                                         href="{{ route('admin.vehicletype.delete', $tyre->id) }}"  onclick="return confirm('Are you sure you want to delete this tyre record?')"> <i
                                                             class="fas fa-trash text-danger"></i>
                                                     </a>
                                                 </button>
-                                                
-
+                                                @endif
                                             </td>
                                         </tr>
                                     @endforeach

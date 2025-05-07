@@ -10,11 +10,22 @@ use App\Models\VehicleType;
 use App\Models\Destination;
 use App\Models\User;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Routing\Controllers\HasMiddleware;
+use Illuminate\Routing\Controllers\Middleware;
 
 
 
-class ConsignmentNoteController extends Controller
+class ConsignmentNoteController extends Controller implements HasMiddleware
 {
+    public static function middleware(): array
+    {
+        return [
+            new Middleware('admin.permission:view lr_consignment', only: ['index']),
+            new Middleware('admin.permission:create lr_consignment', only: ['create']),
+            new Middleware('admin.permission:edit lr_consignment', only: ['edit']),
+            new Middleware('admin.permission:delete lr_consignment', only: ['destroy']),
+        ];
+    }
    public function index(){
     $orders = Order::latest()->get();
 

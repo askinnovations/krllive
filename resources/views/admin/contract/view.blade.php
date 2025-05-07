@@ -15,7 +15,7 @@
                ⬅ Back to Listing
                </a>
             </div>
-           
+            @if (hasAdminPermission('create contract'))
             <form method="POST" action="{{ route('admin.contract.store') }}">
                @csrf
                <input type="hidden" name="user_id" value="{{ $user->id }}">
@@ -70,6 +70,7 @@
                   <button type="submit" class="btn" style="background-color: #ca2639; color: white; border: none;">Submit</button>
                </div>
             </form>
+            @endif
          </div>
       </div>
       <table class="table table-bordered dt-responsive nowrap w-100">
@@ -92,6 +93,7 @@
                <td>{{ $contract->toDestination->destination ?? 'N/A' }}</td>
                <td>{{ $contract->rate }}</td>
                <td>
+                @if (hasAdminPermission('edit contract'))
                <button class="btn btn-sm btn-warning edit-btn"
                     data-id="{{ $contract->id }}"
                     data-vehicletype="{{ $contract->type_id }}"
@@ -100,12 +102,15 @@
                     data-rate="{{ $contract->rate }}">
                     <i class="fas fa-pen"></i>
                 </button>
-                <button class="btn btn-sm btn-light delete-btn"><a
-                                                        href="{{ route('admin.contract.delete', $contract->id) }}"  onclick="return confirm('Are you sure you want to delete this tyre record?')"> <i
-                                                            class="fas fa-trash text-danger"></i>
-                                                    </a>
-                                                </button>
-
+                @endif
+                @if (hasAdminPermission('delete contract'))
+                <button class="btn btn-sm btn-light delete-btn">
+                  <a
+                    href="{{ route('admin.contract.delete', $contract->id) }}"  onclick="return confirm('Are you sure you want to delete this tyre record?')"> <i
+                        class="fas fa-trash text-danger"></i>
+                  </a>
+                 </button> 
+                 @endif
                    
 
                </td>

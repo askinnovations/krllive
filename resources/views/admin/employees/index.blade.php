@@ -46,10 +46,12 @@
                                     sorting, and pagination via DataTables.
                                 </p>
                             </div>
+                            @if (hasAdminPermission('create employees'))
                             <a class="btn" href="{{ route('admin.employees.create') }}" id="addVehicleBtn"
                                 style="background-color: #ca2639; color: white; border: none;">
                                 <i class="fas fa-plus"></i> Add Employee
                             </a>
+                            @endif
 
                         </div>
                         <div class="card-body">
@@ -80,23 +82,30 @@
 
 
                                             <td>
+                                                @if (hasAdminPermission('view employees'))
                                                 <a href="{{ route('admin.employees.task', $employee->id) }}"> <button
                                                     class="btn btn-light btn-sm edit-btn">
                                                     <i class="fas fa-question-circle text-primary"></i>
                                                 </button></a>
+                                                @endif
+                                                @if (hasAdminPermission('view employees'))
                                                 <a href="{{ route('admin.employees.show', $employee->id) }}"> <button
                                                         class="btn btn-light btn-sm edit-btn">
                                                         <i class="fas fa-eye text-primary"></i>
                                                     </button></a>
-
+                                                    @endif
+                                                    @if (hasAdminPermission('edit employees'))
                                                 <a href="{{ route('admin.employees.edit', $employee->id) }}"> <button
                                                         class="btn btn-light btn-sm edit-btn">
                                                         <i class="fas fa-pen text-warning"></i>
                                                     </button></a>
+                                                    @endif
+                                                 @if (hasAdminPermission('delete employees'))
                                                 <button class="btn btn-sm btn-light delete-btn"><a
                                                         href="{{ route('admin.employees.delete', $employee->id) }}">
                                                         <i class="fas fa-trash text-danger"></i></a>
                                                 </button>
+                                                @endif
                                             </td>
                                         </tr>
                                     @endforeach

@@ -27,10 +27,13 @@
                      <h4 class="card-title">📦 Order Booking</h4>
                      <p class="card-title-desc">View, edit, or delete order details below.</p>
                   </div>
+                  @if (hasAdminPermission('create order_booking'))
                   <a href="{{ route('admin.orders.create') }}" class="btn" id="addOrderBtn"
                      style="background-color: #ca2639; color: white; border: none;">
                   <i class="fas fa-plus"></i> Add Order Booking
                    </a>
+                   @endif
+                 
                </div>
                <div class="card-body">
                   <table id="datatable" class="table table-bordered dt-responsive nowrap w-100">
@@ -63,19 +66,22 @@
                               </a> --}}
                             </td>
                             <td>
-                           
+                              @if (hasAdminPermission('view order_booking'))
                             <a href="{{ route('admin.orders.documents', $order->order_id) }}" class="btn btn-sm btn-light view-btn"><i class="fas fa-file-alt text-primary"></i>
-
+                              @endif
                             </a>
+                            @if (hasAdminPermission('view order_booking'))
                             <a href="{{ route('admin.orders.view', $order->order_id) }}" class="btn btn-sm btn-light view-btn"><i class="fas fa-eye text-primary"></i>
                             </a>
-                            
+                            @endif
+                            @if (hasAdminPermission('edit order_booking'))
                             <a href="{{ route('admin.orders.edit', $order->order_id) }}" class="btn btn-sm btn-light edit-btn">
                                  <i class="fas fa-pen text-warning"></i>
                               </a>
-
-
+                              @endif
+                              @if (hasAdminPermission('delete order_booking'))
                               <a href="{{ route('admin.orders.delete', $order->order_id) }}" class="btn btn-sm btn-light delete-btn"><i class="fas fa-trash text-danger"></i></a>
+                              @endif
                             </td>
                         </tr>
                         @endforeach

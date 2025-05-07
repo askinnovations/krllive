@@ -714,7 +714,7 @@
       initializeCargoTable(index);
    }
 
-   // Remove cargo row
+   // Remove cargo rowFF
    function removeRow(button, index) {
       button.closest('tr').remove();
       calculateTotal(index, 'declared-value', `totalDeclaredValue-${index}`);

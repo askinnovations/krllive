@@ -5,11 +5,22 @@ namespace App\Http\Controllers\Backend;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Warehouse;
+use Illuminate\Routing\Controllers\HasMiddleware;
+use Illuminate\Routing\Controllers\Middleware;
 
 
 
-class WarehouseController extends Controller
+class WarehouseController extends Controller implements HasMiddleware
 {
+    public static function middleware(): array
+    {
+        return [
+            new Middleware('admin.permission:view warehouse', only: ['index']),
+            new Middleware('admin.permission:create warehouse', only: ['create']),
+            new Middleware('admin.permission:edit warehouse', only: ['edit']),
+            new Middleware('admin.permission:delete warehouse', only: ['destroy']),
+        ];
+    }
     public function index()
     {
 

@@ -2,13 +2,27 @@
 
 namespace App\Http\Controllers\Backend;
 use App\Models\TaskManagement;
+use App\Http\Controllers\Controller;
+
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use App\Models\Employee;
+use Illuminate\Routing\Controllers\HasMiddleware;
+use Illuminate\Routing\Controllers\Middleware;
 
 
-class TaskManagmentController extends Controller
+
+class TaskManagmentController extends Controller implements HasMiddleware
 {
+    public static function middleware(): array
+    {
+        return [
+            new Middleware('admin.permission:view task_managment', only: ['index']),
+            new Middleware('admin.permission:create task_managment', only: ['create']),
+            new Middleware('admin.permission:edit task_managment', only: ['edit']),
+            new Middleware('admin.permission:delete task_managment', only: ['destroy']),
+        ];
+    }
     public function index(){
         $employees = Employee::where('status', 'active')->get();
 

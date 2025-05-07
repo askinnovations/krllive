@@ -11,8 +11,18 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware) {
-        //
+     
+        $middleware->alias([
+            'auth.admin' => \App\Http\Middleware\AuthenticateAdmin::class,
+            'role' => \Spatie\Permission\Middleware\RoleMiddleware::class,
+            'permission' => \Spatie\Permission\Middleware\PermissionMiddleware::class,
+            'role_or_permission' => \Spatie\Permission\Middleware\RoleOrPermissionMiddleware::class,
+            'admin.permission' => \App\Http\Middleware\AdminHasPermission::class,
+            'admin.guest' => \App\Http\Middleware\RedirectIfAuthenticatedAdmin::class,
+
+        ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {
-        //
-    })->create();
+        
+    })
+    ->create();

@@ -110,7 +110,9 @@
                </div>
                <div class="row">
                   <div class="col-lg-12 mt-4">
+                     @if (hasAdminPermission('edit settings'))
                      <button type="submit" class="btn btn-primary">Update</button>
+                     @endif
                   </div>
                </div>
             </form>

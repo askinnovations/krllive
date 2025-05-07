@@ -13,11 +13,23 @@ use App\Models\Order;
 use App\Models\Vehicle;
 use App\Models\VehicleType;
 use App\Models\Destination;
-use App\Models\User;
+use App\Models\User; 
+use Illuminate\Routing\Controllers\HasMiddleware;
+use Illuminate\Routing\Controllers\Middleware;
 
 
-class OrderController extends Controller
+
+class OrderController extends Controller implements HasMiddleware
 {
+    public static function middleware(): array
+    {
+        return [
+            new Middleware('admin.permission:view order_booking', only: ['index']),
+            new Middleware('admin.permission:create order_booking', only: ['create']),
+            new Middleware('admin.permission:edit order_booking', only: ['edit']),
+            new Middleware('admin.permission:delete order_booking', only: ['destroy']),
+        ];
+    }
     public function  index(){
 
     $orders = Order::latest()->get();
@@ -312,6 +324,8 @@ if (isset($cargo['document_file']) && $cargo['document_file'] instanceof Uploade
             'total_declared_value' => $lr['total_declared_value'] ?? null,
             'insurance_description'=> $lr['insurance_description'] ?? null,
             'insurance_status'     => $lr['insurance_status'] ?? null,
+            'order_rate'     => $lr['order_rate'] ?? null,
+           
 
             // Cargo nested
             'cargo'                => $cargoArray,
