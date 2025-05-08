@@ -188,6 +188,9 @@
       </div>
    </div>
 </form>
+</div>
+</div>
+</div>
 <!-- JavaScript to Add & Remove LR Consignments -->
 <script>
    var vehicles = @json($vehicles);
@@ -266,7 +269,7 @@
 </div>
 <div class="mb-3 " >
                 <label class="form-label">💰 Order Rate</label>
-                <input type="number" name="lr[${counter}][order_rate]" class="form-control"  id="rate_input${counter}" placeholder="0" readonly
+                <input type="number" name="lr[${counter}][order_rate]" class="form-control" step="0.01"  id="rate_input${counter}" placeholder="0" readonly
                >
              </div>
                  </div>
@@ -463,7 +466,7 @@
                                              <th>No. of Packages</th>
                                              <th>Packaging Type</th>
                                              <th>Description</th>
-                                             <th>Actual Weight (kg)</th>
+                                             <th> &nbsp;Actual Weight (kg)&nbsp;</th>
                                              <th>Charged Weight (kg)</th>
                                             <th >  &nbsp;Unit&nbsp;&nbsp;    </th>
                                              <th>Document No.</th>
@@ -488,9 +491,9 @@
                                                   </select>
                                               </td>
                                               <td><input type="text" class="form-control" name="lr[${counter}][cargo][0][package_description]"  placeholder="Enter description" required></td>
-                                              <td><input type="number" class="form-control" name="lr[${counter}][cargo][0][actual_weight]" min="0"  placeholder="0" required></td>
+                                              <td><input type="number" class="form-control" name="lr[${counter}][cargo][0][actual_weight]" min="0" step="0.01"  placeholder="0" required></td>
                                               
-                                              <td><input type="number" class="form-control charged_weight" name="lr[${counter}][cargo][0][charged_weight]"min="0"  placeholder="0" required oninput="calculateTotalChargedWeight(${counter})"></td>
+                                              <td><input type="number" class="form-control charged_weight" name="lr[${counter}][cargo][0][charged_weight]"min="0" step="0.01"  placeholder="0" required oninput="calculateTotalChargedWeight(${counter})"></td>
                                              
                                              <td>
                                                 <select class="form-select" name="lr[${counter}][cargo][0][unit]" required>
@@ -531,21 +534,21 @@
                <div class="row mt-4">
                  <div class="col-12">
                  
-               <h5 class="pb-3">🚚 Freight Details</h5>
-              <div class="mb-3 d-flex gap-3">
-                <div class="form-check form-check-inline">
-                  <input class="form-check-input freight-type" type="radio" name="lr[${counter}][freightType]" id="freightPaid-${counter}" value="paid" checked onchange="toggleFreightTable(${counter})">
-                  <label class="form-check-label" for="freightPaid-${counter}">Paid</label>
-                </div>
-                <div class="form-check form-check-inline">
-                  <input class="form-check-input freight-type" type="radio" name="lr[${counter}][freightType]" id="freightToPay-${counter}" value="to_pay" onchange="toggleFreightTable(${counter})">
-                  <label class="form-check-label" for="freightToPay-${counter}">To Pay</label>
-                </div>
-                <div class="form-check form-check-inline">
-                  <input class="form-check-input freight-type" type="radio" name="lr[${counter}][freightType]" id="freightToBeBilled-${counter}" value="to_be_billed" onchange="toggleFreightTable(${counter})">
-                  <label class="form-check-label" for="freightToBeBilled-${counter}">To Be Billed</label>
-                </div>
-              </div>
+      <h5 class="pb-3">🚚 Freight Details</h5>
+    <div class="mb-3 d-flex gap-3">
+      <div class="form-check form-check-inline">
+        <input class="form-check-input freight-type" type="radio" name="lr[${counter}][freightType]" id="freightPaid-${counter}" value="paid" checked onchange="toggleFreightTable(${counter})">
+        <label class="form-check-label" for="freightPaid-${counter}">Paid</label>
+      </div>
+      <div class="form-check form-check-inline">
+        <input class="form-check-input freight-type" type="radio" name="lr[${counter}][freightType]" id="freightToPay-${counter}" value="to_pay" onchange="toggleFreightTable(${counter})">
+        <label class="form-check-label" for="freightToPay-${counter}">To Pay</label>
+      </div>
+      <div class="form-check form-check-inline">
+        <input class="form-check-input freight-type" type="radio" name="lr[${counter}][freightType]" id="freightToBeBilled-${counter}" value="to_be_billed" onchange="toggleFreightTable(${counter})">
+        <label class="form-check-label" for="freightToBeBilled-${counter}">To Be Billed</label>
+      </div>
+    </div>
                   
    <div class="table-responsive">
    <table class="table table-bordered align-middle text-center freight-table" id="freight-table-${counter}">
@@ -564,30 +567,30 @@
     <tbody id="freightBody-${counter}">
       <tr>
         <td>
-          <input type="number" id="finalResult-${counter}" name="lr[${counter}][freight_amount]" class="form-control freight-amount" min="0" placeholder="Enter Freight Amount" readonly>
+          <input type="number" id="finalResult-${counter}" name="lr[${counter}][freight_amount]" class="form-control freight-amount" min="0"  step="0.01" placeholder="Enter Freight Amount" readonly>
 
           
         </td>
         <td>
-          <input type="number" name="lr[${counter}][lr_charges]" class="form-control lr-charges" min="0" placeholder="Enter LR " >
+          <input type="number" name="lr[${counter}][lr_charges]" class="form-control lr-charges" min="0"  step="0.01" placeholder="Enter LR " >
         </td>
         <td>
-          <input type="number" name="lr[${counter}][hamali]" class="form-control hamali" min="0" placeholder="Enter Hamali " >
+          <input type="number" name="lr[${counter}][hamali]" class="form-control hamali" min="0"  step="0.01" placeholder="Enter Hamali " >
         </td>
         <td>
-          <input type="number" name="lr[${counter}][other_charges]" class="form-control other-charges" min="0" placeholder="Enter Other " >
+          <input type="number" name="lr[${counter}][other_charges]" class="form-control other-charges" min="0"  step="0.01" placeholder="Enter Other " >
         </td>
         <td>
-          <input type="number" name="lr[${counter}][gst_amount]" class="form-control gst" min="0" placeholder="Enter GST %" readonly>
+          <input type="number" name="lr[${counter}][gst_amount]" class="form-control gst" min="0"  step="0.01" placeholder="Enter GST %" readonly>
         </td>
         <td>
-          <input type="number" name="lr[${counter}][total_freight]" class="form-control total-freight" min="0" placeholder="Total Freight" readonly>
+          <input type="number" name="lr[${counter}][total_freight]" class="form-control total-freight" min="0"  step="0.01" placeholder="Total Freight" readonly>
         </td>
         <td>
-          <input type="number" name="lr[${counter}][less_advance]" class="form-control less-advance" min="0" placeholder="Less Advance Amount" >
+          <input type="number" name="lr[${counter}][less_advance]" class="form-control less-advance" min="0"  step="0.01" placeholder="Less Advance Amount" >
         </td>
         <td>
-          <input type="number" name="lr[${counter}][balance_freight]" class="form-control balance-freight" min="0" placeholder="Balance Freight" readonly>
+          <input type="number" name="lr[${counter}][balance_freight]" class="form-control balance-freight" min="0"  step="0.01" placeholder="Balance Freight" readonly>
         </td>
       </tr>
     </tbody>
@@ -601,8 +604,8 @@
           <div class="col-md-6">
             <div class="mb-3">
                 <label class="form-label fw-bold">💰 Total Declared Value (Rs.)</label>
-          <input type="number" class="form-control"  id="totalDeclaredValue-${counter}" name="lr[${counter}][total_declared_value]" min="0" placeholder="0" readonly>
-          <input type="hidden" class="form-control" id="totalChargedWeight-${counter}" min="0" placeholder="0"  oninput="updateFinalAmount(${counter})" readonly>
+          <input type="number" class="form-control" step="0.01"  id="totalDeclaredValue-${counter}" name="lr[${counter}][total_declared_value]" min="0" placeholder="0" readonly>
+          <input type="hidden" class="form-control" step="0.01" id="totalChargedWeight-${counter}" min="0" placeholder="0"  oninput="updateFinalAmount(${counter})" readonly>
 
 
             </div>

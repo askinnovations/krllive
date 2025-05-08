@@ -15,7 +15,8 @@ use App\Http\Controllers\Backend\{
     UserController, TyreController, WarehouseController, OrderController, PackageTypeController,
     ConsignmentNoteController, FreightBillController, StockTransferController, DriverController,
     AttendanceController, MaintenanceController, VehicleController, TaskManagmentController, ContractController,
-    SettingsController, VehicleTypeController,RoleController,PermissionController,TestController
+    SettingsController, VehicleTypeController,RoleController,PermissionController,TestController,GroupController,ledgerMasterController,ledgerController,AccountsReceivableController,AccountsPayableController,
+    ProfitLossController,BalanceSheetController,CashFlowController,VoucherController
 };
 
 // 🌐 Frontend Routes Group (user side)
@@ -282,7 +283,62 @@ Route::prefix('user')->middleware('auth.admin')->group(function () {
 
 });
  Route::get('/stock-transfer/index', [StockTransferController::class, 'index'])->name('admin.stock.index');
+        
 
+
+//  new routes
+    // voucher
+    Route::prefix('voucher')->group(function () {
+        Route::get('/', [VoucherController::class, 'index'])->name('admin.voucher.index');
+        Route::get('/create', [VoucherController::class, 'create'])->name('admin.voucher.create');
+    });
+
+    // Group
+    Route::prefix('group')->group(function () {
+        Route::get('/', [GroupController::class, 'index'])->name('admin.group.index');
+        Route::get('/create', [GroupController::class, 'create'])->name('admin.group.create');
+    });
+
+    // ledger-master
+    Route::prefix('ledger_master')->group(function () {
+        Route::get('/', [ledgerMasterController::class, 'index'])->name('admin.ledger_master.index');
+        Route::get('/create', [ledgerMasterController::class, 'create'])->name('admin.ledger_master.create');
+    });
+
+    // Ledgers
+    Route::prefix('ledger')->group(function () {
+        Route::get('/', [ledgerController::class, 'index'])->name('admin.ledger.index');
+        Route::get('/create', [ledgerController::class, 'create'])->name('admin.ledger.create');
+    });
+
+    // accounts-receivable
+    Route::prefix('accounts_receivable')->group(function () {
+        Route::get('/', [AccountsReceivableController::class, 'index'])->name('admin.accounts_receivable.index');
+        Route::get('/create', [AccountsReceivableController::class, 'create'])->name('admin.accounts_receivable.create');
+    });
+
+    // accounts-payable
+    Route::prefix('accounts_payable')->group(function () {
+        Route::get('/', [AccountsPayableController::class, 'index'])->name('admin.accounts_payable.index');
+        Route::get('/create', [AccountsPayableController::class, 'create'])->name('admin.accounts_payable.create');
+    });
     
+    // profit-loss
+    Route::prefix('profit_loss')->group(function () {
+        Route::get('/', [ProfitLossController::class, 'index'])->name('admin.profit_loss.index');
+        Route::get('/create', [ProfitLossController::class, 'create'])->name('admin.profit_loss.create');
+    });
+    
+    // balance-sheet
+    Route::prefix('balance_sheet')->group(function () {
+        Route::get('/', [BalanceSheetController::class, 'index'])->name('admin.balance_sheet.index');
+        Route::get('/create', [BalanceSheetController::class, 'create'])->name('admin.balance_sheet.create');
+    });
+
+    // cash-flow
+    Route::prefix('cash_flow')->group(function () {
+        Route::get('/', [CashFlowController::class, 'index'])->name('admin.cash_flow.index');
+        Route::get('/create', [CashFlowController::class, 'create'])->name('admin.cash_flow.create');
+    });
 });
 

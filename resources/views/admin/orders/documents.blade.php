@@ -46,7 +46,7 @@
                     <tbody>
                        
                         @php $count = 1; @endphp
-                
+                  @if(!empty($order->lr))
                         @foreach ($order->lr as $lr)
                             @if (!empty($lr['cargo']) && is_array($lr['cargo']))
                                 @foreach ($lr['cargo'] as $cargo)
@@ -67,8 +67,10 @@
                                         </td>
                                     </tr>
                                 @endforeach
-                            @endif
+                                @endif
+                           
                         @endforeach
+                        @endif
                 
                     </tbody>
                 </table>

@@ -373,7 +373,7 @@ body[data-layout=horizontal][data-sidebar=dark] .navbar-brand-box {
     position: absolute;
     right: 0;
     color: var(--bs-footer-color);
-    left: 250px;
+    left:0;
     height: 60px;
     background-color: var(--bs-footer-bg);
     border-top: 1px solid var(--bs-border-color)
@@ -5660,3 +5660,154 @@ body[data-layout=horizontal] .chat-conversation {
     .accordion-button {
         font-weight: 600;
         font-size: 15px;}
+
+
+
+        /* raj started */
+
+
+        @media(max-width:786px) {
+
+            table.dataTable.dtr-inline.collapsed>tbody>tr.parent>td.dtr-control:before, table.dataTable.dtr-inline.collapsed>tbody>tr.parent>th.dtr-control:before {
+                content: "▼";
+                font-size: 10px;
+            } 
+
+            .card-title-desc,
+            .page-title-box,
+            .navbar-brand-box {
+                display: none;
+            }
+
+            .navbar-header,
+            .header-item {
+                height: 50px;
+            }
+
+            .page-content {
+                padding: 17.5% 0 50px;
+            }
+
+            .vertical-menu {
+                margin-top: -19px;
+            }
+
+            .card-header:first-child {
+                padding: 7px;
+            }
+
+            .card-title {
+                margin-bottom: 0;
+            }
+
+            .card-body {
+                padding: 10px;
+            }
+
+            /* Force the top DataTable controls (Show Entries + Search) into a single row */
+            div.dataTables_wrapper .row {
+                display: flex;
+                flex-wrap: nowrap;
+                justify-content: space-between;
+                align-items: center;
+                margin-bottom: 1rem;
+            }
+
+            /* Prevent columns from wrapping */
+            div.dataTables_wrapper .col-sm-12.col-md-6 {
+                flex: 0 0 auto;
+                width: auto;
+            }
+
+            /* Optional: Fix spacing between label and input/select */
+            .dataTables_length label,
+            .dataTables_filter label {
+                display: flex;
+                align-items: center;
+                gap: 0.5rem;
+                margin: 0;
+            }
+
+            .dataTables_length label {
+                display: flex;
+                align-items: center;
+                gap: 0.5rem;
+            }
+
+            /* Hide the word "entries" */
+            .dataTables_length label::after {
+                content: "";
+            }
+
+            /* Force both controls to be on one line */
+            .dataTables_wrapper .row:first-child {
+                display: flex;
+                flex-wrap: nowrap;
+                align-items: center;
+                justify-content: space-between;
+            }
+
+            /* Make the left (length) section take minimal width */
+            .dataTables_length {
+                flex: 0 0 auto;
+                margin-right: 1rem;
+            }
+
+            /* Make the right (search) section overflow or push to edge */
+            .dataTables_filter {
+                flex: 1 1 auto;
+                text-align: right;
+            }
+
+            /* Optional: make search input responsive */
+            .dataTables_filter input {
+                max-width: 100%;
+                width: auto;
+            }
+
+            /* Hide the label text but keep the select dropdown visible */
+            .dataTables_length label {
+                font-size: 0;
+                /* hides text */
+            }
+
+            .dataTables_length select {
+                font-size: 14px;
+                /* restore normal size for dropdown */
+            }
+
+            div.dataTables_wrapper div.dataTables_filter input {        
+                width: 116px;
+            }
+
+            table.table-bordered.dataTable {
+     
+                margin-top: 0px !important;
+            }
+
+        }
+    
+
+
+        /* raj start */ 
+
+        @media(max-width:786px){
+            .add-odr{
+                display: none !important;
+            }
+            .add-odr2{
+                padding-top: 51px !important;
+            }
+            .add-odr2 .card-header p{
+                display: none !important;
+            }
+            .news{
+                padding-top: 60px !important;  
+            }
+            .news p{
+                display: none !important;
+            }
+            .add-odr3 p{
+                display: none !important;
+            }
+        }
