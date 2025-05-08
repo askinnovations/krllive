@@ -167,6 +167,30 @@
                         </a>
                     </li>
                 @endif
+                <li>
+                    <a href="javascript:void(0);" class="has-arrow">
+                        <i data-feather="file-text"></i>
+                        <span data-key="t-accounts">Accounts</span>
+                    </a>
+                    <ul class="sub-menu" aria-expanded="false">
+                        <li><a href="{{ route('admin.voucher.index') }}" data-key="t-voucher">Voucher</a></li>
+                         <li><a href="{{ route('admin.group.index') }}"  data-key="t-group">Group</a></li>
+                         <li><a href="{{ route('admin.ledger_master.index') }}"   data-key="t-ledger-master">Ledger Master</a></li>
+                        <li><a href="{{ route('admin.ledger.index') }}"  data-key="t-ledgers">Ledgers</a></li>
+                        <li><a href="{{ route('admin.accounts_receivable.index') }}"  data-key="t-accounts-receivable">Accounts
+                                Receivable</a></li>
+
+                        <li><a  href="{{ route('admin.accounts_payable.index') }}" data-key="t-accounts-payable">Accounts Payable</a>
+                        </li>
+                        <li><a href="{{ route('admin.profit_loss.index') }}"  data-key="t-profit-loss">Profit & Loss Statement</a></li>
+                        <li><a  href="{{ route('admin.balance_sheet.index') }}" data-key="t-balance-sheet">Balance Sheet</a></li>
+                        <li><a href="{{ route('admin.cash_flow.index') }}"  data-key="t-cash-flow">Cash Flow</a></li>
+                        <li><a href="fund-flow.html" data-key="t-fund-flow">Fund Flow</a></li>
+                        <li><a href="tds.html" data-key="t-tds">TDS</a></li>
+                        <li><a href="gst.html" data-key="t-gst">GST</a></li>
+                    </ul>
+                </li>
+    <li>
             </ul>
         </div>
         <!-- Sidebar -->

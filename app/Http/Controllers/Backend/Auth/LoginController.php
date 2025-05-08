@@ -21,7 +21,22 @@ class LoginController extends Controller
         return view('admin.login'); // Ensure this view exists
     }
 
+    public function apiLogin(Request $request)
+    {
+        $credentials = $request->only('email', 'password');
     
+        if (Auth::guard('admin')->attempt($credentials)) {
+            $admin = Auth::guard('admin')->user();
+            $token = $admin->createToken('admin-token')->plainTextToken;
+    
+            return response()->json([
+                'token' => $token,
+                'admin' => $admin,
+            ]);
+        }
+    
+        return response()->json(['message' => 'Invalid credentials'], 401);
+    }
 
     public function login(Request $request)
 {

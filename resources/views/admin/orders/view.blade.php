@@ -150,6 +150,7 @@
          @php
          $lrData = is_array($order->lr) ? $order->lr : json_decode($order->lr, true);
          @endphp
+         @if(!empty($lrData))
          @foreach($lrData as $index => $lr)
          <div class="row mt-4" id="lr-section">
             <!-- <h4 style="margin-bottom: 2%;">🚚 Update LR - Consignment Details</h4> -->
@@ -583,6 +584,7 @@
          </div>
          <!-- lr -->
          @endforeach
+         @endif
          <div id="lr-container"></div>
       </div>
    </div>
@@ -618,7 +620,7 @@
    
    // Run on page load (edit mode)
    document.addEventListener('DOMContentLoaded', function () {
-       const totalLrCount = {{ count($order->lr) }};
+    const totalLrCount = {{ is_countable($order->lr) ? count($order->lr) : 0 }};
        for (let i = 0; i < totalLrCount; i++) {
            const select = document.getElementById(`consignor_id_${i}`);
            if (select && select.value !== '') {
