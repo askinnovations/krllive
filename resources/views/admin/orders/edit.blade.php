@@ -416,6 +416,7 @@
                            </thead>
                            <tbody id="freight_table_body_{{ $index }}">
                               <tr>
+
                                  <td><input name="lr[{{ $index }}][freight_amount]" id="freight_amount_{{ $index }}" type="number" class="form-control freight-amount" value="{{ $lr['freight_amount'] ?? '' }}" step="0.01"  min="0" placeholder="Enter Freight Amount" readonly></td>
                                  <td><input name="lr[{{ $index }}][lr_charges]" type="number" class="form-control lr-charges" value="{{ $lr['lr_charges'] ?? '' }}" step="0.01"  min="0" placeholder="Enter LR Charges" oninput="updateFreightAndTotalsExisting({{ $index }})"></td>
                                  <td><input name="lr[{{ $index }}][hamali]" type="number" class="form-control hamali" value="{{ $lr['hamali'] ?? '' }}" step="0.01"  min="0" placeholder="Enter Hamali Charges" oninput="updateFreightAndTotalsExisting({{ $index }})"></td>
@@ -424,6 +425,7 @@
                                  <td><input name="lr[{{ $index }}][total_freight]" type="number" class="form-control total-freight" value="{{ $lr['total_freight'] ?? '' }}" step="0.01"  min="0" placeholder="Enter Total Freight" readonly></td>
                                  <td><input name="lr[{{ $index }}][less_advance]" type="number" class="form-control less-advance" value="{{ $lr['less_advance'] ?? '' }}" step="0.01"  min="0" placeholder="Enter Less Advance" oninput="updateFreightAndTotalsExisting({{ $index }})"></td>
                                  <td><input name="lr[{{ $index }}][balance_freight]" type="number" class="form-control balance-freight" value="{{ $lr['balance_freight'] ?? '' }}" step="0.01"  min="0" placeholder="Enter Balance Freight" readonly></td>
+
                               </tr>
                            </tbody>
                         </table>
